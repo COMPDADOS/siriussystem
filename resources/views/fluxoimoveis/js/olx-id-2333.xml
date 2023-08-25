@@ -1,0 +1,457 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Carga xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Imoveis>
+                <Imovel>
+            <CodigoImovel>AP0022</CodigoImovel>
+            <TituloAnuncio>Apartamento com 2 dormitórios, 52 m² - venda por R$ 200.000,00 ou aluguel por R$ 850,00/mês - Jardim</TituloAnuncio>
+            <SubTipoImovel>Salão Comercial  </SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Jardim Panorama</Bairro>
+            <CEP>17011110</CEP>
+
+            <PrecoVenda>200000.00</PrecoVenda>
+            <PrecoLocacao>850.00</PrecoLocacao>
+                        <PrecoCondominio>310.00</PrecoCondominio>
+                                    <ValorIPTU>0.00</ValorIPTU>
+            
+
+            <Observacao>Apartamento em Jardim Panorama - Bauru
+Apartamento com 2 dormitórios à venda, 52 m²  - Jardim Brasil - Bauru/SP</Observacao>
+
+
+                        
+                        
+                        
+                        
+                        <Fotos>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29176032/75B3E8B5A9F88A13B751A5318FC573F127D2F203C5.jpg</URLArquivo>
+                    </Foto>
+                
+            </Fotos>
+                    </Imovel>
+                <Imovel>
+            <CodigoImovel>KN0003</CodigoImovel>
+            <TituloAnuncio>Kitnet com 1 dormitório para alugar, 30 m² por R$ 650,00/mês - Jardim Contorno - Bauru/SP</TituloAnuncio>
+            <SubTipoImovel></SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Vila Engler</Bairro>
+            <CEP>17047100</CEP>
+
+            <PrecoVenda>0.00</PrecoVenda>
+            <PrecoLocacao>650.00</PrecoLocacao>
+                        <PrecoCondominio>0.00</PrecoCondominio>
+                                    <ValorIPTU>0.00</ValorIPTU>
+            
+
+            <Observacao>Kitnet em Vila Engler - Bauru
+Kitnet contendo 30m² com 1 dormitório, banheiro, sala, cozinha e garagem para 1 veículo.</Observacao>
+
+
+                        
+                        
+                        
+                        
+                        <Fotos>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29236119/75321C557EA9A7F63A133186775544326ED50B4917.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                    <Principal>1</Principal>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29236119/7527AF5B5B791D9E7EF0A2D3FC246293C1B1ABDAD6.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29236119/75606951C029366A751139F9CE1BF43B17A69626A4.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29236119/75C7C7E17AA787DD9856A52B4F17A530A227404AC0.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29236119/755D7C01F8E1EC7B4FDEF7FF54C68E4306515D5331.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29236119/759E68715F1C3E7C5005E23AA9D0CE6AA2AF02DC83.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29236119/75B8D2494194C74773A92E8D17249E25F30207448A.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29236119/757EF9DF9A63723CF0C5743DA82C732F52F319830F.JPG</URLArquivo>
+                    </Foto>
+                
+            </Fotos>
+                    </Imovel>
+                <Imovel>
+            <CodigoImovel>CA1453</CodigoImovel>
+            <TituloAnuncio>Casa Residencial à venda, Jardim Bela Vista, Bauru - CA1453.</TituloAnuncio>
+            <SubTipoImovel></SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Jardim Bela Vista</Bairro>
+            <CEP>17060230</CEP>
+
+            <PrecoVenda>450000.00</PrecoVenda>
+            <PrecoLocacao>0.00</PrecoLocacao>
+                        <PrecoCondominio>0.00</PrecoCondominio>
+                                    <ValorIPTU>0.00</ValorIPTU>
+            
+
+            <Observacao>Casa em Jardim Bela Vista - Bauru
+sobrado com 1 ponto comercial com wc  na frente</Observacao>
+
+
+                        
+                        
+                        
+                        
+                        <Fotos>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/7599805D09AA94E7F0EFD95AF7138AF702EC9300B3.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/759927198D438C6081EB2A99F6DD83EABFC78A697E.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/75FC2569CEDC5C85B53BFDBF33F5E947F9F57F6F8B.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/75AF1F6BE432797E9ECEC45BED6974C3A471342B24.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/75596D57AD33AEAD0C0598C81BE9FE0923E9A952D5.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/75BC3F721D2C7AFA22E5B7B2BA88EF2D7081F0C89C.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/7533F4D8497A22EDE03684871C3045D9414797784A.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                    <Principal>1</Principal>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/7521082B40C1688F1A7CAAF9CDA19C63F8CFED71A2.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/759E1EE422ED1ECD820508F0B7E11B830F56900E51.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/758F2180E9B1DC1F2C8148432618CFC1A41682A690.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/75CBC1D55B25A564CE7658A6D38AE60BE51D3A6E26.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/75679750CE9EDDFFE1C176AEEB269DDD9CF4D17BBC.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/7522F1FCCBF1FA8C6F2F9456280BE3FD698AE36B4D.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/75884B6D6AF71CDBF0591F0C2147C74ECAC16D1FBE.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/752D56A2D6F236A7393D22CEDAFBA58982A9678E85.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/7553ED307BF0A4B99F777C6759B40E0D5E743F878D.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/7589F8A62D1D57E74423AD86423F8E64C1AED948F2.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29384745/75C47F3545C9E63AD678E61E295459B6655D989DA2.JPG</URLArquivo>
+                    </Foto>
+                
+            </Fotos>
+                    </Imovel>
+                <Imovel>
+            <CodigoImovel>AP0084</CodigoImovel>
+            <TituloAnuncio>Apartamento com 2 dormitórios para alugar, 52 m² por R$ 950,00/mês - Vila Mesquita - Bauru/SP</TituloAnuncio>
+            <SubTipoImovel>Salão Comercial  </SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Vila Mesquita</Bairro>
+            <CEP>17014400</CEP>
+
+            <PrecoVenda>0.00</PrecoVenda>
+            <PrecoLocacao>950.00</PrecoLocacao>
+                        <PrecoCondominio>340.00</PrecoCondominio>
+                                    <ValorIPTU>0.00</ValorIPTU>
+            
+
+            <Observacao>Apartamento em Vila Mesquita - Bauru
+apto com 2 dormitorios; portaria e interfone</Observacao>
+
+
+                        
+                        
+                        
+                        
+                        <Fotos>
+                                    <Foto>
+                                                    <Principal>1</Principal>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29798366/7530F993A0ECB5CF2655C8C3C115F2A20EBB7FB203.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29798366/751DF555D4DC9E284B024CE127F75508DA2DE77D78.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29798366/75A451F555ECD460A5240F9624BC7F27A5608CE2F8.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29798366/7591025283A5F8CCEB624F48BE129D9AA01291C0EC.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29798366/7595B4DDD851118F195EDE2CA3EEBCF04606B91501.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29798366/7591EFA79A2CF51630F8E225F126C680A783478547.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29798366/75267C09B9B6877B5FE6881846CE47C3134973B09C.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29798366/7522B52B8092959F76D936827A8D351BB7F178011C.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29798366/75FF74C9659EF0DB04F88E45145903C9C07D4F41C9.JPG</URLArquivo>
+                    </Foto>
+                
+            </Fotos>
+                    </Imovel>
+                <Imovel>
+            <CodigoImovel>AP0090</CodigoImovel>
+            <TituloAnuncio>Apartamento residencial para locação, Jardim Samburá, Bauru - AP0090.</TituloAnuncio>
+            <SubTipoImovel>Salão Comercial  </SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Jardim Samburá</Bairro>
+            <CEP>17047190</CEP>
+
+            <PrecoVenda>0.00</PrecoVenda>
+            <PrecoLocacao>700.00</PrecoLocacao>
+                        <PrecoCondominio>309.00</PrecoCondominio>
+                                    <ValorIPTU>50.00</ValorIPTU>
+            
+
+            <Observacao>Apartamento em Jardim Samburá - Bauru
+Otimo apto proximo ao Confiança Flex!</Observacao>
+
+
+                        
+                        
+                        
+                        
+                        <Fotos>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29945371/75F09E58F8F3458C462E2489A9735A8F292CB64ED0.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29945371/756B4F59B360B54803E425DA771705D1A40FE4198C.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29945371/75A2B622F5EC8D4B7E1EEF7D3343BBE5B8E34561BA.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                    <Principal>1</Principal>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29945371/759ABD822DBE42A5AB25D0805D7C39F9E658E6A956.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29945371/757825F3A7B181E5035A7A33C33E532797B9C7F23E.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29945371/75B7E6A3BFB88C075C26069977AF22DDBB5392AA71.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29945371/75D108AE67E1F95EC22BE0E05F091A131F896970F8.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29945371/75CA60BE184F733F3E9DF8E67684E07B62315EA947.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/29945371/758BE6CF876E5E81925E5BB2A87FDB16A3F0C4541B.jpg</URLArquivo>
+                    </Foto>
+                
+            </Fotos>
+                    </Imovel>
+                <Imovel>
+            <CodigoImovel>CA0106</CodigoImovel>
+            <TituloAnuncio>Casa com 3 dormitórios, 168 m²  - Vila Souto - Bauru/SP</TituloAnuncio>
+            <SubTipoImovel></SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Vila Souto</Bairro>
+            <CEP>17051090</CEP>
+
+            <PrecoVenda>290000.00</PrecoVenda>
+            <PrecoLocacao>0.00</PrecoLocacao>
+                        <PrecoCondominio>0.00</PrecoCondominio>
+                                    <ValorIPTU>0.00</ValorIPTU>
+            
+
+            <Observacao>Casa em Vila Souto - Bauru
+Casa com 3 dormitórios, sendo 1 com suíte, banheiro, cozinha, sala, quintal, área de serviço, garagem para 2 veículos.</Observacao>
+
+
+                        
+                        
+                        
+                        
+                    </Imovel>
+                <Imovel>
+            <CodigoImovel>AP0114</CodigoImovel>
+            <TituloAnuncio>Apartamento com 2 dormitórios, 52 m² Núcleo Residencial Presidente Geisel - Bauru/SP</TituloAnuncio>
+            <SubTipoImovel>Salão Comercial  </SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Núcleo Residencial Presidente Geisel</Bairro>
+            <CEP>17033530</CEP>
+
+            <PrecoVenda>140000.00</PrecoVenda>
+            <PrecoLocacao>500.00</PrecoLocacao>
+                        <PrecoCondominio>295.00</PrecoCondominio>
+                                    <ValorIPTU>0.00</ValorIPTU>
+            
+
+            <Observacao>Apartamento em Núcleo Residencial Presidente Geisel - Bauru
+2 dormitórios, portaria 24 horas, churrasqueira e salão de festas.</Observacao>
+
+
+                        
+                        
+                        
+                        
+                        <Fotos>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/30713899/75468A0014DFF1F3EE9D19B0753B833D8C7C5CC704.jpg</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/30713899/75E22C22F24AB444A5C0EEB807B7AB2B5455956ACC.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/30713899/753F513AFA13C7BC0AE932D0690BEA9C80C8572CB2.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/30713899/75564ED009B059F4C5891F21807E8414F2208491CA.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/30713899/75DD29416905507212EDA95E0C35C0D6483F3DE8A8.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/30713899/759ED02F975040A4D0AEF2999336BE30F314BFE711.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/30713899/75E447457186304A94FD6273208C265889DE072BD9.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/30713899/7530E6F80874E55E30DDE165CB88BA5279E846A27E.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                    <Principal>1</Principal>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/30713899/75B83B12E46D3D84CCCFC64FF83A2A6C89B62E4568.JPG</URLArquivo>
+                    </Foto>
+                
+            </Fotos>
+                    </Imovel>
+                <Imovel>
+            <CodigoImovel>CA0230</CodigoImovel>
+            <TituloAnuncio>Casa residencial à venda, Vila Souto, Bauru - CA0230.</TituloAnuncio>
+            <SubTipoImovel></SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Vila Souto</Bairro>
+            <CEP>17051180</CEP>
+
+            <PrecoVenda>360000.00</PrecoVenda>
+            <PrecoLocacao>0.00</PrecoLocacao>
+                        <PrecoCondominio>0.00</PrecoCondominio>
+                                    <ValorIPTU>0.00</ValorIPTU>
+            
+
+            <Observacao>Casa em Vila Souto - Bauru
+Ótima casa com 3 dormitórios sendo 1 suíte, 3 vagas de garagem, área para churrasco, completa em armários e ar condicionado.</Observacao>
+
+
+                        
+                        
+                        
+                        
+                    </Imovel>
+                <Imovel>
+            <CodigoImovel>CA0256</CodigoImovel>
+            <TituloAnuncio>Casa comercial à venda, Vila Aeroporto Bauru, Bauru - CA0256.</TituloAnuncio>
+            <SubTipoImovel></SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Vila Aeroporto Bauru</Bairro>
+            <CEP>17012432</CEP>
+
+            <PrecoVenda>850000.00</PrecoVenda>
+            <PrecoLocacao>0.00</PrecoLocacao>
+                        <PrecoCondominio>0.00</PrecoCondominio>
+                                    <ValorIPTU>0.00</ValorIPTU>
+            
+
+            <Observacao>Casa em Vila Aeroporto Bauru - Bauru
+fundo com 1 salão; churrasqueira; area de serviço e 1 wc</Observacao>
+
+
+                        
+                        
+                        
+                        
+                    </Imovel>
+                <Imovel>
+            <CodigoImovel>AP0188</CodigoImovel>
+            <TituloAnuncio>Apartamento com 1 dormitório para alugar, 38 m² - Jardim América - Bauru/SP</TituloAnuncio>
+            <SubTipoImovel>Salão Comercial  </SubTipoImovel>
+            <Cidade>Bauru</Cidade>
+            <Bairro>Jardim Paulista</Bairro>
+            <CEP>17017240</CEP>
+
+            <PrecoVenda>0.00</PrecoVenda>
+            <PrecoLocacao>700.00</PrecoLocacao>
+                        <PrecoCondominio>360.00</PrecoCondominio>
+                                    <ValorIPTU>0.00</ValorIPTU>
+            
+
+            <Observacao>Apartamento em Jardim Paulista - Bauru
+Apartamento com excelente localização, mobiliado, completo em armários, com 01 dormitórios, sala ampla, cozinha e banheiro.</Observacao>
+
+
+                        
+                        
+                        
+                        
+                        <Fotos>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/75C819700186F4A642A513DA266EB6AFCC900CD6C8.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/75AFE22AF323A4A1C4CEB819E7B4696AECBE5A409F.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/75882E1DA24A31512F24F6D741A577BE8EC342FE1F.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/7584672ECFE222F80C63A705014B76BCB89013A6B0.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/75442AD35381705DBABE9B0E99AF453A97E8182BF9.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/75F3C0BDE48F6576A832F54A224563EC9CF99D8418.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/752F0E9A2D7140465119BAB2AE68D7F530A44691FA.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/757E9A138A509012338151D86B611DED82C288F01A.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/757E9A138A509012338151D86B611DED82C288F01A.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/75C20C878437E82250269A14691709B6998AE30070.JPG</URLArquivo>
+                    </Foto>
+                                    <Foto>
+                                                    <Principal>1</Principal>
+                                                <URLArquivo>http://www.siriussystem.com.br/sys/storage/images/imoveis/32859878/758A1710121EC63F135512F47FA21760118E18A70D.JPG</URLArquivo>
+                    </Foto>
+                
+            </Fotos>
+                    </Imovel>
+            </Imoveis>
+</Carga>

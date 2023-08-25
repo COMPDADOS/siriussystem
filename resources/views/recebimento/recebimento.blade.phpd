@@ -1,0 +1,50 @@
+@extends('layout.app')
+
+
+@section('content')
+<div class="portlet box blue">
+  <div class="portlet-title">
+    <div class="caption" id="i-lbl-header-imovel">xx
+        <i class="fa fa-gift"></i>
+      </div>
+    </div>
+    <input type="hidden" id="i-chave">
+    <div class="portlet-body form">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="i-locador">
+              <span>Locador</span>
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="i-locatario">
+              <span>Locatário</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@endsection      
+
+@push('script')
+
+<script src="{{asset('/js/funcoes.js')}}" type="text/javascript"></script>
+
+
+<script>
+  $( document ).ready(function() 
+  {
+    $(".i-div-informacoes").hide();
+       
+//    cargaLancamento( 1 );
+  });
+
+
+</script>
+
+
+
+@endpush

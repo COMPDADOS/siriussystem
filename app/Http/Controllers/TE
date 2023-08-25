@@ -1,0 +1,97 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:nfse="http://nfse.abrasf.org.br">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <nfse:gerarNfse>
+         <xml>
+            <![CDATA[
+                <GerarNfseEnvio>
+                    <Rps>
+                        <InfDeclaracaoPrestacaoServico>
+                            <Rps>
+                                <IdentificacaoRps>
+                                    <Numero>21</Numero>
+                                    <Serie>C</Serie>
+                                    <Tipo>1</Tipo>
+                                </IdentificacaoRps>
+                                <DataEmissao>2021-10-08</DataEmissao>
+                                <Status>1</Status>
+                            </Rps>
+                            <Competencia>2021-10-01</Competencia>
+                            <Servico>
+                                <Valores>
+                                    <ValorServicos>100.00</ValorServicos>
+                                    <ValorDeducoes>0</ValorDeducoes>
+                                    <ValorPis>0</ValorPis>
+                                    <ValorCofins>0</ValorCofins>
+                                    <ValorInss>0</ValorInss>
+                                    <ValorIr>0</ValorIr>
+                                    <ValorCsll>0</ValorCsll>
+                                    <OutrasRetencoes>0</OutrasRetencoes>
+                                    <ValTotTributos>10.00</ValTotTributos>
+                                    <ValorIss>2.00</ValorIss>
+                                    <Aliquota>2.00</Aliquota>
+                                    <DescontoIncondicionado>0</DescontoIncondicionado>
+                                    <DescontoCondicionado>0</DescontoCondicionado>
+                                </Valores>
+                                <IssRetido>2</IssRetido>
+                                <ItemListaServico>01.02</ItemListaServico>
+                                <CodigoCnae>5231102</CodigoCnae>
+                                <Discriminacao>TESTE</Discriminacao>
+                                <CodigoMunicipio>3205200</CodigoMunicipio>
+                                <ExigibilidadeISS>1</ExigibilidadeISS>
+                                <MunicipioIncidencia>3205200</MunicipioIncidencia>
+                            </Servico>
+                            <Prestador>
+                                <CpfCnpj>
+                                    <Cnpj>55555555555</Cnpj>
+                                </CpfCnpj>
+                                <InscricaoMunicipal>259216</InscricaoMunicipal>
+                            </Prestador>
+                            <Tomador>
+                                <IdentificacaoTomador>
+                                    <CpfCnpj>
+                                        <Cnpj>05753426000130</Cnpj>
+                                    </CpfCnpj>
+                                </IdentificacaoTomador>
+                                <RazaoSocial>ANDRE CIRILO LOPES</RazaoSocial>
+                                <Endereco><Endereco>RUA EDUARDO</Endereco>
+                                    <Numero>30</Numero>
+                                    <Complemento>CASA 5</Complemento>
+                                    <Bairro>JD. ANA MARIA</Bairro>
+                                    <CodigoMunicipio>3510609</CodigoMunicipio>
+                                    <Uf>SP</Uf>
+                                    <Cep>06386710</Cep>
+                                </Endereco>
+                                <Contato />
+                            </Tomador>
+                            <OptanteSimplesNacional>2</OptanteSimplesNacional>
+                            <IncentivoFiscal>2</IncentivoFiscal>
+                        </InfDeclaracaoPrestacaoServico>
+                    </Rps>
+                    <Signature xmlns='http://www.w3.org/2000/09/xmldsig#'>
+                        <SignedInfo>
+                            <CanonicalizationMethod Algorithm='http://www.w3.org/TR/2001/REC-xml-c14n-20010315' />
+                            <SignatureMethod Algorithm='http://www.w3.org/2000/09/xmldsig#rsa-sha1' />
+                            <Reference URI=''>
+                                <Transforms>
+                                    <Transform Algorithm='http://www.w3.org/2000/09/xmldsig#enveloped-signature' />
+                                    <Transform Algorithm='http://www.w3.org/TR/2001/REC-xml-c14n-20010315' />
+                                </Transforms>
+                                <DigestMethod Algorithm='http://www.w3.org/2000/09/xmldsig#sha1' />
+                                <DigestValue>haJQavikuQTfTuFI6xDr6eBSZ14=</DigestValue>
+                            </Reference>
+                        </SignedInfo>
+                    <SignatureValue>A6RWYR9qw7nuDqLQ+DHmVkZPMlaANrvn5jJ6ZC8zLhCZ3ANlZC/Ro7YLQJzt8cXNAQvG0iJe3zy4CwTNDvcshwNv9FhgD+emUJ36MhyWyuI8GGtueL9aoDirqWXlA4ekAbsNK7CDTzGakyydW8oxRsVJlmMOtbVXe/+MuxoWRUVcaSZfWRrCRsU6cBCiI3MvLcRE1SoGOw0026PuHJlUbRU1XMnD05e8om6uK9+gpWX+kvnr3hOB4bc9dDndtzDuKc0z9FvUb1BiRIBkz+t7RcWp9FObcTj5xB5q2NVBs2yCwEw6Fb0ekKU/M/PsoZ7FoynNPVfs4N2ZZV8U3qommA==
+                    </SignatureValue>
+                    <KeyInfo>
+                        <X509Data>
+                            <X509Certificate>MIIIcTCCBlmgAwIBAgIQVG7bpPAepRB/KEzvRWshNTANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJCUjETMBEGA1UEChMKSUNQLUJyYXNpbDE2MDQGA1UECxMtU2VjcmV0YXJpYSBkYSBSZWNlaXRhIEZlZGVyYWwgZG8gQnJhc2lsIC0gUkZCMRwwGgYDVQQDExNBQyBDZXJ0aXNpZ24gUkZCIEc0MB4XDTE1MDcyNzAwMDAwMFoXDTE2MDcyNTIzNTk1OVowggENMQswCQYDVQQGEwJCUjETMBEGA1UEChQKSUNQLUJyYXNpbDELMAkGA1UECBMCU1AxGzAZBgNVBAcUElNBTyBDQUVUQU5PIERPIFNVTDE2MDQGA1UECxQtU2VjcmV0YXJpYSBkYSBSZWNlaXRhIEZlZGVyYWwgZG8gQnJhc2lsIC0gUkZCMRYwFAYDVQQLFA1SRkIgZS1DTlBKIEExMTYwNAYDVQQLFC1BdXRlbnRpY2FkbyBwb3IgQXV0b3JpZGFkZSBkZSBSZWdpc3RybyBDTkIgU1AxNzA1BgNVBAMTLk1VTklDSVBJTyBERSBTQU8gQ0FFVEFOTyBETyBTVUw6NTkzMDc1OTUwMDAxNzUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDQCERyzfcuYCY8o17Bcfob8q7psVSqMCaVjEWAK53gbjHvv63/0DiQy3fVZtyjMcPoJY4C2y6vowPlbpsiEDtjvfSGgrU3jVZ59idpSXsxyRZDvVmmbB7O8J16ko9wWARIAjL6Bc4/ouhUk1pgoRb+xToveI8LVhYV2L1ePFIqOsfU/UoHCa7gzJEbRR6SNsV3AKNypIx+blQjdnUWBjR0MwnKjqZilVvoKqC91a0xEIuKpgAWEn6WhSXB1V9uSAWT84HsThSvbz6s9itzP5OyU0ZQLngj2HiLss85li1jkyQLfa76QuxrsbIC7v3rFMdlzkVn9xGQ2AO9IVnZqPVpAgMBAAGjggNeMIIDWjCBwwYDVR0RBIG7MIG4oD0GBWBMAQMEoDQEMjI5MDYxOTQzMDc3NDg0Nzc1MTUwMDAwMDAwMDAwMDAwMDAwMDUzMjExMjExOFNTUFNQoB8GBWBMAQMCoBYEFFBBVUxPIE5VTkVTIFBJTkhFSVJPoBkGBWBMAQMDoBAEDjU5MzA3NTk1MDAwMTc1oBcGBWBMAQMHoA4EDDAwMDAwMDAwMDAwMIEianVyaWRpY29Ac2FvY2FldGFub2Rvc3VsLnNwLmdvdi5icjAJBgNVHRMEAjAAMB8GA1UdIwQYMBaAFC6R6tZt5bJZgtw4hSl2NBZWPNA+MA4GA1UdDwEB/wQEAwIF4DB/BgNVHSAEeDB2MHQGBmBMAQIBDDBqMGgGCCsGAQUFBwIBFlxodHRwOi8vaWNwLWJyYXNpbC5jZXJ0aXNpZ24uY29tLmJyL3JlcG9zaXRvcmlvL2RwYy9BQ19DZXJ0aXNpZ25fUkZCL0RQQ19BQ19DZXJ0aXNpZ25fUkZCLnBkZjCCARYGA1UdHwSCAQ0wggEJMFegVaBThlFodHRwOi8vaWNwLWJyYXNpbC5jZXJ0aXNpZ24uY29tLmJyL3JlcG9zaXRvcmlvL2xjci9BQ0NlcnRpc2lnblJGQkc0L0xhdGVzdENSTC5jcmwwVqBUoFKGUGh0dHA6Ly9pY3AtYnJhc2lsLm91dHJhbGNyLmNvbS5ici9yZXBvc2l0b3Jpby9sY3IvQUNDZXJ0aXNpZ25SRkJHNC9MYXRlc3RDUkwuY3JsMFagVKBShlBodHRwOi8vcmVwb3NpdG9yaW8uaWNwYnJhc2lsLmdvdi5ici9sY3IvQ2VydGlzaWduL0FDQ2VydGlzaWduUkZCRzQvTGF0ZXN0Q1JMLmNybDAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwgZsGCCsGAQUFBwEBBIGOMIGLMF8GCCsGAQUFBzAChlNodHRwOi8vaWNwLWJyYXNpbC5jZXJ0aXNpZ24uY29tLmJyL3JlcG9zaXRvcmlvL2NlcnRpZmljYWRvcy9BQ19DZXJ0aXNpZ25fUkZCX0c0LnA3YzAoBggrBgEFBQcwAYYcaHR0cDovL29jc3AuY2VydGlzaWduLmNvbS5icjANBgkqhkiG9w0BAQsFAAOCAgEAXvNH8d/Lww8gCXr8d0RG0k7o3XsnxTZhlaOM8nAdHpWT0V7fUv1p4DNuUTThtbENw8OiCr+lG2DRvB7DChRwjyQbqdIWQ1LWschWOdhhRwXiMpnIergyhve4k6wY88zBUmRBJFolqvfPEVa7OjwsFkUn1JOrL5Gbqn5eltGv6TG+2uj5UzF6Cp1mgH8HFcNh3JmSlpdJKUiQninOHaC4N+X0RbUDO2+3NSNhxrS6wuWEvoM2puxbD4SNtRGW+zK4mctOx0bmhjCQHEc3lLsAGgkZyZpvOqUJmp2PaYZA5jXOSBAgy/bl/ZrAa83PMLBxeKeduzx1aZXqaTce0CpHiJIAcXgpzKIu/LQo1ciXbp0bV/XTYtZh5Wo+6UQ6WLt2w67xFrmxvG/KE1ZiA6+h18BzrkUS5H1pifhv93EstUoI/br/J1aou2AGUqUwLb2LIatdDhc+7u9yzA6uaOLDpPqVt5A8+jROJRRkOZmQO/g2oFmuKFBGsayys2mnB7LFVNzmTA9KffBz0LtTWoX2/ReJG8P7EUho7rcc6crkm+xTZoHUHCvcyhIt7gOpLINIlQ4+Tk7IElp3mrvmhap8YB293YcwErbYWMPbtBRZr/dVTI1RtE0apftZdT6Srd/MevN9Hx6daOKSEwBi0AVBDK+LpPcYf+OS62M3U1q+vJw=
+                            </X509Certificate>
+                        </X509Data>
+                    </KeyInfo>
+                </Signature>
+            </GerarNfseEnvio>]]>
+         </xml>
+      </nfse:gerarNfse>
+   </soapenv:Body>
+</soapenv:Envelope>

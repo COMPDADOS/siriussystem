@@ -1,0 +1,2403 @@
+@extends("layout.app")
+@section('scripttop')
+<style>
+
+th, td{
+    vertical-align: middle !important; /* alinha verticalmente */
+    height: 36px; /* altura customizada da celula */
+    padding: 0 16px !important; /* 0 de padding na vertical e 16px na horizontal */
+}
+
+
+
+.lbl-medidas {
+  text-align: center;
+  font-size: 14px;
+  
+}
+.lbl-medidas-valores {
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #4682B4; 
+}
+
+.div-border-blue-center{
+    border:solid 1px #4682B4;
+    text-align: center;
+}
+.lbl-medidas-outrositens {
+  text-align: left;
+  font-size: 12px;
+  color: #4682B4; 
+}
+
+.cardtitulo {
+  text-align: left;
+  font-size: 16px;
+  color: #4682B4; 
+  font-weight: bold;
+
+}
+
+.lbl-medidas-left {
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+
+}
+
+hr {
+    height: 2px;
+}
+
+div .half-size-line
+{
+    line-height: 92%;
+}
+
+H-LEFT {
+    text-align: left;
+    color: #4682B4 ; 
+    font-size: 16px;
+    font-weight: bold;
+
+}
+
+
+h5 {
+    text-align: center;
+}
+
+H5 {
+    text-align: center;
+    color: #4682B4 ; 
+    font-size: 20px;
+    font-weight: bold;
+
+}
+
+h4 {
+  text-align: center;
+}
+
+h4-center-17 {
+  text-align: center;
+  font-size: 17px;
+}
+
+@media screen {
+  #printSection {
+      display: none;
+      font-weight: bold;
+  }
+}
+
+TH {
+    text-align: center;
+    width: 120px;
+}
+@media print {
+  body * {
+    visibility:hidden;
+  }
+  #printSection, #printSection * {
+    visibility:visible;
+  }
+  #printSection {
+    position:absolute;
+    left:0;
+    top:0;
+  }
+}
+
+</style>
+<script src="{{asset('/global/plugins/sweetalert/sweetalert2.min.js')}}"></script>
+<link rel="stylesheet" href="{{asset('/global/plugins/sweetalert/sweetalert2.min.css')}}">        
+
+<style>
+
+/* links: outlines and underscores */  
+a.btn, 			
+a.btn:active,	
+a.btn:focus, 
+
+button.btn:active, 
+button.btn:focus,   
+button.btn:active, 
+button.btn:focus, 
+
+.dropdown-menu li a,
+.dropdown-menu li a:active,
+.dropdown-menu li a:focus,
+.dropdown-menu li a:hover,
+
+ul.dropdown-menu li a,
+ul.dropdown-menu li a:active,
+ul.dropdown-menu li a:focus,
+ul.dropdown-menu li a:hover,
+
+.nav-tabs li a,
+.nav-tabs li a:active,
+.nav-tabs li a:focus { outline:0px !important; -webkit-appearance:none;  text-decoration:none; }  
+
+</style>
+
+<style>
+/* panel */ 
+.panel {margin-top: 25px;}
+.panel .panel-heading { padding: 5px 5px 0 5px;}
+.panel .nav-tabs {border-bottom: none;}
+
+/* inactive tabs */ 
+.nav > li > a				{  border-color: #dddddd; border-width: 1px }} 
+.nav > li > a:hover 		{ background-color: #eeeeee; color: #676767; border-color: #dddddd;} 
+
+/* active tabs */ 
+.nav > li.active > a:hover 	{color: #222222;} 
+
+/* table */ 
+
+/* buttons */ 
+.btn-default.btn-outline:active,
+.btn-default.btn-outline:focus, 
+.btn-default.btn-outline 		{ color: #676767; border-color: #676767; background-color: transparent; border-width: 2px; -webkit-transition: all 0.25s; -moz-transition: all 0.25s; transition: all 0.25s;} 	
+.btn-default.btn-outline:hover 	{ color: #000000; border-color: #000000; background-color: transparent; border-width: 2px; -webkit-transition: all 0.75s; -moz-transition: all 0.75s; transition: all 0.75s; } 
+
+
+/* panel buttons */ 
+.btn-group button.btn.btn-outline.btn-default 			{ background-color: #f5f5f5; color: #676767; border-color: #dddddd; border-width: 1px; padding: 5px 15px; line-height: 2; -webkit-transition: all 0.75s; -moz-transition: all 0.75s; transition: all 0.75s; }} 
+.btn-group button.btn.btn-outline.btn-default:focus		{ background-color: #f5f5f5;} 
+.btn-group button.btn.btn-outline.btn-default:active   	{ background-color: #f5f5f5;}
+.btn-group button.btn.btn-outline.btn-default:hover 	{ background-color: #eeeeee; border-width: 1px; -webkit-transition: all 0.75s; -moz-transition: all 0.75s; transition: all 0.75s; } 
+
+.btn-outline.btn-highlight	{ color: #676767; border-color: #676767; background-color: transparent; border-width: 2px;}
+
+.display-title { font family: verdana, arial, helvetica; color:#008400;}
+
+
+ul.nav.nav-tabs li.btn-group.active > a.btn.btn-default
+{
+border: 1px solid #dddddd;
+background-color: #ffffff;
+border-right:0px;
+margin-right: 0px;
+border-bottom: 0px;
+}
+
+ul.nav.nav-tabs li.btn-group > a.btn.btn-default
+{
+border: 1px solid #F5F5F5;
+border-right:0px;
+margin-right: 0px;
+border-bottom: 0px;
+}
+
+ul.nav.nav-tabs > li.btn-group.active > a.btn.dropdown-toggle
+{
+border: 1px solid #dddddd;
+background-color: #ffffff;
+margin-left: 0px;
+border-left:0px;
+border-bottom: 0px;
+ 
+}
+
+ul.nav.nav-tabs > li.btn-group > a.btn.dropdown-toggle
+{
+border: 1px solid #F5F5F5;
+margin-left: 0px;
+border-left: 0px;
+border-bottom: 0px;
+}
+
+ ul.nav.nav-tabs li.btn-group a.btn.dropdown-toggle span.caret
+{
+color: #F5F5F5;
+}
+
+ ul.nav.nav-tabs li.btn-group.active > a.btn.dropdown-toggle > span.caret
+{
+color: #999999;
+}
+	
+	</style>
+	
+
+
+<style>
+
+ 
+</style>
+
+
+@endsection
+@section('content')
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <a href="#">Cadastro</a>
+            <i class="fa fa-circle"></i>
+        </li>
+    </ul>
+</div>
+
+<div class="portlet light bordered">
+    <div class="portlet-title">
+        <div class="caption font-blue">
+            <span class="caption-subject bold uppercase"> Imóveis Lista</span>
+            <i class="fa fa-search font-blue"></i>
+        </div>
+
+        <div>
+            <button class="btn btn-danger pull-right" type="button" id="btn-limpar"
+            onClick="limparCampos()">Limpar Filtro</button>
+        </div>
+
+        <form action="{{route( 'imovel.add' )}}" method="get">
+            <button type="submit" class="btn green pull-right" type="button" id="i-btn-novo">Novo Imóvel</button>
+        </form>        
+    </div>
+
+    <div class="portlet-body form">
+
+        <form role="form" id="search-form">
+        <!--<form role="form" action="{{ route('imovel.list')}}" method="get">-->
+            <div class="form-body">
+                <input type="hidden" id="IMB_IMB_IDMASTER" name="empresamaster" value="{{ Auth::User()->IMB_IMB_ID }}"> 
+                <input type="hidden" id="i-unidade" name="agencia"> 
+                <input type="hidden" id="i-tipo" name="tipoimovel"> 
+                <input type="hidden" id="i-finalidade" name="finalidade"> 
+                <input type="hidden" id="i-corretor" name="corretor"> 
+                <input type="hidden" id="i-imagemprincipal" name="imagemprincipal"> 
+                <input type="hidden" id="i-usuario" value="{{Auth::user()->email}}"> 
+                <input type="hidden" id="i-idusuario" value="{{Auth::user()->IMB_ATD_ID}}"> 
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="js-select-unidade" class="control-label">Unidade</label>
+                            <select class="form-control" id="js-select-unidade">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="referencia" class="control-label">Referencia</label>
+                            <input type="text" class="form-control" name="referencia" 
+                            placeholder="Ex.: CA-0003" id="i-referencia">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="id_completus">Cód Interno</label>
+                            <input type="text" class="form-control" name="id_completus" id="i-idcompletus">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="tipo" class="control-label">Tipo</label>
+		    				<select class="form-control"  id="i-select-tipo">
+							</select>
+                        </div>
+                     </div>
+                     <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="tipo" class="control-label">Finalidade</label>
+		    				<select class="form-control" id='i-select-finalidade'>
+							</select>
+                        </div>
+                     </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label" for="faixainicial">Faixa de </label>
+                            <input type="number" class="form-control" name="faixainicial"
+                             placeholder="De R$" id="i-faixainicial" >
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label" for="faixafinal">Até</label>
+                            <input type="number" class="form-control" name="faixafinal" 
+                            placeholder="De R$" id="i-faixafinal" >
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="endereco">Endereco</label>
+                            <input type="text" class="form-control" name="endereco" 
+                            placeholder="Sugestão: coloque parte do endereço" id="i-endereco">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="condominio">Condomínio</label>
+                            <input type="text" class="form-control" name="condominio" id="i-condominio"
+                            placeholder="Sugestão:  parte do nome">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="cidade">Cidade</label>
+                            <input type="text" class="form-control"
+                            name="cidade" id="i-cidade" placeholder="Sugestão: parte do nome">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="bairro">Bairro</label>
+                            <input type="text" class="form-control" name="bairro" 
+                            id="i-bairro" placeholder="Sugestão: parte do nome">
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            <label class="control-label" for="dormitorio">Dorm.</label>
+                            <input type="number" class="form-control" name="dormitorio" 
+                            id="i-dormitorio">
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            <label class="control-label" for="suite">Suítes</label>
+                            <input type="number" class="form-control" 
+                            id="i-suite" name="suite" >
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="tipo" class="control-label">Status</label>
+		    				<select class="form-control" name="status" id="i-status">
+							</select>
+                        </div>
+                     </div>
+                     <div class="col-md-1">
+                        <label>Radar
+                            <input type="checkbox" class="form-control" 
+                                name="radar" 
+                                data-checkbox="icheckbox_flat-blue" 
+                                id="i-chk-radar">
+                                
+                        </label>    
+                    </div>                     
+                     <div class="form-actions noborder">
+                        <button class="btn blue pull-right" id='search-form'>Pesquisar</button>
+                    </div>
+
+                </div>
+                
+                <div class="portlet box blue" >
+
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-gift"></i>Mais Filtros
+                        </div>
+                        <div class="tools" id="i-maisfiltros" >
+                            <a href="javascript:;" class="expand" data-original-title title> </a>
+                        </div>
+                    </div>
+              
+                    <div class="portlet-body form" id="i-panmaisfiltros" style="display:none">
+                        <label id="i-t"></label>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="tipo" class="control-label">Corretor</label>
+    		    				    <select class="form-control" id="i-select-corretor" >
+							        </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="captador" class="control-label">Captador</label>
+    		    				    <select class="form-control" id="i-select-captador" >
+							        </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="proprietario">Proprietário</label>
+                                    <input type="text" class="form-control" 
+                                    name="proprietario" id="i-proprietario"
+                                        placeholder="Sugestão: parte do nome proprietário">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>
+                                    <input type="checkbox" name="IMB_IMV_FINANC" 
+                                    data-checkbox="icheckbox_flat-blue" id="i-chk-financiamento" name="chkfinancliamento">
+                                        Aceita Financ.
+                                </label>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>
+                                    <input type="checkbox" name="IMB_IMV_PERMUT" 
+                                    data-checkbox="icheckbox_flat-blue" id="i-chk-permuta" name="chkpemuta">
+                                        Aceita Permuta
+                                </label>
+                            </div>
+
+                            <div class="col-md-1">
+                                <label>
+                                    <input type="checkbox" name="IMB_IMV_WEBIMOVEL" 
+                                        data-checkbox="icheckbox_flat-blue" id="i-chk-site" name="chksite">
+                                        Site
+                                </label>    
+                            </div>
+                        
+                            <div class="col-md-1">
+                                <label>
+                                    <input type="checkbox" name="IMB_IMV_PLACA" class="icheck"
+                                        data-checkbox="icheckbox_flat-blue" id="i-chk-placa">
+                                        Placa
+                                </label>
+                            </div>
+                        
+                            <div class="col-md-2">
+                                <label>
+                                    <input type="checkbox" name="EMCONDOMINIO" class="icheck" 
+                                    data-checkbox="icheckbox_flat-blue" id="i-chk-condominio">
+                                    Cond Fechado
+                                </label>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>
+                                    <input type="checkbox" name="IMB_IMV_PISCIN" class="icheck" 
+                                        id="i-chk-piscina" data-checkbox="icheckbox_flat-blue">
+                                        Piscina
+                                </label>
+                            </div>
+                        
+                            <div class="col-md-2">
+                                <label>
+                                    <input type="checkbox" name="IMB_IMV_CHURRA" class="icheck" 
+                                            data-checkbox="icheckbox_flat-blue" id="i-chk-churrasqueira">
+                                    Churrasqueira
+                                </label>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label for="atuinicial">Atualizado</label>
+                                    <input type="text" class="form-control" name="atuadatainicial" 
+                                    placeholder="Desde dd/mm/yyyy" id="i-atualizado-ini">
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="atuinicial">&nbsp;</label>
+                                    <input type="text" class="form-control" 
+                                        name="atuadatafinal" placeholder="Ate dd/mm/yyyy" id="i-atualizado-fim">
+                                </div>
+                            </div>  
+
+                            <div class="col-md-2">
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="atuinicial">Cadastrado</label>
+                                    <input type="text" class="form-control" name="caddatainicial" id="i-cadastrado-ini"
+                                        placeholder="Desde dd/mm/yyyy">
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="atuinicial">&nbsp;</label>
+                                    <input type="text" class="form-control" name="caddatafinal" id="i-cadastrado-fim"
+                                        placeholder="Ate dd/mm/yyyy">
+                                </div>
+                            </div>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!--<hr style="margin-top: 40px;" />-->
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table "  id="resultTable">
+                    <thead style="display: none;">
+                        <th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>                        <th class="text-left" ></th>
+                        <th class="text-right"></th>
+  <!--                      <th >Proprietário</th>-->
+                        <th width="100" class="text-right" >Ações</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+            <nav class="quick-nav">
+                <a class="quick-nav-trigger" href="#0">
+                    <span aria-hidden="true"></span>
+                </a>
+                <ul>
+                    <li>
+                        <a href="{{ route('atendimentocliente.add')}}">
+                            <span>Iniciar Atendimento</span>
+                            <i class="icon-book-open"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('atendimento')}}" >
+                            <span>Atendimentos</span>
+                            <i class="icon-book-open"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" target="_blank">
+                            <span>Compartilhar</span>
+                            <i class="icon-share"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" target="_blank">
+                            <span>Prontuário</span>
+                            <i class="icon-list"></i>
+                        </a>
+                    </li>
+
+                    
+                </ul>
+                <span aria-hidden="true" class="quick-nav-bg"></span>
+            </nav>
+            <div class="quick-nav-overlay"></div>
+
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="i-modal-img-grande">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="printThis">
+    <div class="modal" tabindex="-1" role="dialog" id="modalimovel">
+        <div class="modal-dialog modal-lg"  role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="i-modalendimovel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+        
+                <input type="hidden" id="i-imovel">
+                <H5 id="i-exclusividade"></H5>
+
+                <div class="modal-body">
+                    <div class="panel panel-default panel-fade">
+                        <div class="panel-heading">
+                            <div class="col-md-12 .cardtitulo">
+                                Você só poderá incluir imagens após salvar e entrar para alterar o imovel
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="i-geral">
+                                    <TABLE class="table" id="tbldadosimovel">
+                                        <THEAD>
+                                            <TR>
+                                                <TH width="100">Informações Básicas</TH>
+                                                <TH style="text-align:left">Valores</TH>
+                                            </TR>
+                                        </THEAD>
+                                        <TBODY>
+                                        </TBODY>
+                                    </TABLE>
+                                </div>
+
+                                <div class="tab-pane fade in active" id="i-imagens">
+                                    <table class="table" id="tblimagens">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th width="20%" >Imagem</th>
+                                                <th width="60%"  >Titulo</th>
+                                                <th width="20%" >Exibição</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="tab-pane fade" id="i-medidas">
+
+                                    <div class="row">
+                                        <h4 ><u><b><u>Área Interna<b></u>
+                                        </h4>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Dormitórios
+                                                            <span class="lbl-medidas-valores" id="i-dormitorio-medida"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas">Suítes
+                                                            <span class="lbl-medidas-valores" id="i-suite-medida"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >WC
+                                                            <span class="lbl-medidas-valores" id="i-wc-medida"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Salas</label>
+                                                        <span class="lbl-medidas-valores" id="i-sala-medida"></span >
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Edícula</label>
+                                                        <span class="lbl-medidas-valores" id="i-edicula"></span>
+                                                    </div>
+                                                </div>                                        
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Despensa</label>
+                                                        <span class="lbl-medidas-valores" id="i-despensa"></span>
+                                                    </div>
+                                                </div>                                        
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                    <label class="lbl-medidas" >Garagem
+                                                        <span  class="lbl-medidas-valores" id="i-garagem-medida"></span> 
+                                                        </label>
+                                                    </div>
+                                                </div>  
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Cozinha
+                                                            <span class="lbl-medidas-valores" id="i-cozinha-medida"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>      
+                                        <div class="div-border-blue-center col-md-12">
+                                            <span class="lbl-medidas-outrositens" id="i-outrosinternos"></span>
+                                        </div>
+                                    </div>  
+
+
+                                    <div class="row">
+                                        <h4 ><u><b>Medidas<b></u>
+                                        </h4>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="div-border-blue-center  col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Área Total</label>
+                                                        <span class="lbl-medidas-valores" id="i-areatotal">Área Total</span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Área Const/Útil</label>
+                                                        <span class="lbl-medidas-valores" id="i-areaconstruida">Área Const/Útil</span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Área Comum</label>
+                                                        <span class="lbl-medidas-valores" id="i-areacomum"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Área Privativa</label>
+                                                        <span class="lbl-medidas-valores" id="i-areaprivativa"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Área Externa</label>
+                                                        <span class="lbl-medidas-valores" id="i-areaexterna"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Medida Terreno</label>
+                                                        <span class="lbl-medidas-valores" id="i-dimensaoterreno"></span>
+                                                    </div>
+                                                </div>
+                                            </div>      
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <h4><u><b>Lazer<b></u>
+                                        </h4>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="div-border-blue-center col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Piscina</label>
+                                                        <span class="lbl-medidas-valores" id="i-piscina"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Sauna</label>
+                                                        <span class="lbl-medidas-valores" id="i-sauna"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center  col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Churrasqueira</label>
+                                                        <span class="lbl-medidas-valores" id="i-churrasqueira"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Quadra</label>
+                                                        <span class="lbl-medidas-valores" id="i-quadra"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center  col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Salão Festas</label>
+                                                        <span class="lbl-medidas-valores" id="i-salao"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Playgr.</label>
+                                                        <span class="lbl-medidas-valores" id="i-playground"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Quintal</label>
+                                                        <span class="lbl-medidas-valores" id="i-quintal"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Inst.TV</label>
+                                                        <span class="lbl-medidas-valores" id="i-tvcabo"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center  col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Campo Gramado</label>
+                                                        <span class="lbl-medidas-valores" id="i-campogramado"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <div class="row">
+                                        <h4><u><b>Área Externa<b></u>
+                                        </h4>   
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Murado</label>
+                                                        <span class="lbl-medidas-valores" id="i-murado"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Esquina</label>
+                                                        <span class="lbl-medidas-valores" id="i-esquina"></span>
+                                                    </div>
+                                                </div>                                        
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Agua</label>
+                                                        <span class="lbl-medidas-valores" id="i-agua"></span>
+                                                    </div>
+                                                </div>                                        
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Esgoto</label>
+                                                        <span class="lbl-medidas-valores" id="i-esgoto"></span>
+                                                    </div>
+                                                </div>                                        
+                                                <div class="div-border-blue-center  col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Portão Eletr.</label>
+                                                        <span class="lbl-medidas-valores" id="i-portao"></span>
+                                                    </div>
+                                                </div>                                        
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Sacada</label>
+                                                        <span class="lbl-medidas-valores" id="i-sacada"></span>
+                                                    </div>
+                                                </div>                                        
+                                                <div class="div-border-blue-center  col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Asfalto</label>
+                                                        <span class="lbl-medidas-valores" id="i-asfalto"></span>
+                                                    </div>
+                                                </div>                                        
+
+                                                <div class="div-border-blue-center  col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Sol da Manhã</label>
+                                                        <span class="lbl-medidas-valores" id="i-solmanha"></span>
+                                                    </div>
+                                                </div>                                            
+                                                <div class="div-border-blue-center  col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Aquecedor</label>
+                                                        <span class="lbl-medidas-valores" id="i-aquecedor"></span>
+                                                    </div>
+                                                </div>                                            
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                
+                                    <div class="row">
+                                        <h4 ><u><b>Segurança<b></u>
+                                        </h4>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="div-border-blue-center col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Alarme</label>
+                                                        <span class="lbl-medidas-valores" id="i-alarme"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Cerca Elétrica</label>
+                                                        <span class="lbl-medidas-valores" id="i-cercaeletrica"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-1">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Câmera</label>
+                                                        <span class="lbl-medidas-valores" id="i-camera"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Interfone</label>
+                                                        <span class="lbl-medidas-valores" id="i-interfone"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="div-border-blue-center col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="lbl-medidas" >Portaria 24hs</label>
+                                                        <span class="lbl-medidas-valores" id="i-p24"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="lbl-medidas" id="i-piso">Pìso: </label>
+                                                    <label class="lbl-medidas-valores" id="i-piso"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>      
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalimoveisselecionados" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Seleção de Imóveis para o Atendimento</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <table  id="tblimoveiselecionados" class="table table-striped table-bordered table-hover" >
+                    <thead class="thead-dark">
+                      <tr >
+                        <th width="40" style="text-align:center"> Código </th>
+                        <th width="150" style="text-align:center"> Referência</th>
+                        <th width="700" style="text-align:center"> Endereço </th>
+                        <th width="100" style="text-align:center"> Ações </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div class="table-footer" >
+                    <a  class="btn btn-sm btn-primary" 
+                        role="button" onClick="mostrarSelecionados()" >
+                        Atualizar</a>
+                    <a  class="btn btn-sm btn-primary" 
+                        role="button" onClick="" >
+                        Continuar com Atendimento</a>
+                                <!--data-toggle="modal" data-target="#modalFormaPagamento"-->
+                </div>                
+            </div>
+        </div>
+    </div>
+</div>      
+
+
+<div class="modal fade" id="modalDadosImobiliaria" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Dados do Parceiro</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                    <h5 id="i-nome-imobiliaria"></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 H5">
+                        <h5 id="i-telefone-imobiliaria"></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 H5">
+                        <h5 id="i-site-imobiliaria"></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 H5">
+                        <h5 id="i-email-imobiliaria"></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>      
+
+<form style="display: none" action="{{route('imovel.edit')}}" method="POST" id="form-alt">            
+@csrf
+    <input type="hidden" id="id" name="id" />                
+    <input type="hidden" id="readonly" name="readonly"/>                
+</form>
+
+
+<form style="display: none" action="{{route('contrato.novo')}}" method="POST" id="form-novocontrato">            
+@csrf
+    <input type="hidden" id="idimovelcontrato" name="idimovel" />                
+</form>
+
+@endsection
+@push('script')
+<script src="{{asset('/js/funcoes.js')}}" type="text/javascript"></script>
+
+<script>
+
+
+    $(document).ready(function() {
+        if  ( carregarOpcao( $("#I-IMB_ATD_ID").val(), 17,1, "{{route('direito.checar')}}",true) == false )  
+            window.history.back();
+
+        if  ( carregarOpcao( $("#I-IMB_ATD_ID").val(), 17,2, "{{route('direito.checar')}}",false) == false )  
+            $("#i-btn-novo").hide();
+            
+            if  ( carregarOpcao( $("#I-IMB_ATD_ID").val(), 17,3, "{{route('direito.checar')}}",false) == false )  
+            $(".alt-imv").hide();
+        
+    });
+
+    //    document.getElementById("myText").disabled = true;   
+    $( "#js-select-unidade" ).change(function() {
+        var nUnidade = $('#js-select-unidade').val();
+        $("#i-unidade").val( nUnidade);
+    });    
+
+    $( "#i-select-tipo" ).change(function() {
+        var nTipo = $('#i-select-tipo').val();
+        $("#i-tipo").val( nTipo);
+    });    
+
+    $( "#i-select-finalidade" ).change(function() {
+        var cFinalidade = $('#i-select-finalidade').val();
+        $("#i-finalidade").val( cFinalidade);
+    });    
+
+    $( "#i-select-corretor" ).change(function() {
+        var cFinalidade = $('#i-select-corretor').val();
+        $("#i-corretor").val( cFinalidade);
+    });    
+
+
+
+</script>    
+<script type="text/javascript">
+
+$( document ).ready(function() 
+  {
+  });
+
+
+console.log('URL IMOVEIS '+"{{ route('imovel.list') }}");
+
+var rows_selected = [];
+var table = $('#resultTable').DataTable({
+            "language": 
+    {
+        "sEmptyTable": "Nenhum registro encontrado",
+        "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+        "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+        "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+        "sInfoPostFix": "",
+        "sInfoThousands": ".",
+        "sLengthMenu": "_MENU_ resultados por página",
+        "sLoadingRecords": "Carregando...",
+        "sProcessing": "Processando...",
+        "sZeroRecords": "Nenhum registro encontrado",
+        "sSearch": "Pesquisar",
+        "scrollY": "300px",
+        "oPaginate": {
+            "sNext": "Próximo",
+            "sPrevious": "Anterior",
+            "sFirst": "Primeiro",
+            "sLast": "Último"
+        },
+        "oAria": 
+        {
+            "sSortAscending": ": Ordenar colunas de forma ascendente",
+            "sSortDescending": ": Ordenar colunas de forma descendente"
+        }
+    },
+    processing: true,
+    serverSide: true,
+    ajax: 
+    {
+        url:"{{ route('imovel.list') }}",
+        data: function (d) 
+        {
+            d.id_completus = $('input[name=id_completus]').val();
+            d.referencia = $('input[name=referencia]').val();
+            d.endereco = $('input[name=endereco]').val();
+            d.bairro = $('input[name=bairro]').val();
+            d.cidade = $('input[name=cidade]').val();
+            d.dormitorio = $('input[name=dormitorio]').val();
+            d.suite = $('input[name=suite]').val();
+            d.agencia = $('input[name=agencia]').val();
+            d.tipoimovel = $('input[name=tipoimovel]').val();
+            d.finalidade = $('input[name=finalidade]').val();
+            d.faixainicial = $('input[name=faixainicial]').val();
+            d.faixafinal = $('input[name=faixafinal]').val();
+            d.condominio = $('input[name=condominio]').val();
+            d.proprietario = $('input[name=proprietario]').val();
+            d.corretor = $('input[name=corretor]').val();
+            d.empresamaster = $('input[name=empresamaster]').val();
+            d.radar = $('input[name=radar]').prop('checked') ? 'S' : 'N';
+        }
+    },
+        columns: [
+                { 
+                    "data": "IMAGEM", render: getImg },
+//                {data: 'IMB_IMV_ID', name: 'IMB_IMV_ID'},
+                //{data: 'IMB_IMV_REFERE', name: 'IMB_IMV_REFERE'},
+//                {data: 'ENDERECOCOMPLETO', name: 'ENDERECOCOMPLETO'},
+                {data: 'ENDERECOCOMPLETO', render: getInformacoes},
+                //{data: 'CEP_BAI_NOME', name: 'CEP_BAI_NOME'},
+                //{data: 'CONDOMINIO', name: 'CONDOMINIO'},
+//                {data: 'IMB_IMV_CIDADE', name: 'IMB_IMV_CIDADE'},
+//                {data: 'IMB_IMV_DORQUA', name: 'IMB_IMV_DORQUA'},
+//                {data: 'IMB_IMV_SUIQUA', name: 'IMB_IMV_SUIQUA'},
+                //{data: 'IMB_IMV_VALLOC', name: 'IMB_IMV_VALLOC'},
+                //{data: 'IMB_IMV_VALVEN', name: 'IMB_IMV_VALVEN'}
+            
+//                {data: 'IMAGEM', name: 'IMAGEM'},
+//                {data: 'IMB_CLT_NOME', name: 'IMB_CLT_NOME'},
+//                {data: 'UNIDADE', name: 'UNIDADE'},
+            ],
+            "columnDefs": [ 
+                {
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'className': 'dt-body-center',
+                    'render': function (data, type, full, meta)
+                        {
+                            return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                        }
+                },
+                
+                {
+                    "targets": 2,
+//                    "data": null,
+                    "defaultContent": "<div style='text-align:center'><button class="+
+                    "'btn-circle glyphicon glyphicon-trash btn btn-danger pull-right del-imv'>"+
+                    "</button><button class='btn-circle glyphicon glyphicon-pencil btn btn-primary pull-right alt-imv'>"+
+                    "</button>"+
+                    "<button class='btn btn-circle green-meadow glyphicon glyphicon-search pull-right show-imv'></button>"+
+                    "<button class='btn btn-circle btn-default glyphicon glyphicon-align-center  pull-right i-btn-atm'></button>"+
+                    "<button class='btn btn-circle yellow-lemon glyphicon glyphicon-shopping-cart pull-right i-btn-selecionar'></button>"+
+                    "<button class='btn btn-circle purple-seance glyphicon glyphicon-record pull-right i-btn-alugar'></button>"+
+                    "<button class='btn btn-circle btn-secondary glyphicon glyphicon-envelope pull-right i-btn-email'></button>"
+                }
+            ],
+            'rowCallback': function(row, data, dataIndex)
+                {
+                    var rowId = data[0];
+
+         // If row ID is in the list of selected row IDs
+                    if($.inArray(rowId, rows_selected) !== -1)
+                    {
+                        $(row).find('input[type="checkbox"]').prop('checked', true);
+                        $(row).addClass('selected');
+                    }
+                },               
+            searching: false
+        });
+
+        $('#search-form').on('submit', function(e) {
+            table.draw();
+            e.preventDefault();
+        });
+
+        $('#resultTable tbody').on( 'click', '.show-imv', function () {
+            var data = table.row( $(this).parents('tr') ).data();
+            mostrarImovelModal( data.IMB_IMV_ID );
+           
+        });
+
+        $('#resultTable tbody').on( 'click', '.i-btn-alugar', function () {
+            var data = table.row( $(this).parents('tr') ).data();
+                $("#idimovelcontrato").val( data.IMB_IMV_ID );
+                $("#form-novocontrato").submit();
+        });
+
+        $('#resultTable tbody').on( 'click', '.i-btn-selecionar', function () {
+            var data = table.row( $(this).parents('tr') ).data();
+            selecionarImovel( data.IMB_IMV_ID );
+           
+        });
+
+        $('#resultTable tbody').on( 'click', '.i-btn-email', function () {
+            var data = table.row( $(this).parents('tr') ).data();
+            enviarPorEmail( data.IMB_IMV_ID );
+           
+        });
+
+        
+
+
+        $('#i-maisfiltros').on( 'click', function () {
+            $('#i-maisfiltros').show();
+        });
+
+
+        $('#i-btn-atm').on( 'click', function () 
+        {
+            var url = "{{ route('atendimento.list') }}";
+            
+            atm =
+            {
+                empresamaster : $("#IMB_IMB_IDMASTER").val(),
+                imovel : data.IMB_IMV_ID,
+            }
+            
+            $.ajax
+            ({
+                type: "get",
+                url: url,
+                data: atm,
+                dataType: "json",
+                success: function( data )
+                {
+                    
+                }
+
+            });
+
+        });
+
+        $('#resultTable tbody').on( 'click', '.alt-imv', function () 
+        {
+            if  ( carregarOpcao( $("#I-IMB_ATD_ID").val(), 17,3, "{{route('direito.checar')}}", true) )
+            {
+                var data = table.row( $(this).parents('tr') ).data();
+                $("#id").val( data.IMB_IMV_ID );
+                $("#form-alt").submit();
+                //window.location = "{{ route('imovel.edit') }}/" + data.IMB_IMV_ID;            
+            }
+        });
+  
+
+        function preencherUnidades()
+        {
+
+            $.getJSON( "{{ route('imobiliaria.carga')}}/"+$("#IMB_IMB_IDMASTER").val(), function( data )
+            {
+                
+                $("#js-select-unidade").empty();
+                
+                linha =  '<option value="0">Todas Unidades</option>';
+                $("#js-select-unidade").append( linha );
+                for( nI=0;nI < data.length;nI++)
+                {
+                    linha = 
+                    '<option value="'+data[nI].IMB_IMB_ID+'">'+
+                        data[nI].IMB_IMB_NOME+"</option>";
+                        $("#js-select-unidade").append( linha );
+                        
+                }
+
+            });
+            
+        }
+
+        function preencherFinalidade()
+        {
+            $("#i-select-finalidade").empty();  
+            linha = '<option value="T">Finalidade</option>';
+            $("#i-select-finalidade").append( linha );
+            linha = '<option value="V">Venda</option>';
+            $("#i-select-finalidade").append( linha );
+            linha = '<option value="L">Locação</option>';
+            $("#i-select-finalidade").append( linha );
+        }
+
+        function preencherTipoImovel()
+        {
+
+            var url = "{{ route('tipoimovel.carga')}}";
+            $.getJSON( url, function( data )
+            {
+                $("#i-select-tipo").empty();
+                linha = '<option value="0">Escolha o Tipo de Imóvel</option>';
+                $("#i-select-tipo").append( linha );
+                for( nI=0;nI < data.length;nI++)
+                {
+                    linha = 
+                    '<option value="'+data[nI].IMB_TIM_ID+'">'+
+                        data[nI].IMB_TIM_DESCRICAO+"</option>";
+                        $("#i-select-tipo").append( linha );
+                        
+                }
+
+            });
+            
+        }
+
+        function preencherCorretor()
+        {
+            var empresa = $("#I-IMB_IMB_IDMASTER").val();
+            var url = "{{ route('atendente.carga')}}";
+
+            $.getJSON( url+"/"+empresa, function( data )
+            {
+                $("#i-select-corretor").empty();
+                linha = '<option value="0">Escolha o Corretor</option>';
+                $("#i-select-corretor").append( linha );
+                for( nI=0;nI < data.length;nI++)
+                {
+                    linha = 
+                    '<option value="'+data[nI].IMB_ATD_ID+'">'+
+                        data[nI].IMB_ATD_NOME+"</option>";
+                        $("#i-select-corretor").append( linha );
+                }
+            });
+            
+        }
+
+        function preencherStatus()
+        {
+            var url = "{{ route('status.carga')}}/"+$("#I-IMB_IMB_IDMASTER").val();
+
+            $.getJSON( url, function( data )
+            {
+                $("#i-status").empty();
+                linha = '<option value="0"></option>';
+                $("#i-status").append( linha );
+                for( nI=0;nI < data.length;nI++)
+                {
+                    linha = 
+                    '<option value="'+data[nI].VIS_STA_ID+'">'+
+                        data[nI].VIS_STA_NOME+"</option>";
+                        $("#i-status").append( linha );
+                        
+                }
+
+            });
+            
+        }
+
+        function limparCampos( )
+        {
+
+            document.getElementById( 'i-chk-site').checked = false;;
+            document.getElementById( 'i-chk-piscina').checked = false;;
+            document.getElementById( 'i-chk-churrasqueira').checked = false;;
+            document.getElementById( 'i-chk-placa').checked = false;;
+            document.getElementById( 'i-chk-condominio').checked = false;;
+            document.getElementById( 'i-chk-financiamento').checked = false;;
+            document.getElementById( 'i-chk-permuta').checked = false;;
+
+            preencherUnidades();
+            preencherTipoImovel();
+            preencherFinalidade();
+            preencherCorretor();
+            preencherStatus();
+
+            $("#i-idcompletus").val('');
+            $("#i-referencia").val('');
+            $("#i-faixainicial").val('');
+            $("#i-faixafinal").val('');
+            $("#i-endereco").val('');
+            $("#i-condominio").val('');
+            $("#i-bairro").val('');
+            $("#i-cidade").val('');
+            $("#i-dormitorio").val('');
+            $("#i-suite").val('');
+            $("#i-proprietario").val('');
+            $("#i-cadastrado-ini").val('');
+            $("#i-cadastrado-fim").val('');
+            $("#i-atualizado-ini").val('');
+            $("#i-atualizado-fim").val('');
+
+        }
+
+
+        function desabilitarCampos( )
+        {
+
+            document.getElementById( 'i-chk-site').disabled = true;
+            document.getElementById( 'i-chk-piscina').disabled = true;
+            document.getElementById( 'i-chk-churrasqueira').disabled = true;
+            document.getElementById( 'i-chk-placa').disabled = true;
+            document.getElementById( 'i-chk-condominio').disabled = true;
+
+            document.getElementById( 'i-idcompletus').disabled = true;
+            document.getElementById( 'i-faixainicial').disabled = true;
+            document.getElementById( 'i-faixafinal').disabled = true;
+            document.getElementById( 'i-endereco').disabled = true;
+            document.getElementById( 'i-condominio').disabled = true;
+            document.getElementById( 'i-bairro').disabled = true;
+            document.getElementById( 'i-cidade').disabled = true;
+            document.getElementById( 'i-dormitorio').disabled = true;
+            document.getElementById( 'i-suite').disabled = true;
+            document.getElementById( 'i-proprietario').disabled = true;
+            document.getElementById( 'i-cadastrado-ini').disabled = true;
+            document.getElementById( 'i-cadastrado-fim').disabled = true;
+            document.getElementById( 'i-atualizado-ini').disabled = true;
+            document.getElementById( 'i-atualizado-fim').disabled = true;
+            document.getElementById( 'i-select-corretor').disabled = true;
+            document.getElementById( 'js-select-unidade').disabled = true;
+            document.getElementById( 'i-select-tipo').disabled = true;
+            
+                        
+
+
+        }
+
+        function mostrarImovelModal( id )
+        {
+            
+
+            var url = "{{ route('imovel.mostrar') }}"+"/"+id;
+            $("#i-imovel").val( id );
+            console.log('Imovel ' + id);
+
+            $.ajax
+            ({
+                type: "get",
+                url: url,
+                dataType: "json",
+                context: this,
+                success: function( data )
+                {
+
+                    CarregarImagens( data[0]['IMB_IMV_ID'] );
+
+                    var outrosinternos='';
+                   if ( data[0]['IMB_IMV_COZPLA'] ='S' )
+                    {
+                        outrosinternos = '.Cozinha Planejada&nbsp;&nbsp;&nbsp;';
+                    }
+
+                    if ( data[0]['IMB_IMV_LAVABO'] ='S' )
+                    {
+                        outrosinternos = outrosinternos + '.Lavabo&nbsp;&nbsp;&nbsp;&nbsp;';
+                    }
+
+
+                    if ( data[0]['IMB_IMV_DORCLO'] ='S' )
+                    {
+                        outrosinternos = outrosinternos + '.Closet&nbsp;&nbsp;&nbsp;&nbsp;';
+                    }
+
+                    if ( data[0]['IMB_IMV_EMPDOR'] ='S' )
+                    {
+                        outrosinternos = outrosinternos + '.Dormitório Empregada&nbsp;&nbsp;&nbsp;&nbsp;';
+                    }
+
+                    if ( data[0]['IMB_IMV_EMPWC'] ='S' )
+                    {
+                        outrosinternos = outrosinternos + '.WC Empregada&nbsp;&nbsp;&nbsp;&nbsp;';
+                    }
+
+                    var condominio='';
+                    if ( data[0]['CONDOMINIO'] != null )
+                    {
+                        condominio = data[0]['CONDOMINIO'];
+                    }
+
+                    var observacoes='Não Informado';
+                    if ( data[0]['IMB_IMV_OBSERV'] != null )
+                    {
+                        observacoes = data[0]['IMB_IMV_OBSERV'];
+                    }
+
+                    var ae='';
+                    if ( data[0]['IMB_IMV_DORAE'] == 'S' )
+                    {
+                        ae = 'C/ Armários';
+                    }
+
+                    var cozinha='<br>Não';
+                    if ( data[0]['IMB_IMV_COZINHA'] == 'S' )
+                    {
+                        cozinha = 'Sim';
+                    }
+
+                    var piscina='<br>Não';
+                    if ( data[0]['IMB_IMV_PISCIN'] == 'S' )
+                    {
+                        piscina = '<br>Sim';
+                    }
+
+                    var sauna='<br>Não';
+                    if ( data[0]['IMB_IMV_SAUNA'] == 'S' )
+                    {
+                        sauna = '<br>Sim';
+                    }
+
+                    var playground='<br>Não';
+                    if ( data[0]['IMB_IMV_PLAGRO'] == 'S' )
+                    {
+                        playground = '<br>Sim';
+                    }
+                    
+                    var quadra='<br>Não';
+                    if ( data[0]['IMB_IMV_QUADRAPOLIESPORTIVA'] == 'S' )
+                    {
+                        quadra = '<br>Sim';
+                    }
+                                        
+                    var churrasqueira='<br>Não';
+                    if ( data[0]['IMB_IMV_CHURRA'] == 'S' )
+                    {
+                        churrasqueira = '<br>Sim';
+                    }
+                                        
+                    var quintal='<br>Não';
+                    if ( data[0]['IMB_IMV_QUINTA'] == 'S' )
+                    {
+                        quintal = '<br>Sim';
+                    }
+                                        
+                    var salao='<br>Não';
+                    if ( data[0]['IMB_IMV_SALFES'] == 'S' )
+                    {
+                        salao = '<br>Sim';
+                    }
+                                        
+                    var dormitorios='<br>';
+                    if ( data[0]['IMB_IMV_DORQUA'] != null )
+                    {
+                        dormitorios = '<br>'+data[0]['IMB_IMV_DORQUA']+ ' '+ae;
+                    }
+
+                    var wc ='<br>';
+                    if ( data[0]['IMB_IMV_WCQUA'] != null )
+                    {
+                        wc = '<br>'+data[0]['IMB_IMV_WCQUA'];
+                    }
+
+                    var hidro='';
+                    if ( data[0]['IMB_IMV_SUIHID'] == 'S' )
+                    {
+                        hidro = 'C/ Hidro';
+                    }
+
+                    var suites='<br>ND';
+                    if ( data[0]['IMB_IMV_SUIQUA'] != null )
+                    {
+                        suites = '<br>'+data[0]['IMB_IMV_SUIQUA']+' ' + hidro;
+                    }
+
+                    var salas='<br>ND';
+                    if ( data[0]['IMB_IMV_SALQUA'] != null )
+                    {
+                        salas = '<br>'+data[0]['IMB_IMV_SALQUA'];
+                    }
+
+                    var vagascob='ND';
+                    if ( data[0]['IMB_IMV_GARCOB'] != null )
+                    {
+                        vagascob = data[0]['IMB_IMV_GARCOB'];
+                    }
+
+                    var vagasdes='ND';
+                    if ( data[0]['IMB_IMV_GARDES'] != null )
+                    {
+                        vagasdes = data[0]['IMB_IMV_GARDES'];
+                    }
+
+                        var financiamento='<br>';
+                    if ( data[0]['IMB_IMV_FINANC'] == 'S' )
+                    {
+                        financiamento = '<br>Aceita';
+                    }
+                    
+                    var tvcabo='<br>Não';
+                    if ( data[0]['IMB_IMV_TVCABO'] == 'S' )
+                    {
+                        tvcabo = '<br>Sim';
+                    }
+                    
+                    var campogramado='<br>Não';
+                    if ( data[0]['IMB_IMV_CAMFUT'] == 'S' )
+                    {
+                        campogramado = '<br>Sim';
+                    }
+                    
+
+                    var murado='<br>Não';
+                    if ( data[0]['IMB_IMV_MURADO'] == 'S' )
+                    {
+                        murado = '<br>Sim';
+                    }
+                    
+                    var esquina='<br>Não';
+                    if ( data[0]['IMB_IMV_ESQUIN'] == 'S' )
+                    {
+                        esquina = '<br>Sim';
+                    }
+                    
+                    var cercaeletrica='<br>Não';
+                    if ( data[0]['IMB_IMV_ESQUIN'] == 'S' )
+                    {
+                        cercaeletrica = '<br>Sim';
+                    }
+                    
+                    var agua='<br>Não';
+                    if ( data[0]['IMB_IMV_AGUA'] == 'S' )
+                    {
+                        agua = '<br>Sim';
+                    }
+                    
+                    var esgoto='<br>Não';
+                    if ( data[0]['IMB_IMV_ESGOTO'] == 'S' )
+                    {
+                        esgoto = '<br>Sim';
+                    }
+                    console.log('Esgoto: '+esgoto)
+                    
+                    var sacada='<br>Não';
+                    if ( data[0]['IMB_IMV_SACADA'] == 'S' )
+                    {
+                        sacada = '<br>Sim';
+                    }
+                    
+                    var asfalto='<br>Não';
+                    if ( data[0]['IMB_IMV_ASFALT'] == 'S' )
+                    {
+                        asfalto = '<br>Sim';
+                    }
+                    
+                    var portao='<br>Não';
+                    if ( data[0]['IMB_IMV_PORELE'] == 'S' )
+                    {
+                        portao = '<br>Sim';
+                    }
+                    
+                    var arcentral='<br>Não';
+                    if ( data[0]['IMB_IMV_ARCENTRAL'] == 'S' )
+                    {
+                        arcentral = '<br>Sim';
+                    }
+                    
+                    
+                    var edicula='<br>Não';
+                    if ( data[0]['IMB_IMV_EDICUL'] == 'S' )
+                    {
+                        edicula = '<br>Sim';
+                    }
+                    
+                    
+                    var solmanha='<br>Não';
+                    if ( data[0]['IMB_IMV_FACE'] == 'S' )
+                    {
+                        solmanha = '<br>Sim';
+                    }
+                    
+                    var despensa='<br>Não';
+                    if ( data[0]['IMB_IMV_DESPENSA'] == 'S' )
+                    {
+                        despensa = '<br>Sim';
+                    }
+                    
+                    var alarme='<br>Não';
+                    if ( data[0]['IMB_IMV_MONITORAMENTO'] == 'S' )
+                    {
+                        alarme = '<br>Sim';
+                    }
+
+
+                    var valorm2v = data[0]['IMB_IMV_VALVEN'] / data[0]['IMB_IMV_ARETOT'];
+                    var m2venda = 'R$ '+ valorm2v.toFixed( 2 );
+                    var valorvenda = data[0]['IMB_IMV_VALVEN'];
+                    
+                    var valorm2l = data[0]['IMB_IMV_VALLOC'] / data[0]['IMB_IMV_ARETOT'];
+                    var m2locacao = 'R$ '+ valorm2l.toFixed( 2 );
+                    var valorlocacao = data[0]['IMB_IMV_VALLOC'];
+                                        
+
+                    var exclusividade='';
+                    if ( data[0]['IMB_IMV_ESCLUSIVO'] == 'S' )
+                    {
+                        exclusividade='COM EXCLUSIVIDADE ATÉ ';
+                    }
+
+
+                    console.log('Valor Venda '+valorvenda);
+                    var cercaeletrica='<br>Não';
+                    if ( data[0]['IMB_IMV_CERCAELETRICA'] == 'S' )
+                    {
+                        cercaeletrica = '<br>Sim';
+                    }
+                    
+                    var camera='<br>Não';
+                    if ( data[0]['IMB_IMV_CAMERA'] == 'S' )
+                    {
+                        camera = '<br>Sim';
+                    }
+                    
+                    var interfone='<br>Não';
+                    if ( data[0]['IMB_IMV_INTERF'] == 'S' )
+                    {
+                        interfone = '<br>Sim';
+                    }
+                    
+                    var p24='<br>Não';
+                    if ( data[0]['IMB_IMV_PORTAR'] == 'S' )
+                    {
+                        p24 = '<br>Sim';
+                    }
+                    
+                    var aquecedor='<br>Não';
+                    if ( data[0]['IMB_IMV_AGUAQUENTE'] == 'S' )
+                    {
+                        aquecedor = '<br>Sim';
+                    }
+
+                    piso = 'Não Informado'                    
+                    if ( data[0]['IMB_IMV_PISO'] != '') 
+                    {
+                        piso=data[0]['IMB_IMV_PISO'];
+                    }
+                                                                
+
+
+                    linha = "";
+                    $("#tbldadosimovel>tbody").empty();
+
+                    linha = 
+                    '<tr>'+
+                    '   <td> Dorm.: '+dormitorios+'</td>'+
+                    '   <td> <H-LEFT>$ Venda: R$' + valorvenda+'</H-LEFT></td>'+
+                    '</tr>';
+                    $("#tbldadosimovel").append( linha );
+
+                    linha = 
+                    '<tr>'+
+                    '   <td> Salas: '+salas+'</td>'+
+                    '   <td> m2 Constr.: '+data[0][ 'IMB_IMV_ARECON']+'</td>'+
+                    '</tr>';
+                    $("#tbldadosimovel").append( linha );
+
+                    linha = 
+                    '<tr>'+
+                    '   <td> Vagas Cob: '+vagascob+'<br>'+
+                    'Vagas Des: '+vagasdes+'</td>'+
+                    '   <td> $ m2 Venda: '+m2venda+' </td>'+
+                    '</tr>';
+                    $("#tbldadosimovel").append( linha );
+
+                    linha = 
+                    '<tr>'+
+                    '   <td> Suites: '+data[0][ 'IMB_IMV_SUIQUA']+'</td>'+
+                    '   <td> <H-LEFT>$ Locação: R$' + valorlocacao+'</H-LEFT></td>'+
+                    '</tr>';
+                    $("#tbldadosimovel").append( linha );
+
+                    linha = 
+                    '<tr>'+
+                    '   <td> WC: '+data[0][ 'IMB_IMV_WCQUA']+'</td>'+
+                    '   <td> $ M2 Locação: '+m2locacao+'</td>'+
+                    '</tr>';
+                    $("#tbldadosimovel").append( linha );
+
+
+                    linha = 
+                    '<tr>'+
+                    '   <td> Terreno: '+data[0][ 'IMB_IMV_ARETOT']+'</td>'+
+                    '   <td> $ IPTU: </td>'+
+                    '</tr>';
+                    $("#tbldadosimovel").append( linha );
+
+                    linha = 
+                    '<tr>'+
+                    '   <td> Condominio </td>'+
+                    '   <td>'+condominio+'</td>'+
+                    '</tr>';
+                    $("#tbldadosimovel").append( linha );
+
+                    linha = 
+                    '<tr>'+
+                    '   <td> Informações: </td>'+
+                    '   <td> '+observacoes+'</td>'+
+                    '</tr>';
+                    $("#tbldadosimovel").append( linha );
+
+                    linha = 
+                    '<tr>'+
+                    '   <td> Financiamento: '+financiamento+'</td>'+
+                    '   <td> Proximidade: '+data[0]['IMB_IMV_PROXIMIDADE'] +'</td>'+
+                    '</tr>';
+                    $("#tbldadosimovel").append( linha );
+
+                    if( ( data[0][ 'IMB_IMV_NUMAPT'] !='') && (  data[0][ 'IMB_IMV_NUMAPT'] !='0') )
+                    {
+                        console.log( 
+                            'End. '+data[0][ 'IMB_IMV_ENDERECO'] );
+                        console.log( 
+                            'ap '+data[0][ 'IMB_IMV_NUMAPT'] );
+                        console.log( 
+                            'comp '+data[0][ 'IMB_IMV_ENDERECOCOMPLEMENTO'] );
+                            
+                        console.log( 
+                            'bairro '+data[0][ 'CEP_BAI_NOME'] );
+                            
+                        $("#i-modalendimovel").html( data[0][ 'IMB_IMV_ENDERECO']+' '+
+                        data[0][ 'IMB_IMV_ENDERECONUMERO']+
+                        ' Apto '+data[0][ 'IMB_IMV_NUMAPT']+
+                        ' '+data[0][ 'IMB_IMV_ENDERECOCOMPLEMENTO']+' - '
+                        +data[0][ 'CEP_BAI_NOME']
+                        );
+                    }
+                    else
+                    {
+                        $("#i-modalendimovel").html( data[0][ 'IMB_IMV_ENDERECO']+' '+
+                        data[0][ 'IMB_IMV_ENDERECONUMERO']+' '+
+                        data[0][ 'IMB_IMV_ENDERECOCOMPLEMENTO']);
+
+                    }
+
+                    $("#i-modalcondimovel").html( condominio);
+
+
+                    //medidas
+                    if ( ( data[0]['IMB_IMV_ARETOT'] != '') || ( data[0]['IMB_IMV_ARETOT'] != '0.00') )
+                    {
+                        $("#i-areatotal").html( '<br>'+data[0]['IMB_IMV_ARETOT']+' m2' );
+                    }
+                    else
+                    {
+                        $("#i-areatotal").html( '<br>Não Informado' );
+                    }
+                    
+                    if ( ( data[0]['IMB_IMV_ARECON'] != '') || ( data[0]['IMB_IMV_ARECON'] != '0.00') )
+                    {
+                        $("#i-areaconstruida").html(  '<br>'+data[0]['IMB_IMV_ARECON']+' m2' );
+                    }
+                    else
+                    {
+                        $("#i-areaconstruida").html( '<br>Não Informado' );
+                    }
+
+                    $("#i-areacomum").html( '<br>Não Informado' );
+
+                    $("#i-areaprivativa").html( '<br>Não Informado' );
+                    $("#i-areaexterna").html( '<br>Não Informado' );
+                    
+                    if ( data[0]['IMB_IMV_MEDTER'] != '') 
+                    {
+                        $("#i-dimensaoterreno").html( '<br>'+data[0]['IMB_IMV_MEDTER']+' m2' );
+                    }
+                    else
+                    {
+                        $("#i-dimensaoterreno").html( '<br>Não Informado' );
+                    }
+
+                    $("#i-dormitorio-medida").html( dormitorios );
+                    $("#i-suite-medida").html( suites );
+                    $("#i-wc-medida").html( wc );
+                    $("#i-sala-medida").html( salas );
+                    $("#i-cozinha-medida").html( cozinha );
+                    $("#i-garagem-medida").html( '<br>Cob: '+vagascob+ ' / Des: '+vagasdes );
+                    $("#i-piscina").html( piscina);
+                    $("#i-playground").html( playground);
+                    $("#i-quadra").html( quadra);
+                    $("#i-playground").html( playground);
+                    $("#i-churrasqueira").html( churrasqueira );
+                    $("#i-quintal").html( quintal );
+                    $("#i-sauna").html( sauna );
+                    $("#i-salao").html( salao );
+                    $("#i-tvcabo").html( tvcabo );
+                    $("#i-campogramado").html( campogramado );
+                    $("#i-murado").html( murado );
+                    $("#i-esquina").html( esquina );
+                    $("#i-agua").html( agua );
+                    $("#i-esgoto").html( esgoto );
+                    $("#i-sacada").html( sacada );
+                    $("#i-asfalto").html( asfalto );
+                    $("#i-portao").html( portao );
+                    //$("#i-arcentral").html( arcentral );
+                    $("#i-edicula").html( edicula );
+                    $("#i-solmanha").html( solmanha );
+                    $("#i-despensa").html( despensa );
+                    $("#i-outrosinternos").html( outrosinternos );
+                    $("#i-alarme").html( alarme );
+                    $("#i-cercaeletrica").html( cercaeletrica );
+                    $("#i-camera").html( camera );
+                    $("#i-interfone").html( interfone  );
+                    $("#i-p24").html( p24 );
+                    $("#i-aquecedor").html( aquecedor );
+                    $("#i-exclusividade").html( exclusividade );
+                    $("#modalimovel").modal("show");
+                    
+                },
+                error: function( error )
+                {
+                    console.log(error);
+                }
+            });
+        }
+
+        preencherStatus();
+        preencherCorretor();
+        preencherUnidades();
+        preencherTipoImovel();
+        preencherFinalidade();
+
+        $("#btnPrint").click(function()
+                {
+                printElement(document.getElementById("printThis"));
+                });
+
+function printElement(elem) {
+    var domClone = elem.cloneNode(true);
+    
+    var $printSection = document.getElementById("printSection");
+    
+    if (!$printSection) {
+        var $printSection = document.createElement("div");
+        $printSection.id = "printSection";
+        document.body.appendChild($printSection);
+    }
+    
+    $printSection.innerHTML = "";
+    $printSection.appendChild(domClone);
+    window.print();
+}
+
+function mostrarImagem( id )
+{
+
+    window.open( "{{ route( 'imagem')}}/"+id,'janela');
+
+}
+
+
+
+
+function CarregarImagens()
+    {
+        str = $("#i-imovel").val();
+        $.getJSON( "{{ route( 'imagens.imoveis')}}/"+str, function( data)
+        {
+            linha = "";
+            $("#tblimagens>tbody").empty();
+            for( nI=0;nI < data.length;nI++)
+            {
+                var nome = data[nI].IMB_IMG_NOME;
+                if( nome == null)
+                    nome = "";
+    
+                    var detalhes ='<ul class="display:inline">';
+
+                var capa= data[nI].IMB_IMG_CAPA;
+                if( capa == 'S')
+                    detalhes = detalhes +'<li>Capa</li>';
+
+                var principal= data[nI].IMB_IMG_CAPA;
+                if( principal == 'S')
+                detalhes = detalhes +'<li>Imagem Principal</li>';
+
+                var naoirprosite= data[nI].IMB_IMG_NAOIRPROSITE;
+                if( naoirprosite == 'S')
+                    detalhes = detalhes +'<li>Não ir pro Site</li>';
+                    naoirprosite = 'Fora do Site';
+
+                detalhes = detalhes +'</ul>';
+
+                linha = 
+                        '<tr>'+
+                        '<td align="left"><a href=javascript:mostrarImagem('+data[nI].IMB_IMG_ID+') ><img src="/sys/storage/images/imoveis/thumb/'+data[nI].IMB_IMV_ID+'/60_45_'+data[nI].IMB_IMG_ARQUIVO+'">'+
+                        '</a> </td>'+
+//                        '<td style="text-align:center" valign="center"> '+
+//                            '<a href=javascript:editarImagem('+data[nI].IMB_IMG_ID+') class="btn btn-sm btn-primary">Editar</a> '+
+//                            '<a href=javascript:apagarImagem('+data[nI].IMB_IMG_ID+') class="btn btn-sm btn-danger">Excluir</a> ';
+                        '<td align="center" >'+nome+'</td>' +
+                        '<td align="center" >'+detalhes+'</td>' ;
+
+                if( data[nI].IMB_IMG_PRINCIPAL !='S')
+                    linha = linha + 
+                            '<a class="btn btn-sm btn-success"></a> '+
+                            '</td> ';
+                else
+                    linha = linha + 
+                    '<a class="btn btn-sm btn-success">Principal</a> '+
+                            '</td> ';
+                    linha = linha +
+                        '</tr>';
+                    
+                $("#tblimagens").append( linha );
+                        
+            }
+                
+        });
+
+    }
+
+
+    function carregarCapImo( id, callback )
+    {
+        
+        var url = "{{ route('capimo.carga') }}/"+id;
+        $.getJSON( url, function( data)
+            {
+                var captadores ='';
+                for( nI=0;nI < data.length;nI++)
+                {
+                    captadores = captadores + data[nI].IMB_ATD_NOME+'&nbsp;&nbsp;&nbsp;&nbsp;';
+                }
+                callback( captadores )
+
+            })
+    }
+
+    
+    function getImg(data, type, full, meta) {
+        console.log( 'data: '+data );
+        console.log( 'type: '+type );
+        console.log( 'full: '+full.ENDERECOCOMPLETO );
+        console.log( 'id: '+full.ID );
+        console.log( 'meta: '+meta );
+        if( data != null )
+            return '<a href="javascript:carrousel( '+full.IMB_IMV_ID+')"><img style="display:block; align:center;" width="100%" height="135px" src="/sys/storage/images/imoveis/thumb/'+full.IMB_IMV_ID+'/180_135_'+data+'"></a>'
+        else
+            return '<a href="javascript:carrousel( '+full.IMB_IMV_ID+')"><img style="display:block; align:center;" width="60" height="60" src="/sys/storage/images/imoveis/thumb/'+full.IMB_IMV_ID+'/60_45_semimagem.jpg"></a>'
+
+            $(td).css('padding', '10px')            
+    }
+
+    function getInformacoes(data, type, full, meta) 
+    {
+        var condominio = '';
+        if ( full.CONDOMINIO != null )
+           condominio = full.CONDOMINIO;
+
+        var tipoimovel='';
+        if ( full.IMB_TIM_DESCRICAO != null )
+           tipoimovel = '  ('+full.IMB_TIM_DESCRICAO+')';
+
+        var comodos='';
+        if( full.IMB_IMV_DORQUA != null  &&  full.IMB_IMV_DORQUA != '0' )
+            comodos = comodos + full.IMB_IMV_DORQUA+' Dorms';
+        
+            if( full.IMB_IMV_SUIQUA != null  &&  full.IMB_IMV_SUIQUA != '0' )
+            comodos = comodos + '&nbsp;&nbsp;&nbsp;&nbsp;'+full.IMB_IMV_SUIQUA+' Suites';
+
+        if( full.IMB_IMV_DORAE == 'S' )
+            comodos = comodos + '&nbsp;&nbsp;C/Armários';
+        
+        if( full.IMB_IMV_SALQUA != null  &&  full.IMB_IMV_SALQUA != '0' )
+            comodos = comodos + '&nbsp;&nbsp;&nbsp;&nbsp;'+full.IMB_IMV_SALQUA+' Salas';
+        
+            if( full.IMB_IMV_PISCIN == 'S' )
+            comodos = comodos + '&nbsp;&nbsp;&nbsp;&nbsp;Piscina';
+        
+            if( full.IMB_IMV_CHURRA == 'S' )
+            comodos = comodos + '&nbsp;&nbsp;&nbsp;&nbsp;Churrasqueira';
+
+
+            if( full.IMB_IMV_ARECON != null  &&  full.IMB_IMV_ARECON != '0' )
+            comodos = comodos + '&nbsp;&nbsp;&nbsp;&nbsp;AC: '+full.IMB_IMV_ARECON+'m2';
+        
+        if( full.IMB_IMV_ARETOT != null  &&  full.IMB_IMV_ARETOT != '' )
+            comodos = comodos + '&nbsp;&nbsp;&nbsp;&nbsp;AT: '+full.IMB_IMV_ARETOT+'m2';
+        
+            var captadores='';
+        if( full.IMB_ATD_NOME != '' )
+            captadores = full.IMB_ATD_NOMECAPTADOR;
+
+            var corretores='';
+        if( full.IMB_ATD_NOMECORRETOR != '' )
+            corretores = full.IMB_ATD_NOMECORRETOR;
+
+
+
+        var data = new Date(full.IMB_IMV_DATACADASTRO); //cria um objeto de data com o valor inserido no input
+        data = data.toLocaleDateString('pt-BR')
+        var atualizado= 'Cadastrado em '+data;
+
+        var data = new Date(full.IMB_IMV_DATAATUALIZACAO); //cria um objeto de data com o valor inserido no input
+        data = moment( data).format( 'DD/MM/YYYY');
+        atualizado= atualizado +'&nbsp;&nbsp;&nbsp;&nbsp;Atualizado em '+data;
+
+
+//        carregarCapImo( full.IMB_IMV_ID, function(dados) {
+            //var captadores = dados;
+            //alert( captadores );
+        //});
+    
+    
+        var texto=  '<div class="row">'+
+                    '   <div class="col-md-6 cardtitulo">'+
+                    '       <div class="form-group">'+
+                    '           </label>'+full.CEP_BAI_NOME+tipoimovel+'</label>'+
+                    '        </div> '+
+                    '   </div> '+
+                    '   <div class="col-md-6 cardtitulo">'+
+                    '       <div class="form-group">'+
+                    '           </label>Referência:'+full.IMB_IMV_REFERE+'</label>'+
+                    '        </div> '+
+                    '   </div> '+
+                    '</div>';
+        
+
+                    texto = texto + '<div class="row">'+
+                        '   <div class="col-md-6 cardtitulo" >'+
+                        '       <div class="form-group">'+
+                        '           </label>Locação: '+full.IMB_IMV_VALLOC+'</label>'+
+                        '        </div> '+
+                        '   </div> '+
+                        '   <div class="col-md-6 cardtitulo" >'+
+                        '       <div class="form-group">'+
+                        '           </label>Venda: '+full.IMB_IMV_VALVEN+'</label>'+
+                        '        </div> '+
+                        '   </div> '+
+                        '</div>';
+                    
+                    if( $("#I-IMB_IMB_IDMASTER").val() == full.IMB_IMB_ID )
+                    {
+                        texto = texto + '<div class="row">'+
+                            '   <div class="col-md-6 cardtitulo">'+
+                            '       <div class="form-group">'+
+                            '           </label>'+full.ENDERECOCOMPLETO+'</label>'+
+                            '        </div> '+
+                            '   </div> '+
+                            '   <div class="col-md-6 cardtitulo">'+
+                            '       <div class="form-group">'+
+                            '           </label>'+condominio+'</label>'+
+                            '        </div> '+
+                            '   </div> '+
+                            '</div>';
+                    }
+                    else
+                    {
+                        texto = texto + '<div class="row">'+
+                            '   <div class="col-md-6 cardtitulo">'+
+                            '       <div class="form-group">'+
+                            '           </label>'+full.UNIDADE+'</label>'+
+                            '        </div> '+
+                            '   </div> '+
+                            '   <div class="col-md-6 cardtitulo">'+
+                            '       <div class="form-group">'+
+                            '           </label><a href=javascript:mostrarImobiliaria('+
+                            full.IMB_IMB_ID+')>Ver Contato</a></label>'+
+                            '        </div> '+
+                            '   </div> '+
+                            '</div>';
+                    }
+
+                    texto = texto + '<div class="row">'+
+                        '   <div class="col-md-12">'+
+                        '       <div class="form-group">'+
+                        '           </label>'+comodos+'</label>'+
+                        '        </div> '+
+                        '   </div> '+
+                        '</div>';
+
+                        texto = texto + '<div class="row">'+
+                        '   <div class="col-md-12">'+
+                        '       <div class="form-group">'+
+                        '           </label>'+atualizado+'</label>'+
+                        '        </div> '+
+                        '   </div> '+
+                        '</div>'+
+                        '<div class="row" >'+
+                        '   <div class="col-md-6">'+
+                        '       <div class="form-group">'+
+                        '           </label>Captador: '+captadores+'</label>'+
+                        '        </div> '+
+                        '   </div> '+
+                        '   <div class="col-md-6">'+
+                        '       <div class="form-group">'+
+                        '           </label>Corretor: '+corretores+'</label>'+
+                        '        </div> '+
+                        '   </div> '+
+                        '</div>';
+
+//                    carregarCapImo( full.IMB_IMV_ID, 
+                    //function(dados) 
+                    //{ 
+                        //$("#i-referencia").val('-------->'+dados );
+                    //});
+
+
+
+        return texto;
+    }
+    
+
+    function getFormattedDate(date) 
+    {
+        let year = date.getFullYear();
+        let month = (1 + date.getMonth()).toString().padStart(2, '0');
+        let day = date.getDate().toString().padStart(2, '0');
+        return month + '/' + day + '/' + year;
+    }
+
+    function selecionarImovel( id )
+    {
+        $.ajaxSetup(
+        {
+            headers:    
+            {
+            'X-CSRF-TOKEN': "{{csrf_token()}}"
+            }
+        });        
+
+        cliente = 
+        {
+            IMB_ATD_ID : $("#i-idusuario").val(),
+            IMB_IMV_ID : id
+        };
+
+        console.log( cliente );
+        $.ajax({
+          url : "{{ route( 'atendimento.selecionarimoveis' ) }}",
+          type : 'post',
+          data : cliente
+        })
+        .done(function(){
+            mostrarSelecionados();
+        });
+
+    }
+
+
+    function apagarImovelSelecao( id )
+    {
+
+        cliente = 
+        {
+            IMB_ATD_ID : $("#i-idusuario").val(),
+            IMB_IMV_ID : id
+        };
+
+        console.log( cliente );
+        $.ajax({
+          url : "{{ route( 'apagarimvselec' ) }}",
+          type : 'get',
+          data : cliente
+     })
+     .done(function(){
+        mostrarSelecionados();
+     });
+    }
+
+    function mostrarSelecionados()
+    {
+
+        cliente = 
+        {
+            IMB_ATD_ID : $("#i-idusuario").val()
+        };
+
+
+        url = "{{ route( 'cargaselecionados' ) }}/"+
+                $("#i-idusuario").val();
+        
+        $.getJSON( url, function(data)
+            {
+                ;
+                linha = "";
+                $("#tblimoveiselecionados>tbody").empty();
+                for( nI=0;nI < data.length;nI++)
+                {
+                    linha = 
+                        '<tr>'+
+                        '   <td>'+data[nI].IMB_IMV_ID+'</td>'+
+                        '   <td>'+data[nI].IMB_IMV_REFERE+'</td>'+
+                        '   <td>'+data[nI].ENDERECO+'</td>'+
+                        '   <td style="text-align:center"> '+   
+//                    '<a  class="btn btn-sm btn-primary" href=javascript:editarCorImo('+data[nI].IMB_CORIMO_ID+')>Editar</a>&nbsp;&nbsp;&nbsp;&nbsp;'+
+//                    '           <button class="btn btn-sm btn-primary" onclick="editarCorImo('+data[nI].IMB_CORIMO_ID+' )">Editar</button>'+ 
+//                    '           <button class="btn btn-sm btn-danger" onclick="apagarCorImo('+data[nI].IMB_CORIMO_ID+' )">Apagar</button>'+ 
+                        '<a  class="btn btn-sm btn-danger" onclick="apagarImovelSelecao('+data[nI].IMB_IMV_ID+')">Apagar</a>'+
+                        
+                        '   </td>'+
+                        '</tr>';
+                    
+                    $("#tblimoveiselecionados").append( linha );
+                        
+                }
+                $("#modalimoveisselecionados").modal('show');
+            })
+    }
+            
+    function carrousel( id )
+    {
+
+        url = "{{ route('imagens.imoveis')}}/"+id;
+        $.ajax(
+        {
+            url : url,
+            datatype : "JSON",
+            type : 'get',
+            async:false,
+            success: function( data)
+            {
+             
+                if( data == '[]' )
+                {
+                    Swal.fire
+                        ({
+                            position: 'center',
+                            icon: 'abort',
+                            title: 'Sem imagens para este imóvel!',
+                            showConfirmButton: true,
+                            timer: 3500
+                        })
+                        return false;
+                    
+                }
+                else
+                    window.location = "{{ route('imagem.slider') }}/" + id;            
+            }
+        });
+
+        
+
+    }
+    function carrousel( id )
+    {
+
+        window.location = "{{ route('imagem.slider') }}/" + id;            
+
+    }
+
+    function mostrarImobiliaria( id )
+    {
+        url = "{{route('pegaragencia')}}/"+id;
+
+        $.ajax(
+            {
+                url : url,
+                type: 'get',
+                datatype: 'json',
+                async:true,
+                success: function( data )
+                {
+                    $("#i-nome-imobiliaria").text( data.IMB_IMB_NOME);
+                    $("#i-telefone-imobiliaria").text( data.IMB_IMB_TELEFONE1+'  '+data.IMB_IMB_TELEFONE2);
+                    $("#i-site-imobiliaria").text( data.IMB_IMB_URL == 'null' ?  '-' : data.IMB_IMB_URL  );
+                    $("#i-email-imobiliaria").text( data.IMB_IMB_EMAIL == 'null' ? data.IMB_IMB_EMAIL : '-' );
+                    $("#modalDadosImobiliaria").modal('show' );
+                }
+            }
+        )
+
+    }
+
+    function enviarPorEmail( id )
+    {
+        alert('');
+        window.location = url = "{{route('pdfresumoimovel')}}/"+id;
+
+    }
+
+</script>
+
+@endpush
+
+
+

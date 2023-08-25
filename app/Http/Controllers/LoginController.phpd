@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\User;
+use Illuminate\Support\Facades\Hash;
+class LoginController extends Controller
+{
+    function index()
+    {
+        if( Auth::user() )
+            return view( 'index');
+        else
+            return view( 'login.acesso');
+        
+    }
+
+    function login( Request $request )
+    {
+
+        //dd( bcrypt( $request->password) );
+        $request->validate(
+        [
+            'username' => 'required',
+            'password' =>'required'
+        ]);
+
+
+        $remember = $request->remember;
+        $user = $request->username;
+        $password = $request->password;
+        $usuario = User::where('email', $user )
+        ->first();
+
+        $encontrouuser = ! empty( $usuario ) ;
+        $hashok = Hash::check( $password, $usuario->password   ) ;
+
+
+        if ( $encontrouuser && $hashok )
+        {
+            //dd( '-----  encontrouuser: '.$encontrouuser.'   -    hash: '.$hashok);
+            Auth::loginUsingId( $usuario->id, $remember);
+            
+        }
+
+
+
+        return redirect()->action('LoginController@index');
+
+//        ->
+    
+    }
+
+    function logout()
+    {
+        Auth::logout();
+
+        return view( 'logout.logout');
+    }
+}

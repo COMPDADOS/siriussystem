@@ -1,0 +1,432 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+    @include('site.header')
+    <body>
+        <!--loader-->
+        <div class="loader-wrap">
+            <div class="loader-inner">
+                <svg>
+                    <defs>
+                        <filter id="goo">
+                            <fegaussianblur in="SourceGraphic" stdDeviation="2" result="blur" />
+                            <fecolormatrix in="blur"   values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 5 -2" result="gooey" />
+                            <fecomposite in="SourceGraphic" in2="gooey" operator="atop"/>
+                        </filter>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+        <!--loader end-->
+        <!-- main -->
+        <div id="main">
+            <!-- header -->
+            @include('site.menutop')
+            <!-- header end  -->	
+            <!-- wrapper  -->	
+            <div id="wrapper">
+                <!-- content -->	
+                <div class="content">
+                    <!-- categoties-column -->
+                    <div class="categoties-column">
+                        <div class="categoties-column_container cat-list">
+                            <ul>
+                                <li><a href="#" class="act-category"><i class="fal fa-city"></i><span>Apartments</span></a></li>
+                                <li><a href="#"><i class="fal fa-car-building"></i><span>Offices</span></a></li>
+                                <li><a href="#"><i class="fal fa-home"></i><span>House</span></a></li>
+                                <li><a href="#"><i class="fal fa-hotel"></i><span>Hotel</span></a></li>
+                                <li><a href="#"><i class="fal fa-warehouse-alt"></i><span>Villa</span></a></li>
+                            </ul>
+                        </div>
+                        <div class="progress-indicator">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                viewBox="-1 -1 34 34">
+                                <circle cx="16" cy="16" r="15.9155"
+                                    class="progress-bar__background" />
+                                <circle cx="16" cy="16" r="15.9155"
+                                    class="progress-bar__progress 
+                                    js-progress-bar" />
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- categoties-column end -->
+                    <!-- Map -->
+                    <div class="map-container column-map   hid-mob-map">
+                        <div id="map-main"></div>
+                        <ul class="mapnavigation no-list-style">
+                            <li><a href="#" class="prevmap-nav mapnavbtn"><span><i class="fas fa-caret-left"></i></span></a></li>
+                            <li><a href="#" class="nextmap-nav mapnavbtn"><span><i class="fas fa-caret-right"></i></span></a></li>
+                        </ul>
+                        <div class="scrollContorl mapnavbtn tolt"   data-microtip-position="top-left" data-tooltip="Enable Scrolling"><span><i class="fal fa-unlock"></i></span></div>
+                        <div class="location-btn geoLocation tolt" data-microtip-position="top-left" data-tooltip="Your location"><span><i class="fal fa-location"></i></span></div>
+                        <div class="map-close"><i class="fas fa-times"></i></div>
+                    </div>
+                    <!-- Map end -->					
+                    <!-- top-search-content -->
+                    <div class="top-search-content">
+                        <div class="top-search-dec color-bg"><i class="far fa-sliders-h"></i></div>
+                        <div class="top-search-content-title">Pesquisar:</div>
+                        <div class="close_sb-filter"><i class="fal fa-times"></i></div>
+                        <div class="custom-form fl-wrap">
+                            <div class="row">
+                                <!-- listsearch-input-item -->
+                                <div class="col-sm-3">
+                                    <div class="listsearch-input-item">
+                                        <input type="text" onClick="this.select()" placeholder="Address , Street , State..." value=""/>										
+                                    </div>
+                                </div>
+                                <!-- listsearch-input-item -->
+                                <!-- listsearch-input-item -->
+                                <div class="col-sm-2">
+                                    <div class="listsearch-input-item">
+                                        <select data-placeholder="Status" class="chosen-select on-radius no-search-select" >
+                                            <option value="">Finalidade</option>
+                                            <option value="V">Venda</option>
+                                            <option value="L">Locação</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- listsearch-input-item -->								
+                                <!-- listsearch-input-item -->
+                                <div class="col-sm-2">
+                                    <div class="listsearch-input-item">
+                                        <select data-placeholder="Todas Cidades" class="chosen-select on-radius no-search-select" >
+                                            <option value="">Todas as Cidades</option>
+                                            @foreach( $cidades as $cidade)
+                                                <option value="{{$cidade->IMB_IMV_CIDADE}}">{{$cidade->IMB_IMV_CIDADE}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- listsearch-input-item -->	
+                                <!-- listsearch-input-item -->
+                                <div class="col-sm-2">
+                                    <div class="listsearch-input-item">
+                                        <select data-placeholder="Categories" class="chosen-select on-radius no-search-select" >
+                                            <option>Todos os Tipos</option>
+                                            @foreach( $tipoimovel as $ti)
+                                                <option value="{{$ti->IMB_TIM_ID}}">{{$ti->IMB_TIM_DESCRICAO}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- listsearch-input-item -->								
+                                <!-- listsearch-input-item -->
+                                <div class="col-sm-3">
+                                    <div class="listsearch-input-item">
+                                        <div class="price-rage-item fl-wrap">
+                                            <span class="pr_title">Preço:</span>                            
+                                            <input type="text" class="price-range-double" data-min="100" data-max="100000"  name="price-range2"  data-step="100" value="1" data-prefix="$">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- listsearch-input-item -->								
+                            </div>
+                        </div>
+                        <div class="more-opt_btn mor-opt-btn_act">Filtro Avançado<span><i class="fas fa-caret-down"></i></span></div>
+                        <!-- more-search-opt-wrap -->
+                        <div class="more-search-opt-wrap more-hidden_wrap">
+                            <div class="msotw_title fl-wrap"><i class="far fa-sliders-h"></i>Busca Avançada</div>
+                            <div class="close_msotw"><i class="fal fa-times"></i></div>
+                            <div class="clearfix"></div>
+                            <div class="row">
+                                <!-- listsearch-input-item -->								
+                                <div class="col-sm-2">
+                                    <div class="listsearch-input-item">
+                                        <label>Dormitórios</label>
+                                        <select data-placeholder="Bedrooms" class="chosen-select on-radius no-search-select" >
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4 ou +</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- listsearch-input-item end-->
+                                <!-- listsearch-input-item -->								
+                                <div class="col-sm-2">
+                                    <div class="listsearch-input-item">
+                                        <label>Banheiros</label>
+                                        <select data-placeholder="Bathrooms" class="chosen-select on-radius no-search-select" >
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4 ou +</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- listsearch-input-item end-->
+                                <!-- listsearch-input-item -->
+                                <!-- listsearch-input-item end-->
+                                <!-- listsearch-input-item -->
+                                <div class="col-sm-2">
+                                    <div class="listsearch-input-item">
+                                        <label>Código(referência)</label>
+                                        <input type="text" onClick="this.select()" placeholder="Ex.: AP0001" value=""/>
+                                    </div>
+                                </div>
+                                <!-- listsearch-input-item end-->								
+                                <!-- listsearch-input-item -->
+                                <!-- listsearch-input-item -->								
+                            </div>
+                            <div class="clearfix"></div>
+                            <!-- listsearch-input-item-->
+                            <div class="listsearch-input-item clact">
+                                <label>Recursos</label>
+                                <div class=" fl-wrap filter-tags">
+                                    <ul class="no-list-style">
+                                        <li>
+                                            <input id="check-aa" type="checkbox" name="check">
+                                            <label for="check-aa">Com Elevador</label>
+                                        </li>
+                                        <li>
+                                            <input id="check-b" type="checkbox" name="check">
+                                            <label for="check-b"> Àrea de Serviço</label>
+                                        </li>
+                                        <li>
+                                            <input id="check-c" type="checkbox" name="check" checked>
+                                            <label for="check-c">Cozinha Planejada</label>
+                                        </li>
+                                        <li>
+                                            <input id="check-d" type="checkbox" name="check">
+                                            <label for="check-d">Ar Condicionado</label>
+                                        </li>
+                                        <li>
+                                            <input id="check-d2" type="checkbox" name="check" checked>
+                                            <label for="check-d2">Garagem</label> 
+                                        </li>
+                                        <li>
+                                            <input id="check-d3" type="checkbox" name="check" checked>
+                                            <label for="check-d3">Piscina</label> 
+                                        </li>
+                                        <li>   
+                                            <input id="check-d4" type="checkbox" name="check">
+                                            <label for="check-d4">Churrasqueira</label>
+                                        </li>
+                                        <li>   
+                                            <input id="check-d5" type="checkbox" name="check">
+                                            <label for="check-d5">Quadra</label>
+                                        </li>
+                                        <li>   
+                                            <input id="check-d6" type="checkbox" name="check">
+                                            <label for="check-d6">Despensa</label>
+                                        </li>
+                                        <li>   
+                                            <input id="check-d7" type="checkbox" name="check">
+                                            <label for="check-d7">Armário Embutido</label>
+                                        </li>
+                                        <li>   
+                                            <input id="check-d8" type="checkbox" name="check">
+                                            <label for="check-d8">Portão Eletrônico</label>
+                                        </li>
+                                        <li>   
+                                            <input id="check-d9" type="checkbox" name="check">
+                                            <label for="check-d9">Sacada Gourmet</label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- listsearch-input-item end--> 							
+                            <div class="msotw_footer">
+                                <a href="#" class="btn small-btn float-btn color-bg">Localizar</a>
+                                <div class="reset-form reset-btn"> <i class="far fa-sync-alt"></i> Limpar Filtros</div>
+                            </div>
+                        </div>
+                        <!-- more-search-opt-wrap end -->
+                    </div>
+                    <!-- top-search-content end -->					
+                    <!-- col-list-wrap -->
+                    <div class="col-list-wrap gray-bg ">
+                        <div class="col-list-wrap_opt fl-wrap">
+                            <div class="show-hidden-filter col-list-wrap_opt_btn color-bg">Filtro Avançado</div>
+                        </div>
+                        <!-- list-main-wrap-header-->
+                        <!-- list-main-wrap-header end-->					
+                        <!-- listing-item-wrap-->
+                        <div class="listing-item-container fl-wrap">
+                            <!-- listing-item -->
+                            @foreach( $ultimos as $imovel )
+                            <div class="listing-item">
+                                <article class="geodir-category-listing fl-wrap">
+                                    <div class="geodir-category-img fl-wrap">
+                                        <a href="{{route('detalhe')}}/{{$imovel->IMB_IMV_ID}}" class="geodir-category-img_item" title="{{$imovel->IMB_IMV_OBSWEB}}">
+                                            @if( $imovel->IMB_IMG_ARQUIVO )
+                                            <img  class="img-200" src="http://pjaiello.com.br/sys/storage/images/1/imoveis/{{$imovel->IMB_IMV_ID}}/{{$imovel->IMB_IMG_ARQUIVO}}" alt="">
+                                            @else
+                                                <img  class="img-200" src="http://www.pjaiello.com.br/sys/storage/images/1/logos/logo_200_200.jpg" alt="">
+                                            @endif
+                                            
+                                            <div class="overlay"></div>
+                                        </a>
+                                        <div class="geodir-category-location">
+                                        
+
+                                            <a href="#1" class="map-item tolt" data-microtip-position="top-left" data-tooltip="On the map"><i class="fas fa-map-marker-alt"></i>  {{$imovel->CEP_BAI_NOME}}</a>
+                                        </div>
+                                        <ul class="list-single-opt_header_cat">
+                                            @if( $imovel->IMB_IMV_VALLOC <> 0 and $imovel->IMB_IMV_VALVEN <> 0 )
+                                                <li><a href="#" class="cat-opt blue-bg">Venda/Locação</a></li>
+                                            @elseif( $imovel->IMB_IMV_VALLOC <> 0  )
+                                                <li><a href="#" class="cat-opt blue-bg">Somente Locação</a></li>
+                                            @elseif( $imovel->IMB_IMV_VALVEN <> 0  )
+                                                <li><a href="#" class="cat-opt blue-bg">Somente Venda</a></li>
+                                            @endif
+
+                                            <li><a href="#" class="cat-opt color-bg">{{$imovel->IMB_TIM_DESCRICAO}}</a></li>
+                                        </ul>
+                                        <a href="#" class="geodir_save-btn tolt" data-microtip-position="left" data-tooltip="Compartilhar"><span><i class="fas fa-share-alt" aria-hidden="true"></i></span></a>
+<!--                                        <a href="#" class="compare-btn tolt" data-microtip-position="left" data-tooltip="Compare"><span><i class="fal fa-random"></i></span></a>-->
+                                        <div class="geodir-category-listing_media-list">
+                                            <span><i class="fas fa-camera"></i> {{$imovel->QTDFOTOS}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="geodir-category-content fl-wrap">
+                                        <h3><a href="listing-single.html">Referência: <b>{{$imovel->IMB_IMV_REFERE}}</b></a></h3>
+                                        @if( $imovel->IMB_IMV_VALLOC <> 0 and $imovel->IMB_IMV_VALVEN <> 0 )
+                                            <div class="geodir-category-content_price">${{number_format($imovel->IMB_IMV_VALVEN, 2, ',', '.')}}/
+                                                                                    ${{number_format($imovel->IMB_IMV_VALLOC, 2, ',', '.')}}</div>
+                                        @elseif( $imovel->IMB_IMV_VALVEN <> 0  )
+                                            <div class="geodir-category-content_price">${{number_format($imovel->IMB_IMV_VALVEN, 2, ',', '.')}}</div>
+                                        @elseif( $imovel->IMB_IMV_VALLOC <> 0  )
+                                            <div class="geodir-category-content_price">${{number_format($imovel->IMB_IMV_VALLOC, 2, ',', '.')}}</div>
+                                        @endif
+                                        <div class="geodir-category-content-details">
+                                            <ul>
+                                                <li><i class="fal fa-bed"></i><span>{{$imovel->IMB_IMV_DORQUA}}</span></li>
+                                                <li><i class="fal fa-bath"></i><span>{{$imovel->IMB_IMV_WCQUA}}</span></li>
+                                                <li><i class="fal fa-car"></i><span>{{$imovel->IMB_IMV_GARCOB}}</span></li>
+                                            </ul>
+                                        </div>
+                                        <div class="geodir-category-footer fl-wrap">
+                                            <a href="https://wa.me/5514997002400?text=Olá!%20Gostaria%20de%20receber%20mais%20informações%20sobre%20o%20imóvel%20{{$imovel->IMB_IMV_REFERE}}" class="gcf-company" target="_blank"><img class="img-50" src="{{asset('images/logo.png')}}" alt=""><span>Fluxo Imóveis</span></a>
+                                        </div>
+                                    </div>
+
+                                </article>
+                            </div>
+                            @endforeach
+                            <!-- listing-item end-->	
+                            <!-- listing-item -->
+                            
+                            <!-- listing-item end-->							
+                        </div>
+                        <!-- listing-item-wrap end-->
+                        <!-- pagination-->
+                        <div class="pagination">
+                            <a href="#" class="prevposts-link"><i class="fa fa-caret-left"></i></a>
+                            <a href="#" >1</a>
+                            <a href="#" class="current-page">2</a>
+                            <a href="#">3</a>
+                            <a href="#">4</a>
+                            <a href="#" class="nextposts-link"><i class="fa fa-caret-right"></i></a>
+                        </div>
+                        <!-- pagination end-->						
+                        <div class="small-footer fl-wrap">
+                            <div class="copyright"> © Sirius System 2021 .  All rights reserved.</div>
+                            <a class="custom-to-top color-bg custom-scroll-link" href="#main"><i class="fas fa-caret-up"></i></a>
+                        </div>
+                    </div>
+                    <!-- col-list-wrap end -->
+                </div>
+                <!-- content end -->	
+            </div>
+            <!-- wrapper end -->
+            <!--register form -->
+            <div class="main-register-wrap modal">
+                <div class="reg-overlay"></div>
+                <div class="main-register-holder tabs-act">
+                    <div class="main-register-wrapper modal_main fl-wrap">
+                        <div class="main-register-header color-bg">
+                            <div class="main-register-logo fl-wrap">
+                                <img src="images/white-logo.png" alt="">
+                            </div>
+                            <div class="main-register-bg">
+                                <div class="mrb_pin"></div>
+                                <div class="mrb_pin mrb_pin2"></div>
+                            </div>
+                            <div class="mrb_dec"></div>
+                            <div class="mrb_dec mrb_dec2"></div>
+                        </div>
+                        <div class="main-register">
+                            <div class="close-reg"><i class="fal fa-times"></i></div>
+                            <ul class="tabs-menu fl-wrap no-list-style">
+                                <li class="current"><a href="#tab-1"><i class="fal fa-sign-in-alt"></i> Login</a></li>
+                                <li><a href="#tab-2"><i class="fal fa-user-plus"></i> Register</a></li>
+                            </ul>
+                            <!--tabs -->                       
+                            <div class="tabs-container">
+                                <div class="tab">
+                                    <!--tab -->
+                                    <div id="tab-1" class="tab-content first-tab">
+                                        <div class="custom-form">
+                                            <form method="post"  name="registerform">
+                                                <label>Username or Email Address  * <span class="dec-icon"><i class="fal fa-user"></i></span></label>
+                                                <input name="email" type="text"    onClick="this.select()" value="">
+                                                <div class="pass-input-wrap fl-wrap">
+                                                    <label >Password  * <span class="dec-icon"><i class="fal fa-key"></i></span></label>
+                                                    <input name="password" type="password"  autocomplete="off" onClick="this.select()" value="" >
+                                                    <span class="eye"><i class="fal fa-eye"></i> </span>
+                                                </div>
+                                                <div class="lost_password">
+                                                    <a href="#">Lost Your Password?</a>
+                                                </div>
+                                                <div class="filter-tags">
+                                                    <input id="check-a3" type="checkbox" name="check">
+                                                    <label for="check-a3">Remember me</label>
+                                                </div>
+                                                <div class="clearfix"></div>
+                                                <button type="submit"  class="log_btn color-bg"> LogIn </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <!--tab end -->
+                                    <!--tab -->
+                                    <div class="tab">
+                                        <div id="tab-2" class="tab-content">
+                                            <div class="custom-form">
+                                                <form method="post"   name="registerform" class="main-register-form" id="main-register-form2">
+                                                    <label >Full Name  * <span class="dec-icon"><i class="fal fa-user"></i></span></label>
+                                                    <input name="name" type="text"    onClick="this.select()" value="">
+                                                    <label>Email Address  * <span class="dec-icon"><i class="fal fa-envelope"></i></span></label>
+                                                    <input name="email" type="text"    onClick="this.select()" value="">
+                                                    <div class="pass-input-wrap fl-wrap">
+                                                        <label >Password  * <span class="dec-icon"><i class="fal fa-key"></i></span></label>
+                                                        <input name="password" type="password"  autocomplete="off"  onClick="this.select()" value="" >
+                                                        <span class="eye"><i class="fal fa-eye"></i> </span>
+                                                    </div>
+                                                    <div class="filter-tags ft-list">
+                                                        <input id="check-a2" type="checkbox" name="check">
+                                                        <label for="check-a2">I agree to the <a href="#">Privacy Policy</a> and <a href="#">Terms and Conditions</a></label>
+                                                    </div>
+                                                    <div class="clearfix"></div>
+                                                    <button type="submit"     class="log_btn color-bg"> Register </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--tab end -->
+                                </div>
+                                <!--tabs end -->
+                                <div class="log-separator fl-wrap"><span>or</span></div>
+                                <div class="soc-log fl-wrap">
+                                    <p>For faster login or register use your social account.</p>
+                                    <a href="#" class="facebook-log"> Facebook</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--register form end -->
+        </div>
+        <!-- Main end -->
+        <!--=============== scripts  ===============-->
+        <script   src="{{asset('js/jquery.min.js')}}"></script>
+        <script   src="{{asset('js/plugins.js')}}"></script>
+        <script   src="{{asset('js/scripts.js')}}"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=YOU_API_KEY_HERE&libraries=places"></script>
+        <script src="{{asset('js/map-plugins.js')}}"></script>
+        <script src="{{asset('js/map-listing.js')}}"></script>  
+        <script src="{{asset('js/map-single.js')}}"></script>
+
+    </body>
+</html>
