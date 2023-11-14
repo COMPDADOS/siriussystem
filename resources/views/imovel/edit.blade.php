@@ -5,7 +5,16 @@
 @section('scripttop')
 <link href="{{asset('/global/plugins/select2/css/select2.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{asset('/global/plugins/select2/css/select2-bootstrap.min.css')}}" rel="stylesheet" type="text/css" />
+<script language="JavaScript" src="js/myscript.js?n=1"></script>
 <style>
+    .border-05
+    {
+        border-width: 0px;
+        border-color: blue;
+        border-style: solid;
+        background-color:#dfdfdf;
+    }
+
     .img-album
         {
             width: 100%;
@@ -140,7 +149,7 @@
                         <a href="#tab_1_1_3" data-toggle="tab">Observações / Chaves</a>
                     </li>
                     <li>
-                        <a href="#tab_1_1_4" data-toggle="tab">Imagens</a>
+                        <a href="#tab_1_1_4" data-toggle="tab" id="i-imagens-click">Imagens</a>
                     </li>
                     <li>
                         <a href="#tab_1_1_5" data-toggle="tab">Condições Comerciais e Corretor/Captador</a>
@@ -150,61 +159,76 @@
                     </li>
                 </ul>
                 <div class="tab-content">
+                    @php
+                        $dadosimovel = app('App\Http\Controllers\ctrImovel')->carga( $imovel->IMB_IMV_ID );
+                    @endphp
                     <div class="tab-pane active" id="tab_1_1_1">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="col-md-6">
                                 <div class="col-md-2">
                                         <label class="label-control">Internet
-                                            <input type="checkbox" id="IMB_IMV_WEBIMOVEL" class="form-control" data-checkbox="icheckbox_flat-blue">
+                                            <input type="checkbox" id="IMB_IMV_WEBIMOVEL" class="form-control" 
+                                            data-checkbox="icheckbox_flat-blue" @if( $dadosimovel->IMB_IMV_WEBIMOVEL=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="label-control">Destaque
-                                            <input type="checkbox" id="IMB_IMV_DESTAQUE" class="form-control" data-checkbox="icheckbox_flat-blue">
+                                            <input type="checkbox" id="IMB_IMV_DESTAQUE" class="form-control" 
+                                            data-checkbox="icheckbox_flat-blue"
+                                            @if( $dadosimovel->IMB_IMV_DESTAQUE=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="label-control">Super Dest.
-                                            <input type="checkbox" id="IMB_IMV_SUPERDESTAQUE" class="form-control" data-checkbox="icheckbox_flat-blue">
+                                            <input type="checkbox" id="IMB_IMV_SUPERDESTAQUE" class="form-control" data-checkbox="icheckbox_flat-blue"
+                                            @if( $dadosimovel->IMB_IMV_SUPERDESTAQUE=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="label-control">Lançto.
-                                            <input type="checkbox" id="IMB_IMV_WEBLANCAMENTO"  class="form-control"  data-checkbox="icheckbox_flat-blue">
+                                            <input type="checkbox" id="IMB_IMV_WEBLANCAMENTO"  class="form-control"  
+                                            data-checkbox="icheckbox_flat-blue"
+                                            @if( $dadosimovel->IMB_IMV_WEBLANCAMENTO=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="label-control">Exclusivo
-                                            <input type="checkbox" id="IMB_IMV_ESCLUSIVO" class="form-control" data-checkbox="icheckbox_flat-blue">
+                                            <input type="checkbox" id="IMB_IMV_ESCLUSIVO" class="form-control" data-checkbox="icheckbox_flat-blue"
+                                            @if( $dadosimovel->IMB_IMV_ESCLUSIVO=='S') Checked @endif>
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="col-md-2">
                                         <label >Sobrado
-                                                <input type="checkbox" id="IMB_IMV_SOBRADO" class="form-control" data-checkbox="icheckbox_flat-blue">
+                                                <input type="checkbox" id="IMB_IMV_SOBRADO" class="form-control" data-checkbox="icheckbox_flat-blue"
+                                                @if( $dadosimovel->IMB_IMV_SOBRADO=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-2">
                                         <label >Placa
                                             <input type="checkbox" id="IMB_IMV_PLACA"
-                                            class="form-control" data-checkbox="icheckbox_flat-blue">
+                                            class="form-control" data-checkbox="icheckbox_flat-blue"
+                                            @if( $dadosimovel->IMB_IMV_PLACA=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-3">
                                         <label >Ac. Financ.
-                                            <input type="checkbox" id="IMB_IMV_ACEITAFINANC"class="form-control"  data-checkbox="icheckbox_flat-blue">
+                                            <input type="checkbox" id="IMB_IMV_ACEITAFINANC"class="form-control"  data-checkbox="icheckbox_flat-blue"
+                                            @if( $dadosimovel->IMB_IMV_ACEITAFINANC=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-2">
                                         <label >Permuta
-                                            <input type="checkbox" id="IMB_IMV_PERMUTA"  class="form-control" data-checkbox="icheckbox_flat-blue">
+                                            <input type="checkbox" id="IMB_IMV_PERMUTA"  class="form-control" data-checkbox="icheckbox_flat-blue"
+                                            @if( $dadosimovel->IMB_IMV_PERMUTA=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-2">
                                         <label >Escritura
-                                            <input type="checkbox" id="IMB_IMV_ESCRIT" class="form-control" data-checkbox="icheckbox_flat-blue">
+                                            <input type="checkbox" id="IMB_IMV_ESCRIT" class="form-control" data-checkbox="icheckbox_flat-blue"
+                                            @if( $dadosimovel->IMB_IMV_ESCRIT=='S') Checked @endif>
                                         </label>
                                     </div>
 
@@ -263,7 +287,8 @@
                                             <div class="form-group">
                                                 <label id="label-titulo">Título do Imóvel</label>
                                                 <input type="text" id="IMB_IMV_TITULO"
-                                                class="form-control input-sm titulo" style="font-family: Tahoma; font-size: 16px" >
+                                                class="form-control input-sm titulo" style="font-family: Tahoma; font-size: 16px" 
+                                                value = "{{$dadosimovel->IMB_IMV_TITULO}}">
                                             </div>
                                         </div>
                                         <div class="col-md-1">
@@ -276,7 +301,8 @@
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>Tipo</label>
-                                                <select class="form-control" id="IMB_IMV_ENDERECOTIPO">
+                                                <select class="form-control" id="IMB_IMV_ENDERECOTIPO"
+                                                value="{{$dadosimovel->IMB_IMV_ENDERECOTIPO}}">
                                                     <option value="Acesso">Acesso</option>
                                                     <option value="Alameda">Alameda</option>
                                                     <option value="Avenida">Avenida</option>
@@ -293,28 +319,32 @@
                                             <div class="form-group">
                                                 <label id="ilogradouro" >Logradouro</label>
                                                 <input type="text" maxlength="40" id="IMB_IMV_ENDERECO"
-                                                class="form-control  mr-sm-0 input-sm" style="font-family: Tahoma; font-size: 16px">
+                                                class="form-control  mr-sm-0 input-sm" style="font-family: Tahoma; font-size: 16px"
+                                                value="{{$dadosimovel->IMB_IMV_ENDERECO}}">
                                             </div>
                                         </div>
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>Número</label>
                                                 <input type="text" maxlength="10"  id="IMB_IMV_ENDERECONUMERO"
-                                                class="form-control input-sm" style="font-family: Tahoma; font-size: 16px">
+                                                class="form-control input-sm" style="font-family: Tahoma; font-size: 16px"
+                                                value="{{$dadosimovel->IMB_IMV_ENDERECONUMERO}}">
                                             </div>
                                         </div>
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>Complemento</label>
                                                 <input type="text" maxlength="20"  id="IMB_IMV_ENDERECOCOMPLEMENTO"
-                                                class="form-control input-sm" style="font-family: Tahoma; font-size: 16px" >
+                                                class="form-control input-sm" style="font-family: Tahoma; font-size: 16px" 
+                                                value="{{$dadosimovel->IMB_IMV_ENDERECOCOMPLEMENTO}}">
                                             </div>
                                         </div>
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>Apt.</label>
                                                 <input type="text" id="IMB_IMV_NUMAPT" maxlength="5"
-                                                class="form-control input-sm" style="font-family: Tahoma; font-size: 16px">
+                                                class="form-control input-sm" style="font-family: Tahoma; font-size: 16px"
+                                                value="{{$dadosimovel->IMB_IMV_NUMAPT}}">
                                             </div>
                                         </div>
                                     </div>
@@ -323,7 +353,15 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>Condomínio -<a href="javascript:tirarCondominio()"><b>Remover Condominio</b></a></label>
+                                                @php
+                                                    $cnds = app('App\Http\Controllers\ctrCondominio')->cargaSemJson( Auth::user()->IMB_IMB_ID );
+                                                @endphp
                                                 <select class="select2"  id="IMB_CND_ID" placeholder="Selecione o Condominio">
+                                                    <option value=""></option>
+                                                    @foreach( $cnds as $cnd )
+                                                        <option value="{{$cnd->IMB_CND_ID}}" 
+                                                            @if( $cnd->IMB_CND_ID == $dadosimovel->IMB_CND_ID ) selected @endif>{{$cnd->IMB_CND_NOME}}</option>
+                                                    @endforeach
                                                 </select>
                                                 <span>
 
@@ -337,7 +375,8 @@
                                             <div class="form-group">
                                                 <label>Nome Prédio</label>
                                                 <input type="text" id="IMB_IMV_PREDIO"
-                                                class="form-control input-sm" >
+                                                class="form-control input-sm" 
+                                                value="{{$dadosimovel->IMB_IMV_PREDIO}}">
                                             </div>
                                         </div>
 
@@ -345,14 +384,23 @@
                                             <div class="form-group">
                                                 <label>Andar</label>
                                                 <input type="text" id="IMB_IMV_ANDAR"
-                                                class="form-control input-sm">
+                                                class="form-control input-sm"
+                                                value="{{$dadosimovel->IMB_IMV_ANDAR}}">
                                             </div>
                                         </div>
 
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Bairro&nbsp; &nbsp; &nbsp;</label><span><a href="javascript:cadastrarBairro()"> <b>Cadastrar Bairro</b> </a></span>
+                                                @php
+                                                    $bairros = app('App\Http\Controllers\ctrBairro')->carga('X');
+                                                @endphp
                                                 <select class="form-control select2" id="CEP_BAI_ID">
+                                                    <option value=""></option>
+                                                    @foreach( $bairros as $bairro)
+                                                        <option value="{{$bairro->CEP_BAI_ID}}"
+                                                            @if( $bairro->CEP_BAI_ID == $dadosimovel->CEP_BAI_ID ) selected @endif>{{$bairro->CEP_BAI_NOME}}({{$bairro->CEP_CID_NOME}})</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>
@@ -366,7 +414,7 @@
                                                     <input type="text"id="IMB_IMV_ENDERECOCEP"
                                                     class="form-control input-sm"
                                                     max="99999999"
-                                                    placeholder="Somente Nºs" >
+                                                    placeholder="Somente Nºs" value="{{$dadosimovel->IMB_IMV_ENDERECOCEP}}">
                                                 </div>
                                             </div>
                                         </div>
@@ -376,26 +424,58 @@
                                                 <label>Cidade</label>
                                                 <input type="text" id="IMB_IMV_CIDADE"
                                                 maxlength="40"
-                                                class="form-control input-sm">
+                                                class="form-control input-sm"
+                                                value="{{$dadosimovel->IMB_IMV_CIDADE}}">
                                             </div>
                                         </div>
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>UF</label>
-                                                <input type="text" id="IMB_IMV_ESTADO" class="form-control input-sm" >
+                                                <select class="form-control" id="IMB_IMV_ESTADO" >
+                                                    <option value="AC" @if( $dadosimovel->IMB_IMV_ESTADO =='AC') selected @endif>Acre</option>
+                                                    <option value="AL" @if( $dadosimovel->IMB_IMV_ESTADO =='AL') selected @endif>Alagoas</option>
+                                                    <option value="AP" @if( $dadosimovel->IMB_IMV_ESTADO =='AP') selected @endif>Amapá</option>
+                                                    <option value="AM" @if( $dadosimovel->IMB_IMV_ESTADO =='AM') selected @endif>Amazonas</option>
+                                                    <option value="BA" @if( $dadosimovel->IMB_IMV_ESTADO =='BA') selected @endif>Bahia</option>
+                                                    <option value="CE" @if( $dadosimovel->IMB_IMV_ESTADO =='CE') selected @endif>Ceará</option>
+                                                    <option value="DF" @if( $dadosimovel->IMB_IMV_ESTADO =='DF') selected @endif>Distrito Federal</option>
+                                                    <option value="ES" @if( $dadosimovel->IMB_IMV_ESTADO =='ES') selected @endif>Espírito Santo</option>
+                                                    <option value="GO" @if( $dadosimovel->IMB_IMV_ESTADO =='GO') selected @endif>Goiás</option>
+                                                    <option value="MA" @if( $dadosimovel->IMB_IMV_ESTADO =='MA') selected @endif>Maranhão</option>
+                                                    <option value="MT" @if( $dadosimovel->IMB_IMV_ESTADO =='MT') selected @endif>Mato Grosso</option>
+                                                    <option value="MS "@if( $dadosimovel->IMB_IMV_ESTADO =='MS') selected @endif>Mato Grosso do Sul</option>
+                                                    <option value="MG" @if( $dadosimovel->IMB_IMV_ESTADO =='MG') selected @endif>Minas Gerais</option>
+                                                    <option value="PA" @if( $dadosimovel->IMB_IMV_ESTADO =='PA') selected @endif>Pará</option>
+                                                    <option value="PB" @if( $dadosimovel->IMB_IMV_ESTADO =='PB') selected @endif>Paraíba</option>
+                                                    <option value="PR" @if( $dadosimovel->IMB_IMV_ESTADO =='PR') selected @endif>Paraná</option>
+                                                    <option value="PE" @if( $dadosimovel->IMB_IMV_ESTADO =='PE') selected @endif>Pernambuco</option>
+                                                    <option value="PI" @if( $dadosimovel->IMB_IMV_ESTADO =='PI') selected @endif>Piauí</option>
+                                                    <option value="RJ" @if( $dadosimovel->IMB_IMV_ESTADO =='RJ') selected @endif>Rio de Janeiro</option>
+                                                    <option value="RN" @if( $dadosimovel->IMB_IMV_ESTADO =='RN') selected @endif>Rio Grande do Norte</option>
+                                                    <option value="RS" @if( $dadosimovel->IMB_IMV_ESTADO =='RS') selected @endif>Rio Grande do Sul</option>
+                                                    <option value="RO" @if( $dadosimovel->IMB_IMV_ESTADO =='RO') selected @endif>Rondônia</option>
+                                                    <option value="RR" @if( $dadosimovel->IMB_IMV_ESTADO =='RR') selected @endif>Roraima</option>
+                                                    <option value="SC" @if( $dadosimovel->IMB_IMV_ESTADO =='SC') selected @endif>Santa Catarina</option>
+                                                    <option value="SP" @if( $dadosimovel->IMB_IMV_ESTADO =='SP') selected @endif>São Paulo</option>
+                                                    <option value="SE" @if( $dadosimovel->IMB_IMV_ESTADO =='SE') selected @endif>Sergipe</option>
+                                                    <option value="TO" @if( $dadosimovel->IMB_IMV_ESTADO =='TO') selected @endif>Tocantins</option>
+                                                    <option value="EX" @if( $dadosimovel->IMB_IMV_ESTADO =='EX') selected @endif>Estrangeiro</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>Quadra</label>
-                                                <input type="text" id="IMB_IMV_QUADRA" class="form-control input-sm" >
+                                                <input type="text" id="IMB_IMV_QUADRA" class="form-control input-sm" 
+                                                value="{{$dadosimovel->IMB_IMV_QUADRA}}">
                                             </div>
                                         </div>
 
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>Lote</label>
-                                                <input type="text" id="IMB_IMV_LOTE" class="form-control input-sm" >
+                                                <input type="text" id="IMB_IMV_LOTE" class="form-control input-sm" 
+                                                value="{{$dadosimovel->IMB_IMV_LOTE}}">
                                             </div>
                                         </div>
                                     </div>
@@ -405,7 +485,8 @@
                                             <div class="form-group">
                                                 <label>Pontos de Referência/Imediações</label>
                                                 <input type="text" maxlength="80"  id="IMB_IMV_PROXIMIDADE"
-                                                class="form-control" >
+                                                class="form-control" 
+                                                value="{{$dadosimovel->IMB_IMV_PROXIMIDADE}}">
                                             </div>
                                         </div>
                                     </div>
@@ -413,11 +494,13 @@
                                         <div class="col-md-12">
                                             <div class="col-md-6">
                                                 <label class="control-label">Latitude</label>
-                                                <input class="form-control" type="text" id="IMB_IMV_LATITUDE">
+                                                <input class="form-control" type="text" id="IMB_IMV_LATITUDE"
+                                                value="{{$dadosimovel->IMB_IMV_LATITUDE}}">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="control-label">Longitude</label>
-                                                <input class="form-control" type="text" id="IMB_IMV_LONGITUDE">
+                                                <input class="form-control" type="text" id="IMB_IMV_LONGITUDE"
+                                                value="{{$dadosimovel->IMB_IMV_LONGITUDE}}">
                                             </div>
                                         </div>
                                     </div>
@@ -436,16 +519,31 @@
                                 <div class="portlet-body form">
                                     <div class="row">
                                         <div class="col-md-3">
+                                            @php
+                                                $imobs=app('App\Http\Controllers\ctrImobiliaria')->carga(1);
+                                            @endphp
                                             <div class="form-group" >
                                                 <label class="control-label">Unidade</label>
                                                 <select class="form-control" id="IMB_IMB_ID2" >
+                                                    @foreach( $imobs as $imob )
+                                                        <option value="{{$imob->IMB_IMB_ID}}">{{$imob->IMB_IMB_NOME}}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-md-3 ">
                                             <div class="form-group">
                                                 <label>Tipo de Imóvel</label>
+                                                @php
+                                                    $tipos = app('App\Http\Controllers\ctrTipoImovel')->carga();
+                                                @endphp
                                                 <select class="form-control" id="IMB_TIM_ID">
+                                                    @foreach( $tipos as $tipo)
+                                                        <option value="{{$tipo->IMB_TIM_ID}}"
+                                                            @if( $tipo->IMB_TIM_ID == $dadosimovel->IMB_TIM_ID) selected @endif>{{$tipo->IMB_TIM_DESCRICAO}}</option>
+                                                    @endforeach
+                                                
+
                                                 </select>
                                             </div>
                                         </div>
@@ -455,7 +553,7 @@
                                                     <input type="text"
                                                 id="IMB_IMV_VALVEN" class="form-control valor valores-direita"
                                                 type="text"
-                                                value="0,00">
+                                                value="{{number_format( $dadosimovel->IMB_IMV_VALVEN,2,',','.')}}">
                                             </div>
                                         </div>
 
@@ -464,7 +562,7 @@
                                                 <label>R$ Locação</label>
                                                 <input type="text"
                                                 id="IMB_IMV_VALLOC"  class="form-control valor valores-direita"
-                                                value="0,00">
+                                                value="{{number_format( $dadosimovel->IMB_IMV_VALLOC,2,',','.')}}">
                                             </div>
                                         </div>
                                     </div>
@@ -490,6 +588,7 @@
                                                 <label>Referência</label>
                                                 <input type="text" id="IMB_IMV_REFERE"
                                                     class="form-control input-sm"
+                                                    value="{{$dadosimovel->IMB_IMV_REFERE}}"
                                                     $acesso>
 
                                             </div>
@@ -497,29 +596,37 @@
 
                                         <div class="col-md-2 ">
                                             <label>Status</label>
+                                            @php
+                                                $sts = app('App\Http\Controllers\ctrStatusImovel')->carga( Auth::user()->IMB_IMB_ID );
+                                            @endphp
                                             <select class="form-control" id="VIS_STA_ID">
+                                                @foreach( $sts as $st)
+                                                    <option value="{{$st->VIS_STA_ID}}"
+                                                        @if( $st->VIS_STA_ID == $dadosimovel->VIS_STA_ID) selected @endif>{{$st->VIS_STA_NOME}}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
 
                                         <div class="col-md-2 ">
                                             <label>Finalidade</label>
                                             <select class="form-control" id="IMB_IMV_FINALIDADE">
-                                                <option value="">Não Informado</option>
-                                                <option value="Residencial">Residencial</option>
-                                                <option value="Comercial">Comercial</option>
-                                                <option value="Misto">Misto</option>
+                                                <option value="" @if( $dadosimovel->IMB_IMV_FINALIDADE='') select @endif>Não Informado</option>
+                                                <option value="Residencial" @if( $dadosimovel->IMB_IMV_FINALIDADE='Residencial') select @endif>Residencial</option>
+                                                <option value="Comercial"  @if( $dadosimovel->IMB_IMV_FINALIDADE='Comercial') select @endif>Comercial</option>
+                                                <option value="Misto"  @if( $dadosimovel->IMB_IMV_FINALIDADE='Misto') select @endif>Misto</option>
                                             </select>
                                         </div>
 
-                                        <input  type="hidden" id="IMB_CLT_ID"  >
-                                        <input  type="hidden" id="IMB_CLT_IDORIGINAL">
+                                        <input  type="hidden" id="IMB_CLT_ID" value="{{$dadosimovel->IMB_CLT_ID}}"  >
+                                        <input  type="hidden" id="IMB_CLT_IDORIGINAL" value="{{$dadosimovel->IMB_CLT_ID}}">
 
                                         <div class="col-md-2">
                                             <div class="form-group" >
                                                 <label>R$ IPTU</label>
                                                 <input type="text"
                                                 id="IMB_IMV_VALORIPTU"  class="form-control valor"
-                                                value="0,00">
+                                                value="{{number_format( $dadosimovel->IMB_IMV_VALORIPTU,2,',','.')}}">
                                             </div>
                                         </div>
                                         <div class="col-md-2">
@@ -527,7 +634,7 @@
                                                 <label>R$ Condomínio</label>
                                                 <input type="text"
                                                 id="imb_imv_valorcondominio"  class="form-control valor"
-                                                value="0,00">
+                                                value="{{number_format( $dadosimovel->imb_imv_valorcondominio,2,',','.')}}">
                                             </div>
                                         </div>
                                     </div>
@@ -536,17 +643,21 @@
                             <div class="row">
                             <div class="col-md-3">
                                    <label class="label-control">Cadastrado em
-                                        <input class="form-control" type="text" id="IMB_IMV_DATACADASTRO" readonly>
+                                        <input class="form-control" type="text" id="IMB_IMV_DATACADASTRO" readonly
+                                        value="{{date( 'd/m/Y', strtotime($dadosimovel->IMB_IMV_DATACADASTRO))}}">
                                     </label>
                                 </div>
                                 <div class="col-md-3">
                                    <label class="label-control">Atualizado em
-                                        <input class="form-control" type="text" id="IMB_IMV_DATAATUALIZACAO" readonly>
+                                        <input class="form-control" type="text" id="IMB_IMV_DATAATUALIZACAO" readonly
+                                        value="{{date( 'd/m/Y', strtotime($dadosimovel->IMB_IMV_DATAATUALIZACAO))}}">
+                                        
                                     </label>
                                 </div>
                                 <div class="col-md-6 div-center">
                                 <label class="label-control">Manter no site mesmo que comercializado
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_MANTERSITE">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_MANTERSITE"
+                                            @if( $dadosimovel->IMB_IMV_MANTERSITE=='S') Checked @endif>
                                         </label>
                                 </div>
                             </div>
@@ -565,41 +676,45 @@
                                         <div class="form-group">
                                             <label class="control-label">Medida Terreno</label>
                                             <input type="text" id="IMB_IMV_MEDTER"  class="form-control"
-                                            placeholder="ex.: 10x20">
+                                            placeholder="ex.: 10x20"
+                                            value="{{$dadosimovel->IMB_IMV_MEDTER}}">
                                         </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label class="control-label">Área Total(m2)</label>
-                                            <input type="text" id="IMB_IMV_ARETOT"  class="form-control" >
+                                            <input type="text" id="IMB_IMV_ARETOT"  class="form-control" 
+                                            value="{{$dadosimovel->IMB_IMV_ARETOT}}">
                                         </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label class="control-label">Área Constr.(m2)</label>
-                                            <input type="text" id="IMB_IMV_ARECON"   class="form-control" >
+                                            <input type="text" id="IMB_IMV_ARECON"   class="form-control" 
+                                            value="{{$dadosimovel->IMB_IMV_ARECON}}">
                                         </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label class="control-label">Área Útil(m2)</label>
-                                            <input type="text" id="IMB_IMV_AREUTI"  class="form-control">
+                                            <input type="text" id="IMB_IMV_AREUTI"  class="form-control"
+                                            value="{{$dadosimovel->IMB_IMV_AREUTI}}">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label class="control-label">Posição Solar</label>
                                             <select class="form-control" id="IMB_IMV_ORIENTACAOSOLAR">
-                                                <option value="0">Não Informado</option>
-                                                <option value="L">Leste</option>
-                                                <option value="M">Manhã</option>
-                                                <option value="N">Norte</option>
-                                                <option value="O">Oeste</option>
-                                                <option value="S">Sul</option>
-                                                <option value="T">Tarde</option>
+                                                <option value="0" @if($dadosimovel->IMB_IMV_ORIENTACAOSOLAR =='0') selected @endif>Não Informado</option>
+                                                <option value="L" @if($dadosimovel->IMB_IMV_ORIENTACAOSOLAR =='L') selected @endif>Leste</option>
+                                                <option value="M" @if($dadosimovel->IMB_IMV_ORIENTACAOSOLAR =='M') selected @endif>Manhã</option>
+                                                <option value="N" @if($dadosimovel->IMB_IMV_ORIENTACAOSOLAR =='N') selected @endif>Norte</option>
+                                                <option value="O" @if($dadosimovel->IMB_IMV_ORIENTACAOSOLAR =='O') selected @endif>Oeste</option>
+                                                <option value="S" @if($dadosimovel->IMB_IMV_ORIENTACAOSOLAR =='S') selected @endif>Sul</option>
+                                                <option value="T" @if($dadosimovel->IMB_IMV_ORIENTACAOSOLAR =='T') selected @endif>Tarde</option>
                                             </select>
                                         </div>
                                     </div>
@@ -608,10 +723,10 @@
                                         <div class="form-group">
                                             <label class="control-label">Posição</label>
                                             <select class="form-control" id="IMB_IMV_POSICAO">
-                                                <option value="0">Não Informado</option>
-                                                <option value="F">Frente</option>
-                                                <option value="U">Fundo</option>
-                                                <option value="L">Lateral</option>
+                                                <option value="0" @if($dadosimovel->IMB_IMV_POSICAO =='0') selected @endif>Não Informado</option>
+                                                <option value="F"@if($dadosimovel->IMB_IMV_POSICAO =='F') selected @endif>Frente</option>
+                                                <option value="U"@if($dadosimovel->IMB_IMV_POSICAO =='U') selected @endif>Fundo</option>
+                                                <option value="L"@if($dadosimovel->IMB_IMV_POSICAO =='L') selected @endif>Lateral</option>
                                             </select>
                                         </div>
                                     </div>
@@ -628,7 +743,8 @@
                                 <div class="col-md-1">
                                         <div class="form-group">
                                             <label>Alarme
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_ALARME">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_ALARME"
+                                            @if( $dadosimovel->IMB_IMV_ALARME=='S') Checked @endif>
                                             </label>
                                         </div>
                                     </div>
@@ -637,7 +753,8 @@
                                     <div class="col-md-1">
                                         <div class="form-group">
                                             <label>Ar
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_ARAPARELHO">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_ARAPARELHO"
+                                            @if( $dadosimovel->IMB_IMV_ARAPARELHO=='S') Checked @endif>
                                             </label>
                                             <span>Condic.</span>
                                         </div>
@@ -646,7 +763,8 @@
                                     <div class="col-md-1">
                                         <div class="form-group">
                                             <label>Aquecedor
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_AGUAQUENTE">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_AGUAQUENTE"
+                                            @if( $dadosimovel->IMB_IMV_AGUAQUENTE=='S') Checked @endif>
                                             </label>
                                             <span>Solar</span>
                                         </div>
@@ -655,7 +773,8 @@
                                     <div class="col-md-1">
                                         <div class="form-group">
                                             <label>Lareira
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_LAREIRA">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_LAREIRA"
+                                            @if( $dadosimovel->IMB_IMV_LAREIRA=='S') Checked @endif>
                                             </label>
                                         </div>
                                     </div>
@@ -663,7 +782,9 @@
                                     <div class="col-md-1">
                                         <div class="form-group">
                                             <label>Semi
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_SEMIMOB">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_SEMIMOB"
+                                            @if( $dadosimovel->IMB_IMV_SEMIMOB=='S') Checked @endif>
+
                                                 <span>Mobiliado</span>
                                             </label>
                                         </div>
@@ -672,7 +793,9 @@
                                     <div class="col-md-1">
                                         <div class="form-group">
                                             <label>Interfone
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_INTERF">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_INTERF"
+                                            @if( $dadosimovel->IMB_IMV_INTERF=='S') Checked @endif>
+
                                             </label>
                                         </div>
                                     </div>
@@ -686,31 +809,39 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="control-label">Hectares</label>
-                                    <input type="text" id="IMB_IMV_HECTARES"  class="form-control">
+                                    <input type="text" id="IMB_IMV_HECTARES"  class="form-control"
+                                    @if( $dadosimovel->IMB_IMV_HECTARES=='S') Checked @endif>
+
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="control-label">Alqueire Paulista</label>
-                                    <input type="text" id="IMB_IMV_ALQPAU"  class="form-control">
+                                    <input type="text" id="IMB_IMV_ALQPAU"  class="form-control"
+                                    @if( $dadosimovel->IMB_IMV_ALQPAU=='S') Checked @endif>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="control-label">Alqueire Goiano</label>
-                                    <input type="text" id="IMB_IMV_ALQGOI"  class="form-control">
+                                    <input type="text" id="IMB_IMV_ALQGOI"  class="form-control"
+                                    @if( $dadosimovel->IMB_IMV_ALQGOI=='S') Checked @endif>
+
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="control-label">Alqueire Mineiro</label>
-                                    <input type="text" id="IMB_IMV_ALQMIN"  class="form-control">
+                                    <input type="text" id="IMB_IMV_ALQMIN"  class="form-control"
+                                    @if( $dadosimovel->IMB_IMV_ALQMIN=='S') Checked @endif>
+                                    
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="control-label">Alqueire Norte</label>
-                                    <input type="text" id="IMB_IMV_ALQNOR"  class="form-control">
+                                    <input type="text" id="IMB_IMV_ALQNOR"  class="form-control"
+                                    @if( $dadosimovel->IMB_IMV_ALQNOR=='S') Checked @endif>
                                 </div>
                             </div>
 
@@ -723,23 +854,24 @@
                                 <div class="col-md-3">
                                     <label class="control-label">Topografia</label>
                                     <select class="form-control" id="IMB_IMV_TOPOGR">
-                                            <option value="-1">Não Informado</option>
-                                            <option value="A">Aclive</option>
-                                            <option value="D">Declive</option>
-                                            <option value="P">Plano</option>
+                                            <option value="-1" @if($dadosimovel->IMB_IMV_TOPOGR =='-1') selected @endif>Não Informado</option>
+                                            <option value="A" @if($dadosimovel->IMB_IMV_TOPOGR =='A') selected @endif>Aclive</option>
+                                            <option value="D"@if($dadosimovel->IMB_IMV_TOPOGR =='D') selected @endif>Declive</option>
+                                            <option value="P"@if($dadosimovel->IMB_IMV_TOPOGR =='P') selected @endif>Plano</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="control-label">Ano Construção</label>
-                                    <input class="form-control" type="text" id="IMB_IMV_ANOCONSTRUCAO" >
+                                    <input class="form-control" type="text" id="IMB_IMV_ANOCONSTRUCAO" 
+                                    value="{{$dadosimovel->IMB_IMV_ANOCONSTRUCAO}}">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="control-label">Padrão</label>
                                     <select class="form-control" id="IMB_IMV_PADRAO">
-                                            <option value="">Não Informado</option>
-                                            <option value="A">Alto</option>
-                                            <option value="M">Médio</option>
-                                            <option value="B">Baixo</option>
+                                            <option value="" @if($dadosimovel->IMB_IMV_PADRAO =='') selected @endif>Não Informado</option>
+                                            <option value="A"@if($dadosimovel->IMB_IMV_PADRAO =='A') selected @endif>Alto</option>
+                                            <option value="M"@if($dadosimovel->IMB_IMV_PADRAO =='M') selected @endif>Médio</option>
+                                            <option value="B"@if($dadosimovel->IMB_IMV_PADRAO =='B') selected @endif>Baixo</option>
                                     </select>
 
                                 </div>
@@ -758,7 +890,8 @@
                                     <div class="form-group">
                                         <label class="control-label">Dorm.</label>
                                         <input type="number" id="IMB_IMV_DORQUA" 
-                                        class="form-control">
+                                        class="form-control"
+                                        value="{{$dadosimovel->IMB_IMV_DORQUA}}">
                                     </div>
                                 </div>
 
@@ -766,7 +899,8 @@
                                     <div class="form-group">
                                         <label class="control-label">suites</label>
                                         <input type="number" id="IMB_IMV_SUIQUA"
-                                        class="form-control">
+                                        class="form-control"
+                                        value="{{$dadosimovel->IMB_IMV_SUIQUA}}">
                                     </div>
                                 </div>
 
@@ -774,7 +908,8 @@
                                     <div class="form-group">
                                         <label class="control-label">WC</label>
                                         <input type="number" id="IMB_IMV_WCQUA"
-                                        class="form-control ">
+                                        class="form-control "
+                                        value="{{$dadosimovel->IMB_IMV_WCQUA}}">
                                     </div>
                                 </div>
 
@@ -782,27 +917,32 @@
                                     <div class="form-group">
                                         <label class="control-label">Salas</label>
                                         <input type="number" id="IMB_IMV_SALQUA"
-                                        class="form-control">
+                                        class="form-control"
+                                        value="{{$dadosimovel->IMB_IMV_SALQUA}}">
                                     </div>
                                 </div>
                                 <div class="col-md-1">
                                     <label>Copa
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_COPA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_COPA"
+                                        @if( $dadosimovel->IMB_IMV_COPA=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label>Escrit.
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_SALESC">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_SALESC"
+                                        @if( $dadosimovel->IMB_IMV_SALESC=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label>Lavabo
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_LAVABO">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_LAVABO"
+                                        @if( $dadosimovel->IMB_IMV_LAVABO=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label>Closet
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_SUICLO">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_SUICLO"
+                                        @if( $dadosimovel->IMB_IMV_SUICLO=='S') Checked @endif>
                                     </label>
                                 </div>
                             </div>
@@ -818,39 +958,47 @@
 
                                 <div class="col-md-1">
                                     <label class="label-control">Dorm.
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_DORAE">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_DORAE"
+                                        value="{{$dadosimovel->IMB_IMV_DORAE}}">
                                     </label>
                                 </div>
 
 
                                 <div class="col-md-1">
                                     <label class="label-control">Cozinha
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_COZAE">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_COZAE"
+                                        @if( $dadosimovel->IMB_IMV_COZAE=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Corredor
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_AECORREDOR">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_AECORREDOR"
+                                        @if( $dadosimovel->IMB_IMV_AECORREDOR=='S') Checked @endif>
+                                        
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Closet
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_AECLOSET">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_AECLOSET"
+                                        @if( $dadosimovel->IMB_IMV_AECLOSET=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control"> Salas
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_AESALA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_AESALA"
+                                        @if( $dadosimovel->IMB_IMV_AESALA=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Escrit.
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_AEESCRITORIO">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_AEESCRITORIO"
+                                        @if( $dadosimovel->IMB_IMV_AEESCRITORIO=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Banheiro
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_AEWC">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_AEWC"
+                                        @if( $dadosimovel->IMB_IMV_AEWC=='S') Checked @endif>
                                     </label>
                                 </div>
 
@@ -866,45 +1014,53 @@
                             <div class="col-md-10">
                                 <div class="col-md-1 center" >
                                     <label class="label-control">Cozinha
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_COZINHA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_COZINHA"
+                                        @if( $dadosimovel->IMB_IMV_COZINHA=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center" >
                                     <label class="label-control">A.Serv.
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_ARESER">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_ARESER"
+                                        @if( $dadosimovel->IMB_IMV_ARESER=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center">
                                     <label class="label-control">WC
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_EMPWC">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_EMPWC"
+                                        @if( $dadosimovel->IMB_IMV_EMPWC=='S') Checked @endif>
                                         <span> Empreg.</span>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center">
                                     <label class="label-control">Dorm.
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_EMPQUA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_EMPQUA"
+                                        @if( $dadosimovel->IMB_IMV_EMPQUA=='S') Checked @endif>
                                         <span> Empreg.</span>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center">
                                     <label class="label-control">Elevador
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_ELEVADORES">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_ELEVADORES"
+                                        @if( $dadosimovel->IMB_IMV_ELEVADORES=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-2 center">
                                     <label class="label-control">Despensa
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_DESPENSA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_DESPENSA"
+                                        @if( $dadosimovel->IMB_IMV_DESPENSA=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center">
                                     <label class="label-control">Sala
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_SALAAMOCO">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_SALAAMOCO"
+                                        @if( $dadosimovel->IMB_IMV_SALAAMOCO=='S') Checked @endif>
                                         <span> Almoço</span>
                                     </label>
                                 </div>
                                 <div class="col-md-2 center">
                                     <label class="label-control">Depósito
-                                        <input class="form-control" type="checkbox" id="imb_imv_deposito">
+                                        <input class="form-control" type="checkbox" id="imb_imv_deposito"
+                                        @if( $dadosimovel->imb_imv_deposito=='S') Checked @endif>
                                     </label>
                                 </div>
 
@@ -921,56 +1077,69 @@
                             <div class="col-md-10">
                                 <div class="col-md-1">
                                     <label class="label-control">Hidro
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_SUIHID">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_SUIHID"
+                                        @if( $dadosimovel->IMB_IMV_SUIHID=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Sacada
-                                        <input class="form-control" type="checkbox" id="imb_imv_varandagourmet">
+                                        <input class="form-control" type="checkbox" id="imb_imv_varandagourmet"
+                                        @if( $dadosimovel->imb_imv_varandagourmet=='S') Checked @endif>
                                     </label>
                                     <span>Gourmet</span>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Piscina
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_PISCIN">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_PISCIN"
+                                        @if( $dadosimovel->IMB_IMV_PISCIN=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Churr.
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_CHURRA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_CHURRA"
+                                        @if( $dadosimovel->IMB_IMV_CHURRA=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Sauna
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_SAUNA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_SAUNA"
+                                        @if( $dadosimovel->IMB_IMV_SAUNA=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Quadra
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_QUADRAPOLIESPORTIVA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_QUADRAPOLIESPORTIVA"
+                                        @if( $dadosimovel->IMB_IMV_QUADRAPOLIESPORTIVA=='S') Checked @endif>
+
                                     </label>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Campo
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_CAMFUT">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_CAMFUT"
+                                        @if( $dadosimovel->IMB_IMV_CAMFUT=='S') Checked @endif>
+
                                     </label>
                                     <span>Futebol</span>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Salão
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_SALFES">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_SALFES"
+                                        @if( $dadosimovel->IMB_IMV_SALFES=='S') Checked @endif>
                                     </label>
                                     <span>Festas</span>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Play
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_PLAGRO">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_PLAGRO"
+                                        @if( $dadosimovel->IMB_IMV_PLAGRO=='S') Checked @endif>
+
                                     </label>
                                     <span>Ground</span>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="label-control">Home
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_HOME">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_HOME"
+                                        @if( $dadosimovel->IMB_IMV_HOME=='S') Checked @endif>
                                     </label>
                                     <span>Teather</span>
                                 </div>
@@ -987,32 +1156,38 @@
                             <div class="col-md-10">
                                 <div class="col-md-1 center">
                                     <label class="label-control">Quintal
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_QUINTA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_QUINTA"
+                                        @if( $dadosimovel->IMB_IMV_QUINTA=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center">
                                     <label class="label-control">Varanda
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_VARANDA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_VARANDA"
+                                        @if( $dadosimovel->IMB_IMV_VARANDA=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center">
                                     <label class="label-control">Sacada
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_SACADA">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_SACADA"
+                                        @if( $dadosimovel->IMB_IMV_SACADA=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center">
                                     <label class="label-control">Edícula
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_EDICUL">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_EDICUL"
+                                        @if( $dadosimovel->IMB_IMV_EDICUL=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center">
                                     <label class="label-control">Murado
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_MURADO">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_MURADO"
+                                        @if( $dadosimovel->IMB_IMV_MURADO=='S') Checked @endif>
                                     </label>
                                 </div>
                                 <div class="col-md-1 center">
                                     <label class="label-control">Portão
-                                        <input class="form-control" type="checkbox" id="IMB_IMV_PORELE">
+                                        <input class="form-control" type="checkbox" id="IMB_IMV_PORELE"
+                                        @if( $dadosimovel->IMB_IMV_PORELE=='S') Checked @endif>
                                     </label>
                                     <span>Eletrônico</span>
                                 </div>
@@ -1020,13 +1195,15 @@
                                 <div class="col-md-2 center">
                                     <label class="control-label">Vagas Cobertas</label>
                                     <input type="text" id="IMB_IMV_GARCOB"class="form-control"
-                                    onkeypress="return isNumber(event)" onpaste="return false;" >
+                                    onkeypress="return isNumber(event)" onpaste="return false;" 
+                                    value="{{$dadosimovel->IMB_IMV_GARCOB}}">
                                 </div>
 
                                 <div class="col-md-2 center">
                                     <label class="control-label">Vagas Descob.</label>
                                     <input type="text" id="IMB_IMV_GARDES"   class="form-control"
-                                    onkeypress="return isNumber(event)" onpaste="return false;">
+                                    onkeypress="return isNumber(event)" onpaste="return false;"
+                                    value="{{$dadosimovel->IMB_IMV_GARDES}}">
                                 </div>
                             </div>
                         </div>
@@ -1041,57 +1218,68 @@
                                 <div class="row">
                                     <div class="col-md-1 center">
                                         <label class="label-control">Aquecido
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOAQUECIDO">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOAQUECIDO"
+                                            @if( $dadosimovel->IMB_IMV_PISOAQUECIDO=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Ardósia
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOARDOSIA">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOARDOSIA"
+                                            @if( $dadosimovel->IMB_IMV_PISOARDOSIA=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Bloquete
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOBLOQUETE">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOBLOQUETE"
+                                            @if( $dadosimovel->IMB_IMV_PISOBLOQUETE=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Carpete
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCARPETE">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCARPETE"
+                                            @if( $dadosimovel->IMB_IMV_PISOCARPETE=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Carp.Acril.
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCARPETEACRIL">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCARPETEACRIL"
+                                            @if( $dadosimovel->IMB_IMV_PISOCARPETEACRIL=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Carp.Mad.
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCARPETEMADEIRA">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCARPETEMADEIRA"
+                                            @if( $dadosimovel->IMB_IMV_PISOCARPETEMADEIRA=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Carp.Nylon
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCARPETENYLON">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCARPETENYLON"
+                                            @if( $dadosimovel->IMB_IMV_PISOCARPETENYLON=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Cerâmica
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCERAMICA">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCERAMICA"
+                                            @if( $dadosimovel->IMB_IMV_PISOCERAMICA=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Cimento
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCIMENTO">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCIMENTO"
+                                            @if( $dadosimovel->IMB_IMV_PISOCIMENTO=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">C/Piso
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCONTRAPISO">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOCONTRAPISO"
+                                            @if( $dadosimovel->IMB_IMV_PISOCONTRAPISO=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Emborrachado
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOEMBORRACHADO">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOEMBORRACHADO"
+                                            @if( $dadosimovel->IMB_IMV_PISOEMBORRACHADO=='S') Checked @endif>
                                         </label>
                                     </div>
                                 </div>
@@ -1099,37 +1287,44 @@
                                 <div class="row">
                                     <div class="col-md-1 center">
                                         <label class="label-control">Granito
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOGRANITO">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOGRANITO"
+                                            @if( $dadosimovel->IMB_IMV_PISOGRANITO=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Laminado
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOLAMINADO">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOLAMINADO"
+                                            @if( $dadosimovel->IMB_IMV_PISOLAMINADO=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Mármore
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOMARMORE">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOMARMORE"
+                                            @if( $dadosimovel->IMB_IMV_PISOMARMORE=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Tábua
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOTABUA">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOTABUA"
+                                            @if( $dadosimovel->IMB_IMV_PISOTABUA=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Taco
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOTACOMADEIRA">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOTACOMADEIRA"
+                                            @if( $dadosimovel->IMB_IMV_PISOTACOMADEIRA=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Vinílico
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOVINICULO">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOVINICULO"
+                                            @if( $dadosimovel->IMB_IMV_PISOVINICULO=='S') Checked @endif>
                                         </label>
                                     </div>
                                     <div class="col-md-1 center">
                                         <label class="label-control">Porcelanato
-                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOPORCELANATO">
+                                            <input class="form-control" type="checkbox" id="IMB_IMV_PISOPORCELANATO"
+                                            @if( $dadosimovel->IMB_IMV_PISOPORCELANATO=='S') Checked @endif>
                                         </label>
                                     </div>
 
@@ -1158,21 +1353,17 @@
                                         <div class="col-md-3">
                                             <label class="label-control">Local</label>
                                             <select class="form-control" id="IMB_IMV_CHAVESSITUACAO">
-                                                <option value="0">Não Informado</option>
-                                                <option value="C">Corretor</option>
-                                                <option value="I">Imobiliária</option>
-                                                <option value="P">Proprietário</option>
-                                                <option value="O">Outro</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                        <label class="label-control">Corretor</label>
-                                            <select class="form-control" id="IMB_ATD_IDCHAVE">
+                                                <option value="0" @if( $dadosimovel->IMB_IMV_CHAVESSITUACAO =='0') selected @endif>Não Informado</option>
+                                                <option value="C"@if( $dadosimovel->IMB_IMV_CHAVESSITUACAO =='C') selected @endif>Corretor</option>
+                                                <option value="I"@if( $dadosimovel->IMB_IMV_CHAVESSITUACAO =='I') selected @endif>Imobiliária</option>
+                                                <option value="P"@if( $dadosimovel->IMB_IMV_CHAVESSITUACAO =='P') selected @endif>Proprietário</option>
+                                                <option value="O"@if( $dadosimovel->IMB_IMV_CHAVESSITUACAO =='O') selected @endif>Outro</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
                                             <label class="label-control">Box </label>
-                                            <input class="form-control" id="IMB_IMV_CHABOX">
+                                            <input class="form-control" id="IMB_IMV_CHABOX"
+                                            value="{{$dadosimovel->IMB_IMV_CHABOX}}">
                                         </div>
                                     </div>
                                 </div>
@@ -1180,17 +1371,17 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <label class="label-control">Observações sobre as Chaves</label>
-                                        <textarea rows="2" id="IMB_IMV_CHAVES" style="min-width: 100%"></textarea>
+                                        <textarea rows="2" id="IMB_IMV_CHAVES" style="min-width: 100%">{{$dadosimovel->IMB_IMV_CHAVES}}</textarea>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <label class="control-label" for="IMB_IMV_VALORAVALLOC">Valor Locação Avaliado</label>
-                                        <input class="form-control valor valores-direita" type="text" value='0'>
+                                        <input class="form-control valor valores-direita" type="text" value="{{number_format( $dadosimovel->IMB_IMV_VALORAVALLOC,2,',','.')}}">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="control-label" for="IMB_IMV_VALORAVALVEN">Valor Venda Avaliado</label>
-                                        <input class="form-control valor valores-direita" type="text" value='0'>
+                                        <input class="form-control valor valores-direita" type="text"  value="{{number_format( $dadosimovel->IMB_IMV_VALORAVALLOC,2,',','.')}}">
                                     </div>
 
                                 </div>
@@ -1210,7 +1401,7 @@
                             <div class="portlet-body form">
                                 <div class="form-body" ></div>
                                 <div class="form-actions text-center">
-                                    <textarea rows="5" id="IMB_IMV_OBSERV" style="min-width: 100%"></textarea>
+                                    <textarea rows="5" id="IMB_IMV_OBSERV" style="min-width: 100%" >{{$dadosimovel->IMB_IMV_OBSERV}}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -1228,7 +1419,7 @@
                             <div class="portlet-body form">
                                 <div class="form-body" ></div>
                                 <div class="form-actions text-center">
-                                    <textarea rows="5"id="IMB_IMV_OBSWEB" style="min-width: 100%"></textarea>
+                                    <textarea rows="5"id="IMB_IMV_OBSWEB" style="min-width: 100%" >{{$dadosimovel->IMB_IMV_OBSWEB}}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -1239,7 +1430,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label for="IMB_IMV_LINKVIDEO">Link do Vídeo</label>
-                                <input class="form-control" type="text" id="IMB_IMV_LINKVIDEO">
+                                <input class="form-control" type="text" id="IMB_IMV_LINKVIDEO" value="{{$dadosimovel->IMB_IMV_LINKVIDEO}}">
                             </div>
                         </div>
                         <div class="container">
@@ -1307,6 +1498,7 @@
                                             <tr>
                                                 <th width="70%" style="text-align:center"> Captador </th>
                                                 <th width="10%" style="text-align:center"> Percentual </th>
+                                                <th width="20%" style="text-align:center"> Tipo</th>
                                                 <th width="20%" style="text-align:center"> Ações </th>
                                             </tr>
                                         </thead>
@@ -1325,7 +1517,8 @@
                         <div class="row">
                                 <div class="col-md-12">
                                     <label class="label-control">Condições Comerciais</label>
-                                    <textarea rows="4" id="IMB_IMV_CONDICOESCOMERCIAIS" style="min-width: 100%"></textarea>
+                                    <textarea rows="4" id="IMB_IMV_CONDICOESCOMERCIAIS" style="min-width: 100%">
+                                    {{$dadosimovel->IMB_IMV_CONDICOESCOMERCIAIS}}</textarea>
                                 </div>
                         </div>
 
@@ -1336,7 +1529,7 @@
                             <div class="col-md-12">
                                 <div class="col-md-12">
                                     <label for="IMB_IMV_TITULO_apoio">Título para portais e no site da imobiliária</label>
-                                    <input class="form-control titulo" type="text" id="IMB_IMV_TITULO">
+                                    <input class="form-control titulo" type="text" id="IMB_IMV_TITULO" value="{{$dadosimovel->IMB_IMV_TITULO}}">
                                     <span> <a href="javascript:gerarSugestaoTitulo()">Gerar Sugestão</a> </span>
                                 </div>
                             </div>
@@ -1520,7 +1713,7 @@
 
 <!--modal CAPIMO -->
 <div class="modal" tabindex="-1" role="dialog" id="modalcapimo">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog"  style="width:70%;">
         <div class="modal-content">
             <div class="modal-body">
                 <div class="portlet box blue">
@@ -1541,7 +1734,7 @@
                         <div class="portlet-body form">
                             <div class="form-body" >
                                 <div class="row">
-                                    <div class="col-md-8">
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Captador</label>
                                             <select class="form-control" id="i-select-captador" name="IMB_ATD_ID">
@@ -1552,6 +1745,16 @@
                                         <div class="form-group">
                                             <label>Percentual</label>
                                             <input class="form-control valor" id="i-percentual-cap">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label class="control-label">Tipo</label>
+                                            <select  class="form-control" id="IMB_CAPIMO_TIPO">
+                                                <option value="Venda">Venda</option>
+                                                <option value="Locação">Locação</option>
+                                                <option value="Ven./Loc.">Ven./Loc.</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -1681,6 +1884,12 @@
     </div>
 </div>
 
+<form style="display: none" action="{{route('cliente.edit')}}" method="POST" id="form-alt-cliente-indexctr"  target="_blank">
+    @csrf
+        <input type="hidden" id="id-cliente-prop" name="id" />
+        <input type="hidden" id="readonly" name="readonly" value="readonly"/>
+    </form>
+    
 <form style="display: none" action="{{route('imoveis.imagens.dragdrop')}}" method="get" id="form-img"  target="_blank">
     <input type="hidden" id="i-idimovel-imgdrag" name="id" value="{{$imovel->IMB_IMV_ID}}"/>
 </form>
@@ -1709,13 +1918,22 @@
           window.history.back();
           return false;
         }
+        $("#i-imagens-click").click( function()
+        {
+            CarregarImagens( $("#IMB_IMV_ID").val());
 
+
+        });
 
         preencherCBCorretores(999999);
         calcularPerProp();
         temPrincipal();
-        cargaImovel();
+        //cargaImovel();
         portalImovelCarga();
+
+        CarregarPropImo( $("#IMB_IMV_ID").val());
+        CarregarCorImo( $("#IMB_IMV_ID").val());
+        CarregarCapImo( $("#IMB_IMV_ID").val());
 
         $("#sirius-menu").click();
 
@@ -2251,6 +2469,7 @@ function modalCaptadores()
                     '<tr>'+
                     '   <td class="div-center">'+data[nI].IMB_ATD_NOME+'</td>'+
                     '   <td class="div-center">'+data[nI].IMB_CAPIMO_PERCENTUAL+'</td>'+
+                    '   <td class="div-center">'+data[nI].IMB_CAPIMO_TIPO+'</td>'+
                     '   <td style="text-align:center"> '+
 //                    '<a  class="btn btn-sm btn-primary" href=javascript:editarCorImo('+data[nI].IMB_CORIMO_ID+')>Editar</a>&nbsp;&nbsp;&nbsp;&nbsp;'+
 //                    '           <button class="btn btn-sm btn-primary" onclick="editarCorImo('+data[nI].IMB_CORIMO_ID+' )">Editar</button>'+
@@ -2371,51 +2590,70 @@ function modalCaptadores()
 
 
         //área de IMAGENS
-        function CarregarImagens( id )
+    function CarregarImagens( id )
     {
         
+        $( "#galeria-imovel-inc" ).empty();        
         $("#galeria-update-btn").hide();        
         var url = "{{ route( 'imagens.imoveis')}}/"+id;
 
         var empresa = "{{Auth::user()->IMB_IMB_ID}}";
-//        console.log('imagens '+url );
-        $.getJSON( url, function( data)
-        {
-            $( "#galeria-imovel-inc" ).empty();
-            contador = 4;
-            texto='';
-            for( nI=0;nI < data.length;nI++)
+        console.log('recarregar');
+        $("#preloader").show();
+        $.ajax(
             {
+                url:url,
+                dataType:'json',
+                type:'get',
+                async:false,
+                success:function( data )
+                {
+            
+                    contador = 4;
+                    texto='';
+                    for( nI=0;nI < data.length;nI++)
+                    {
 
-                if( data[nI].IMB_IMG_PRINCIPAL !='S')
-                    principal = '<a title="Definir essa imagem como a imagem principal" href=javascript:imagemPrincipal('+data[nI].IMB_IMV_ID+','+
-                                    data[nI].IMB_IMG_ID+') class="btn btn-sm btn-warning"><i class="fa fa-check-square-o" aria-hidden="true"></i></a> '
-                else
-                    principal =
-                        '<a class="btn btn-sm btn-success">Principal</a> ';
+                        console.log('recarregando');
+                        console.log( data[nI]);
+                        if( data[nI].IMB_IMG_PRINCIPAL !='S')
+                            principal = '<a title="Definir essa imagem como a imagem principal" href=javascript:imagemPrincipal('+data[nI].IMB_IMV_ID+','+
+                                            data[nI].IMB_IMG_ID+') class="btn btn-sm btn-warning"><i class="fa fa-check-square-o" aria-hidden="true"></i></a> '
+                        else
+                            principal =
+                                '<a class="btn btn-sm btn-success">Principal</a> ';
 
-                bloqnet = '';
-                if( data[nI].IMB_IMG_NAOIRPROSITE == 'S')
-                    bloqnet = '<a title="Não vai pro site"><i class="fa fa-ban" aria-hidden="true"></i><a>';
-                texto = '<div class="col-md-3">'+
-                        '   <div class="card">'+
-                        '       <div class="card-body"> '+
-                        '          <h5 class="card-title div-center">'+data[nI].IMB_IMG_NOME+'</h5>' +
-                        '       </div> '+
-                        
-                        '       <a title="click na imagem para ir para o album" href="javascript:verImagem('+data[nI].IMB_IMV_ID+', \''+data[nI].IMB_IMG_ARQUIVO+'\' )"><img class="img-album" src={{url('')}}/storage/images/'+empresa+'/imoveis/'+data[nI].IMB_IMV_ID+'/'+data[nI].IMB_IMG_ARQUIVO+'></a>'+
-                        '       <a title="Alterar ou complementar informações para esta imagem" href=javascript:editarImagem('+data[nI].IMB_IMG_ID+') class="btn btn-sm btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i></a>'+
-                        '&nbsp;&nbsp;<a title="Excluir a imagem" href=javascript:apagarImagem('+data[nI].IMB_IMG_ID+') class="btn btn-sm btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>'+
-                        '&nbsp;&nbsp;'+principal+
-                        '&nbsp;&nbsp;'+bloqnet+
-                        '   </div> '+
-                        '</div>';
-                $( "#galeria-imovel-inc" ).append( texto );                
+                        bloqnet = '';
+                        if( data[nI].IMB_IMG_NAOIRPROSITE == 'S')
+                            bloqnet = '<a title="Não vai pro site"><i class="fa fa-ban" aria-hidden="true"></i><a>';
 
-            }
+                        texto = '<div class="col-lg-3 border-05">'+
+                                '   <div class="card">'+
+                                '       <div class="card-body"> '+
+                                '          <h5 class="card-title div-center">'+data[nI].IMB_IMG_NOME+'</h5>' +
+                                '       </div> '+
+
+                                '       <a title="click na imagem para ir para o album" href="javascript:verImagem('+data[nI].IMB_IMV_ID+', \''+data[nI].IMB_IMG_ARQUIVO+'\' )"><img id="img'+data[nI].IMB_IMG_ID+'" class="img-album" src={{url('')}}/storage/images/'+empresa+'/imoveis/'+data[nI].IMB_IMV_ID+'/'+data[nI].IMB_IMG_ARQUIVO+'?v='+moment().format('YYYYDDMMHHMMSS')+'></a>'+
+                                '       <a title="Alterar ou complementar informações para esta imagem" href=javascript:editarImagem('+data[nI].IMB_IMG_ID+') class="btn btn-sm btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i></a>'+
+                                '       <a title="Rotacionar Imagem para Direita em 90º" href=javascript:rotacionar('+data[nI].IMB_IMG_ID+',90) class="btn btn-sm btn-secondary"><i class="fa fa-rotate-right" aria-hidden="true"></i></a>'+
+                                '       <a title="Rotacionar Imagem para Esquerda em 90º" href=javascript:rotacionar('+data[nI].IMB_IMG_ID+',-90) class="btn btn-sm btn-secondary"><i class="fa fa-rotate-left" aria-hidden="true"></i></a>'+
+                                                
+                                '&nbsp;&nbsp;<a title="Excluir a imagem" href=javascript:apagarImagem('+data[nI].IMB_IMG_ID+') class="btn btn-sm btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>'+
+                                '&nbsp;&nbsp;'+principal+
+                                '&nbsp;&nbsp;'+bloqnet+
+                                '   </div> '+
+                                '</div>';
+                        $( "#galeria-imovel-inc" ).append( texto );                
+
+                    }
+                },
+                complete:function()
+                {
+                    $("#preloader").hide();
+                }
 
 
-        });
+            });
     }
 
 
@@ -2959,6 +3197,7 @@ function modalCaptadores()
             {
 
                 alert('Gravado com sucesso!');
+
                 window.close();
 
             },
@@ -2980,8 +3219,10 @@ function modalCaptadores()
 
     function preencherCondominio( nId )
     {
+
         url = "{{ route('condominio.carga')}}/"+$("#I-IMB_IMB_IDMASTER").val();
         console.log( 'condominios: '+url );
+
         $.getJSON( url, function( data )
 
         {
@@ -3017,7 +3258,7 @@ function modalCaptadores()
             {
                 linha =
                     '<tr>'+
-                    '   <td style="text-align:center">'+data[nI].IMB_CLT_NOME+'</td>'+
+                    '   <td style="text-align:center"><a href="javascript:alterarClienteEditImv('+data[nI].IMB_CLT_ID+')">'+data[nI].IMB_CLT_NOME+'</a></td>'+
                     '   <td style="text-align:center">'+data[nI].IMB_IMVCLT_PERCENTUAL4+'</td>'+
                     '   <td style="text-align:center">'+data[nI].principal+'</td>'+
                     '   <td style="text-align:center"> '+
@@ -3573,18 +3814,20 @@ function modalCaptadores()
                 $("#IMB_IMV_CONDICOESCOMERCIAIS").val( data.IMB_IMV_CONDICOESCOMERCIAIS);
                 $("#IMB_IMV_CHABOX").val( data.IMB_IMV_CHABOX);
                 $("#IMB_IMV_LINKVIDEO").val( data.IMB_IMV_LINKVIDEO);
+                $("#IMB_CND_ID").val( data.IMB_CND_ID);
+                $("#CEP_BAI_ID").val( data.CEP_BAI_ID );
+                $("#IMB_TIM_ID").val( data.IMB_TIM_ID );
 
 
-                cargaBairrosdaTabela( data.CEP_BAI_ID )
+                //cargaBairrosdaTabela( data.CEP_BAI_ID )
 
 
                 preencherUnidades( data.IMB_IMB_ID2 );
-                preencherTipoImovel( data.IMB_TIM_ID );
-                preencherCondominio( data.IMB_CND_ID);
+                //preencherTipoImovel( data.IMB_TIM_ID );
+//                preencherCondominio( data.IMB_CND_ID);
                 CarregarPropImo(data.IMB_IMV_ID);
                 CarregarCorImo(data.IMB_IMV_ID);
                 CarregarCapImo(data.IMB_IMV_ID);
-                CarregarImagens(data.IMB_IMV_ID);
                 cargaStatus( data.VIS_STA_ID );
                 statusImovel( data.VIS_STA_ID );
                 preencherCorretoresChave( data.IMB_ATD_IDCHAVE );
@@ -3882,6 +4125,7 @@ function modalCaptadores()
     {
         $("#IMB_CND_ID").empty();
         $("#IMB_CND_ID").val('0');
+        preencherCondominio();
 
     }
 
@@ -3910,6 +4154,37 @@ function modalCaptadores()
 {
     $("#modalcadbairro").modal('show');
 }
+
+    function rotacionar( idimagem, graus )
+    {
+        var url = "{{route('image.rotate')}}/"+idimagem+"/"+graus;
+        console.log(url);
+        $.ajax(
+            {
+                url:url,
+                dataType:'json',
+                type:'get',
+                success:function()
+                {
+                    alert('Rotacionado');
+                    dsource = $("#img"+idimagem).attr( 'src' );
+                    $("#img"+idimagem).attr("src", dsource+moment().format('MMSS') );
+                    
+
+                },
+                error:function()
+                {
+                    alert('erro ao rotacionar');
+                }
+            }
+        )
+    }
+
+    function alterarClienteEditImv( id )
+        {
+            $("#id-cliente-prop").val( id );
+            $("#form-alt-cliente-indexctr").submit();
+        }
 
     
 

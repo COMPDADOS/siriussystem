@@ -169,6 +169,7 @@ class ctrClienteAcesso extends Controller
         )
         
         ->where( 'IMB_LOCATARIOCONTRATO.IMB_CLT_ID','=',$id )
+        ->where( 'IMB_CTR_SITUACAO','=', 'ATIVO')
         ->leftJoin('IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_LOCATARIOCONTRATO.IMB_CTR_ID')
         ->leftJoin('IMB_IMOVEIS','IMB_IMOVEIS.IMB_IMV_ID','IMB_CONTRATO.IMB_IMV_ID')
         ->get();

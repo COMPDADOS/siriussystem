@@ -26,6 +26,19 @@
                             </div>
                             <div class="row">
                                 
+                                <h6 class="col-md-12 back-dark">Padrões no Repasse de Aluguel</h6>   
+                                <div class="col-md-6">
+                                    <label class="label-control">Forma de Repasse</label>
+                                    <select select class="form-control" id="IMB_FORPAG_IDLOCADOR"></select>
+                                </div>
+                                    
+                                <div class="col-md-6">
+                                    <label class="label-control">Conta Banco/Caixa</label>
+                                    <select class="form-control" id="FIN_CCX_ID_PADRAO_REP"></select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                
                                 <h6 class="col-md-12 back-dark">Padrões no Apoio ao Financeiro Pagto. de Compromissos</h6>   
                                 <div class="col-md-4">
                                     <label class="label-control">CFC Multa</label>
@@ -41,6 +54,33 @@
                                 </div>
                                     
                             </div>
+
+                            
+                            <div class="row">
+                                
+                                  
+                                <div class="col-md-4">
+                                    <h6 class="col-md-12 back-dark">Na desocupação</h6> 
+                                    <label class="label-control">Deixar no Status</label>
+                                    <select select class="form-control" id="VIS_STA_IDALUGADO"></select>
+                                </div>          
+                                <div class="col-md-4">
+                                    @php
+                                        $eventos = app('App\Http\Controllers\ctrEvento')->carga();
+                                   @endphp
+                                    <h6 class="col-md-12 back-dark">Seguro Incêndio</h6> 
+                                    <label class="label-control">Evento do Seguro Incêndio</label>
+                                    <select select class="form-control" id="IMB_TBE_IDSEGINC">
+                                        <option value="">Selecione</option>
+                                        @foreach( $eventos as $evento )
+                                            <option value="{{$evento->IMB_TBE_ID}}">{{$evento->IMB_TBE_NOME}}</option>
+                                        @endforeach
+
+                                    </select>
+                                </div>
+
+                            </div>
+
 
                         </div>
                     </div>

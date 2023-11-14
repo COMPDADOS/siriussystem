@@ -96,6 +96,10 @@
 
             }
 
+            .div-100-perc
+            {
+                width:100%;
+            }
             .divTableCellUSUARIO
             {
                 border: 1px solid #999999;
@@ -202,6 +206,14 @@
                 width : 10%;
                 font-size:9px;
             }
+            .divTableCell7Porcento
+            {
+                border: 0px;
+                display: table-cell;
+                padding: 3px;
+                width : 7%;
+                font-size:9px;
+            }
             .divTableCell15Porcento
             {
                 border: 0px;
@@ -241,6 +253,24 @@
                 display: table-cell;
                 padding: 3px;
                 width : 50%;
+                font-size:9px;
+            }
+
+            .divTableCell100Porcento
+            {
+                border: 0px;
+                display: table-cell;
+                padding: 3px;
+                width : 100%;
+                font-size:9px;
+            }
+
+            .divTableCell52Porcento
+            {
+                border: 0px;
+                display: table-cell;
+                padding: 3px;
+                width : 52%;
                 font-size:9px;
             }
 
@@ -653,7 +683,7 @@
     	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js";></script>
         
         
-		<title>Previsao Repasse </title>
+		<title>Relatório de Caixa </title>
 		<body>
             @php
              $qteve=0;
@@ -661,9 +691,6 @@
             <div class="divTable">
                 <div class="divTableBody">
                     <div class="divTableRow semborba">
-                        <div class="divTableCellLogo">
-                            <img src="{{env('APP_URL')}}/storage/images/1/logos/logo.jpg" alt="alt-logo">
-                        </div>
                         @php
                             $imb = app('App\Http\Controllers\ctrImobiliaria')->pegarImobiliaria( Auth::user()->IMB_IMB_ID );
                         @endphp
@@ -674,33 +701,54 @@
                             <p style="margin: -2;" class="titulo-10-black" >{{$imb->IMB_IMB_URL}} </p>
                             <p id="i-titulo" style="margin: -2;" class="titulo-empresa-center " >Extrato de Caixa</p>
                             <p id="i-titulo" style="margin: -2;" class="titulo-empresa-center " >{{$periodo}}</p>
+                            
                         </div>
                     </div>
                 </div>                        
             </div>
-          
             <div class="divTable semborda">
                 <div class="divTableBody semborda">
                     <div class="divTableRow semborda">
-                    <div class="divTableCell10Porcento semborda">
+                        <hr>
+                    </div>
+                </div>
+            <div>
+          
+                <div class="divTable semborda">
+                    <div class="divTableBody semborda">
+                        <div class="divTableRow semborda">
+
+                            <div class="divTableCell70Porcento semborda">
+                            </div>
+                            <div class="divTableCell20Porcento semborda">
+                                <b>Saldo Inicial:{{number_format( $saldoinicial,2,',','.')}}  </b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+            <div class="divTable semborda div-100-perc">
+                <div class="divTableBody semborda div-100-perc">
+                    <div class="divTableRow semborda div-100-perc">
+                        <div class="divTableCell7Porcento semborda  div-center">
                             <u>Situação</u>
                         </div>
-                        <div class="divTableCell10Porcento semborda">
+                        <div class="divTableCell7Porcento semborda  div-center">
                             <u>Origem</u>
                         </div>
-                        <div class="divTableCell10Porcento semborda">
-                            <u>Dt. Efetivação</u>
+                        <div class="divTableCell10Porcento semborda div-center">
+                            <u>Dt.Entrada</u>
                         </div>
-                        <div class="divTableCell10Porcento semborda">
-                            <u>Dt. Cadastro</u>
+                        <div class="divTableCell10Porcento semborda  div-center">
+                            <u>Dt.Cadastro</u>
                         </div>
-                        <div class="divTableCell10Porcento semborda div-right">
+                        <div class="divTableCell7Porcento semborda div-right">
                             <u>Entrada</u>
                         </div>
-                        <div class="divTableCell10Porcento semborda div-right">
+                        <div class="divTableCell7Porcento semborda div-right">
                             <u>Saída</u>
                         </div>
-                        <div class="divTableCell40Porcento semborda">
+                        <div class="divTableCell100Porcento semborda  div-center">
                             <u>Histórico</u>
                         </div>
                     </div>
@@ -727,56 +775,67 @@
                     }
                        
                 @endphp
-                <div class="divTable semborda">
-                    <div class="divTableBody semborda">
-                        <div class="divTableRow semborda">
-                            <div class="divTableCell10Porcento semborda">
-                                {{$l->FIN_LCX_SITUACAO}}
+                <div class="divTable semborda div-100-perc">
+                    <div class="divTableBody semborda div-100-perc">
+                        <div class="divTableRow semborda div-100-perc">
+                            <div class="divTableCell7Porcento semborda  div-center">
+                                @if( $l->FIN_LCX_CONCILIADO == 'S' )
+                                    <b>Conciliado</b>
+                                @endif
                             </div>
-                            <div class="divTableCell10Porcento semborda">
+                            <div class="divTableCell7Porcento semborda  div-center">
                                 {{$l->FIN_LCX_ORIGEM}}
                             </div>
-                            <div class="divTableCell10Porcento semborda">
+                            <div class="divTableCell10Porcento semborda  div-center">
                                 {{ date('d-m-Y', strtotime($l->FIN_LCX_DATAENTRADA))}}
                             </div>
-                            <div class="divTableCell10Porcento semborda">
+                            <div class="divTableCell10Porcento semborda  div-center">
                                 {{date('d-m-Y', strtotime($l->FIN_LCX_DATACADASTRO))}}
                             </div>
-                            <div class="divTableCell10Porcento semborda div-right">
+                            <div class="divTableCell7Porcento semborda div-right">
                                 {{$entrada}}
                             </div>
-                            <div class="divTableCell10Porcento semborda div-right">
+                            <div class="divTableCell7Porcento semborda div-right">
                                 {{$saida}}
                             </div>
-                            <div class="divTableCell40Porcento semborda">
+                            <div class="divTableCell100Porcento semborda  div-center">
                                 {{$l->FIN_LCX_HISTORICO}}
                             </div>
                         </div>
                     </div>
                 </div>
             @endforeach
-                <div class="divTableBody semborda">
-                    <div class="divTableRow semborda">
-                        <div class="divTableCell10Porcento semborda">
-                            <b>Totais</b>
-                        </div>
-                            <div class="divTableCell10Porcento semborda">
-                            </div>
-                            <div class="divTableCell10Porcento semborda">
-                            </div>
-                            <div class="divTableCell10Porcento semborda">
-                            </div>
-                            <div class="divTableCell10Porcento semborda">
-                            </div>
-                            <div class="divTableCell10Porcento semborda div-right">
-                                {{number_format($totalentrada,2,',','.')}}
-                            </div>
-                            <div class="divTableCell10Porcento semborda div-right">
-                                {{number_format($totalsaida,2,',','.')}}
+                <div class="divTable semborda">
+                    <div class="divTableBody semborda">
+                        <div class="divTableRow semborda">
+                            <hr>
                         </div>
                     </div>
-                </div>
+                <div>
+          
+                <div class="divTable semborda">
+                    <div class="divTableBody semborda">
+                        <div class="divTableRow semborda">
 
+                            <div class="divTableCell20Porcento semborda">
+                            </div>
+                            <div class="divTableCell20Porcento semborda div-right">
+                                Total Entradas R$: {{number_format($totalentrada,2,',','.')}}
+                            </div>
+                            <div class="divTableCell20Porcento semborda div-right">
+                                Total Saídas R$: {{number_format($totalsaida,2,',','.')}}
+                            </div>
+
+                            <div class="divTableCell20Porcento semborda">
+                            </div>
+                            <div class="divTableCell60Porcento semborda">
+                                <b>Saldo Final:{{number_format( $saldofinal,2,',','.')}}  </b>
+                            </div>
+                        </div>
+                    </div>
+                <div>
+                            
+            
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js";></script>
     	    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js";></script>
 

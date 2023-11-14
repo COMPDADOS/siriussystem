@@ -171,7 +171,7 @@ class ctrRepasse extends Controller
                     ->incideTaxaAdm( $lf->IMB_TBE_ID, $lf->IMB_LCF_ID ) =='S' )
                     $objbases->basetaxa = $objbases->basetaxa + $valorlcf;
 
-            Log::info('1 calcular taxa: '.$calculartaxaadm);
+            //Log::info('1 calcular taxa: '.$calculartaxaadm);
                     $recebido = 'N';
             if( $lf->IMB_LCF_DATARECEBIMENTO <> null and $lf->IMB_LCF_LOCATARIOCREDEB =='D' and $lf->IMB_LCF_LOCADORCREDEB == 'C' ) 
                 $recebido  = 'S';
@@ -266,7 +266,6 @@ class ctrRepasse extends Controller
 
             $this->cobraItemTaxaDiferente( $idcontrato,$ctr->IMB_IMV_ID, $datavencimento, $datapagamento );
 
-            Log::info( "objbases->basetaxa $objbases->basetaxa" );
 
             //dd( "$calculartaxaadm and $objbases->basetaxa");
             if( $calculartaxaadm =='S' and $objbases->basetaxa <> 0 and $this->verificarFixado( 6 ) =='' )
@@ -332,9 +331,11 @@ class ctrRepasse extends Controller
         ->where('IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID)->orderBy('IMB_TBE_ID')->get();
 
         $ctr = mdlContrato::find( $idcontrato );
+        $imovel = mdlImovel::find( $ctr->IMB_IMV_ID);
         $baseirrf = 0;
         $nvalorbaseiss=0;
         $irrflancado=0;
+        $d13lancado = 0;
         foreach ($tmp as $item)
         {
             $valoritem = $item->IMB_LCF_VALOR;
@@ -356,6 +357,8 @@ class ctrRepasse extends Controller
                 $this->itemDelete( $item->IMB_PAG_ID );
             
             if( $item->IMB_TBE_ID == 18 ) $irrflancado = $item->IMB_LCF_VALOR;
+
+            if( $item->IMB_TBE_ID == 35 ) $d13lancado = $item->IMB_LCF_VALOR;
 
         }
 
@@ -379,6 +382,10 @@ class ctrRepasse extends Controller
 
         if( $irrflancado == 0 and $ctr->IMB_CTR_NUNCARETEIRRF <> 'S')
             $this->lancarIRRF( $idcontrato, $idimovel, $datavencimento, $datapagamento,$baseirrf );
+
+        
+        if( $d13lancado ==  0 and $imovel->IMB_IMV_13COBRAR == 'S')
+            $this->lancar13( $idcontrato, $idimovel, $datavencimento, $datapagamento,$nvalorbaseiss );
 
         return $tmp;
 
@@ -739,6 +746,9 @@ class ctrRepasse extends Controller
         $titulo1 = $request->titulo1;
         $titulo2 = $request->titulo2;
         $titulo3 = $request->titulo3;
+        $ordem = "data";
+        if( $request->ordem == 'nome' )
+           $ordem="nome";
 
         $idcliente = $request->idcliente;
         $gerardatatable = $request->gerardatatable;
@@ -1074,6 +1084,10 @@ class ctrRepasse extends Controller
         $titulo3 = $request->titulo3;
         $idcliente= $request->idcliente;
         $gerardatatable = $request->gerardatatable;
+        $ordem = "data";
+        if( $request->ordem == 'nome' )
+           $ordem="nome";
+
 
        ////// //////Log::info( "previsão de repasse");
 
@@ -1228,13 +1242,22 @@ class ctrRepasse extends Controller
         where( 'IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID)
         ->orderBy('IMB_CTR_ID');
 
+/*
+        if( $ordem == 'data')
+        
+            $tr = $tr->orderBy( 'DATAPREVISAOPAGAMENTO')
+            ->orderBy( 'IMB_CLT_NOMELOCADOR');
+        else
+        if( $ordem=='nome')
+            $tr = $tr->orderBy( 'IMB_CLT_NOMELOCADOR');
+
 
         if( $idcliente <> '')
         {
             $tr = $tr->where( 'IMB_CLT_IDLOCADOR','<>', $idcliente )->delete();
             return response()->json($tr,200);
         }
-
+*/
     
         $tr = $tr->get();
 
@@ -1252,6 +1275,10 @@ class ctrRepasse extends Controller
 
 
         $datatermino =$request->termino;
+
+        $ordem = "data";
+        if( $request->ordem == 'nome' )
+           $ordem="nome";
 
         $titulo1 = $request->titulo1;
         $titulo2 = $request->titulo2;
@@ -1431,7 +1458,15 @@ class ctrRepasse extends Controller
         $tr = mdlTmpPrevisaoRepasse::
         where( 'IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID)
         ->orderBy('IMB_CTR_ID');
-
+/*
+        if( $ordem == 'data')
+        
+            $tr = $tr->orderBy( 'DATAPREVISAOPAGAMENTO')
+            ->orderBy( 'IMB_CLT_NOMELOCADOR');
+        else
+        if( $ordem=='nome')
+            $tr = $tr->orderBy( 'IMB_CLT_NOMELOCADOR');
+  */      
         if( $idcliente <> '')
         {
             $tr = $tr->where( 'IMB_CLT_IDLOCADOR','<>', $idcliente )->delete();
@@ -1566,7 +1601,7 @@ class ctrRepasse extends Controller
     {
         $array = array();
 
-        $tmp = mdlTmpPrevisaoTaxAdm::all();
+        $tmp = mdlTmpPrevisaoTaxAdm::where( 'IMB_ATD_ID','=', Auth::user()->IMB_ATD_ID)->get;
         $total=0;
         $totaltc=0;
         foreach( $tmp as $tm )
@@ -1653,6 +1688,7 @@ class ctrRepasse extends Controller
                 ->where( 'IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID);
         
         $dados = $dados->orderBy('IMB_FORPAG_NOME')
+                        ->orderBy('DATAPREVISAOPAGAMENTO')
          ->get(['IMB_FORPAG_NOME','IMB_FORPAG_ID', 'TMP_PVR_TITULO2']);
 
          return  $dados;
@@ -1667,7 +1703,7 @@ class ctrRepasse extends Controller
                 ->where( 'IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID)
                 ->where( 'IMB_FORPAG_ID','=',$forma );
         
-        $dados =  $dados->orderBy('IMB_CLT_NOMELOCADOR')
+        $dados =  $dados->orderBy('DATAPREVISAOPAGAMENTO')->orderBy('IMB_CLT_NOMELOCADOR')
          ->get(['IMB_CLT_NOMELOCADOR', 'IMB_CLT_IDLOCADOR']);
 
          return  $dados;
@@ -1740,6 +1776,77 @@ class ctrRepasse extends Controller
 
     }
 
+    public function lancar13( $idcontrato, $idimovel, $datavencimento, $datapagamento, $valortaxaadm)
+    {
+        $mes = date( 'm',strtotime( $datavencimento) );
 
+        $imovel = mdlImovel::find( $idimovel);
+
+        if( $imovel->IMB_IMV_13MES == $mes )
+        {
+            $tmp = new mdlRepasse;
+            $tmp->IMB_IMV_ID             = $idimovel;
+            $tmp->IMB_CTR_ID             = $idcontrato;
+            $tmp->IMB_IMB_ID             = Auth::user()->IMB_IMB_ID;
+            $tmp->IMB_ATD_ID             = Auth::user()->IMB_ATD_ID;
+            $tmp->IMB_PAG_DATAVENCIMENTO = $datavencimento;
+            $tmp->IMB_PAG_DATAPAGAMENTO  = $datapagamento;
+            $tmp->IMB_TBE_ID                   = 35;
+            $tmp->IMB_TBE_NOME            = 'Décima Terceira Parcela';
+            $tmp->IMB_LCF_LOCATARIOCREDEB      = 'N';
+            $tmp->IMB_LCF_LOCADORCREDEB        = 'D';
+            $tmp->IMB_LCF_VALOR                = abs($valortaxaadm)  * $imovel->IMB_IMV_13PERCENTUAL / 100;
+            $tmp->IMB_LCF_OBSERVACAO           = '';
+            $tmp->IMB_LCF_ID             = 0;
+            $tmp->FIN_CFC_ID             =   app('App\Http\Controllers\ctrRotinas')
+                                        ->pegarCFCPadrao( 35 );
+             $tmp->save();    
+        }
+
+
+        if( $imovel->IMB_IMV_13_2MES == $mes )
+        {
+            $tmp = new mdlRepasse;
+            $tmp->IMB_IMV_ID             = $idimovel;
+            $tmp->IMB_CTR_ID             = $idcontrato;
+            $tmp->IMB_IMB_ID             = Auth::user()->IMB_IMB_ID;
+            $tmp->IMB_ATD_ID             = Auth::user()->IMB_ATD_ID;
+            $tmp->IMB_PAG_DATAVENCIMENTO = $datavencimento;
+            $tmp->IMB_PAG_DATAPAGAMENTO  = $datapagamento;
+            $tmp->IMB_TBE_ID                   = 35;
+            $tmp->IMB_TBE_NOME            = 'Décima Terceira Parcela';
+            $tmp->IMB_LCF_LOCATARIOCREDEB      = 'N';
+            $tmp->IMB_LCF_LOCADORCREDEB        = 'D';
+            $tmp->IMB_LCF_VALOR                = abs($valortaxaadm * $imovel->IMB_IMV_13_2PERCENTUAL / 100);
+            $tmp->IMB_LCF_OBSERVACAO           = '';
+            $tmp->IMB_LCF_ID             = 0;
+            $tmp->FIN_CFC_ID             =   app('App\Http\Controllers\ctrRotinas')
+                                        ->pegarCFCPadrao( 35 );
+             $tmp->save();    
+        }
+
+
+        if( $imovel->IMB_IMV_13_3MES == $mes )
+        {
+            $tmp = new mdlRepasse;
+            $tmp->IMB_IMV_ID             = $idimovel;
+            $tmp->IMB_CTR_ID             = $idcontrato;
+            $tmp->IMB_IMB_ID             = Auth::user()->IMB_IMB_ID;
+            $tmp->IMB_ATD_ID             = Auth::user()->IMB_ATD_ID;
+            $tmp->IMB_PAG_DATAVENCIMENTO = $datavencimento;
+            $tmp->IMB_PAG_DATAPAGAMENTO  = $datapagamento;
+            $tmp->IMB_TBE_ID                   = 35;
+            $tmp->IMB_TBE_NOME            = 'Décima Terceira Parcela';
+            $tmp->IMB_LCF_LOCATARIOCREDEB      = 'N';
+            $tmp->IMB_LCF_LOCADORCREDEB        = 'D';
+            $tmp->IMB_LCF_VALOR                = abs($valortaxaadm * $imovel->IMB_IMV_13_3PERCENTUAL / 100);
+            $tmp->IMB_LCF_OBSERVACAO           = '';
+            $tmp->IMB_LCF_ID             = 0;
+            $tmp->FIN_CFC_ID             =   app('App\Http\Controllers\ctrRotinas')
+                                        ->pegarCFCPadrao( 35 );
+             $tmp->save();    
+        }
+
+    }
     //
 }

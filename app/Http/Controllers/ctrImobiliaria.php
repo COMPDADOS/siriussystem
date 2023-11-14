@@ -98,6 +98,8 @@ class ctrImobiliaria extends Controller
         $param->FIN_CFC_IDDESCONTOS                 = $request->FIN_CFC_IDDESCONTOS;
         $param->FIN_CFC_IDMULTA                 = $request->FIN_CFC_IDMULTA;
         $param->FIN_CFC_IDJUROS                 = $request->FIN_CFC_IDJUROS;
+        $param->IMB_PRM_USARPARCELAS                 = $request->IMB_PRM_USARPARCELAS;
+        
 
         $param2->IMB_PRM_PERDEBONIFAPOSDIAS                 = $request->IMB_PRM_PERDEBONIFAPOSDIAS;
 
@@ -117,7 +119,8 @@ class ctrImobiliaria extends Controller
         $param2->IMB_PRM_TOLERANCIABOLETO                 = $request->IMB_PRM_TOLERANCIABOLETO;
         $param->IMB_PRM_COBMULTANDIASPER                 = $request->IMB_PRM_COBMULTANDIASPER;
         $param->IMB_PRM_COBMULTANDIAS                 = $request->IMB_PRM_COBMULTANDIAS;
-
+        $param->IMB_PRM_MODRECLOCATARIO                 = $request->IMB_PRM_MODRECLOCATARIO;
+        
         //IMPOSTOS
         $param->IMB_PRM_ISSALIQUOTA                 = $request->IMB_PRM_ISSALIQUOTA;
         $param->IMB_PRM_ISSALIQUOTA1005                 = $request->IMB_PRM_ISSALIQUOTA1005;
@@ -146,7 +149,8 @@ class ctrImobiliaria extends Controller
         $param2->IMB_PRM_PONTUAL_SOB_ACORDO  = $request->IMB_PRM_PONTUAL_SOB_ACORDO;
 
         $param2->IMB_CODIGOATIVIDADE                 = $request->IMB_CODIGOATIVIDADE;
-
+        $param2->IMB_FORPAG_IDLOCADOR                 = $request->IMB_FORPAG_IDLOCADOR;
+        $param2->FIN_CCX_ID_PADRAO_REP                = $request->FIN_CCX_ID_PADRAO_REP;
 
         //recibos
         $param2->IMB_PRM_PER_DIAS_INICIO                 = $request->IMB_PRM_PER_DIAS_INICIO;
@@ -181,9 +185,9 @@ class ctrImobiliaria extends Controller
         $param2->IMB_PRM_WSAPELIDO                 = $request->IMB_PRM_WSAPELIDO;
         $param2->IMB_PRM_WSWEBHOOK                 = $request->IMB_PRM_WSWEBHOOK;
         $param2->IMB_PRM_TOKENNFS                 = $request->IMB_PRM_TOKENNFS;
-        
-        
-
+        $param2->VIS_STA_IDALUGADO                 = $request->VIS_STA_IDALUGADO;
+        $param2->IMB_PRM_DEMONSTRATIVOPDF                 = $request->IMB_PRM_DEMONSTRATIVOPDF;
+        $param2->IMB_TBE_IDSEGINC                 = $request->IMB_TBE_IDSEGINC;
         $param->save();
 
         $param2->save();
@@ -250,5 +254,11 @@ class ctrImobiliaria extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function parametros( $id)
+    {
+        $imob = mdlParametros::find( $id );
+        return $imob;
     }
 }

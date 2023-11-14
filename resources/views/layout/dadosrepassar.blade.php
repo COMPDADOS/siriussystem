@@ -24,10 +24,10 @@
           <input type="text" class="form-control valor" id="i-troco-locador" value="0">
         </div>
         <div class="col-md-2 escondido div-center" id="div-debito-futuro-locador">
-          <input type="checkbox" class="form-control" id="i-debito-futuro"><b>Troco como Débito Futuro
+          <input type="checkbox" class="form-control" id="i-debito-futuro"><b>Diferença como Débito Futuro
         </div>
         <div class="col-md-2 escondido div-center" id="div-credito-futuro-locador">
-          <input type="checkbox" class="form-control" id="i-credito-futuro"><b>Troco como Crédito Futuro
+          <input type="checkbox" class="form-control" id="i-credito-futuro"><b>Diferença como Crédito Futuro
         </div>
         <div class="col-md-2 escondido div-center" id="div-abater-locador">
           <input type="checkbox" class="form-control" id="i-abater"><b>Abater e manter em aberto

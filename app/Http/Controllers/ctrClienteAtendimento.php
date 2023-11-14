@@ -15,6 +15,7 @@ use App\mdlLeads;
 use DataTables;
 use DB; 
 use Auth;
+use Log;
 
 class ctrClienteAtendimento extends Controller
 {
@@ -75,7 +76,7 @@ class ctrClienteAtendimento extends Controller
        ->where( 'VIS_ATENDIMENTO.IMB_CLT_ID','=', $id)
        ->leftJoin( 'IMB_ATENDENTE', 'IMB_ATENDENTE.IMB_ATD_ID', 'VIS_ATENDIMENTO.IMB_ATD_ID')
        ->leftJoin( 'IMB_CLIENTE', 'IMB_CLIENTE.IMB_CLT_ID', 'VIS_ATENDIMENTO.IMB_CLT_ID')
-       ->orderBy('VIS_ATENDIMENTO.IMB_ATM_DTHINICIO','DESC')
+       ->orderBy('VIS_ATENDIMENTO.IMB_ATM_DTHINICIO','ASC')
       ->get();
         return $atm;
     }
@@ -145,7 +146,7 @@ class ctrClienteAtendimento extends Controller
         $cl->IMB_CLT_DTHALTERACAO = date('Y-m-d H:i:s');
         $cl->save();
 
-        return response()->json('ok',200);
+        return response()->json($cliatm->IMB_CLA_ID,200);
 
     }
 
@@ -333,24 +334,9 @@ class ctrClienteAtendimento extends Controller
    public function listarAtendimentos( Request $request )
    {
 
-    
-        function formatarData($data){
-            $rData = implode("-", array_reverse(explode("/", trim($data))));
-            return $rData;
-        }
+   
 
-
-        $vertodos = app('App\Http\Controllers\ctrDireitos')
-        ->checarDireitoPHP( Auth::user()->IMB_ATD_ID, '204', 1 );
-
-
-        $datainicio='';
-        if( $request->datainicio <> '' )
-            $datainicio       =  formatarData( $request->datainicio );
-
-        $datafim='';
-        if( $request->datafim <> '' )
-                $datafim       =  formatarData( $request->datafim );
+      
 
         $prioridade         =   $request->prioridade;
         $emaberto           =   $request->emaberto;
@@ -358,7 +344,21 @@ class ctrClienteAtendimento extends Controller
         $idcliente          =   $request->idcliente;
         $idcorretor         =   $request->corretor;
         $idprioridade       =   $request->prioridade;
-        
+
+        if( $id == '' )
+        {
+            $datainicio       =  $request->datainicio ;
+            if( $datainicio == '' ) $datainicio = date('Y/m/d');
+
+            $datafim       =   $request->datafim ;
+            if( $datafim == '' ) $datafim = date('Y/m/d');
+        }
+        else
+        {
+            $datainicio         =  '';
+            $datafim            =   '';
+
+        }
         //dd( "inicio $datainicio - data fim: $datafim");
 
 
@@ -386,12 +386,13 @@ class ctrClienteAtendimento extends Controller
            ]
        )
        ->where( 'IMB_ATENDENTE.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID )
+       ->whereNotNull('IMB_CLIENTEATENDIMENTO.IMB_ATD_ID')
        ->leftJoin( 'IMB_ATENDENTE', 'IMB_ATENDENTE.IMB_ATD_ID', 'IMB_CLIENTEATENDIMENTO.IMB_ATD_IDCADASTRO')
        ->leftJoin( 'IMB_CLIENTE', 'IMB_CLIENTE.IMB_CLT_ID', 'IMB_CLIENTEATENDIMENTO.IMB_CLT_ID')
-       ->orderBy('IMB_CLIENTEATENDIMENTO.IMB_CLA_ID','DESC');
+       ->orderBy('IMB_CLIENTEATENDIMENTO.IMB_CLA_ID','ASC');
 
-       if( $request->filtroatendimento=='MEU' or $vertodos <> 'S' ) 
-            $atm->where( 'IMB_CLIENTEATENDIMENTO.IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID );
+       //if( $request->filtroatendimento=='MEU' or $vertodos <> 'S' ) 
+            //$atm->where( 'IMB_CLIENTEATENDIMENTO.IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID );
        
         if( $request->filtroatendimento=='DEMAIS') 
             $atm->where( 'IMB_CLIENTEATENDIMENTO.IMB_ATD_ID','<>',Auth::user()->IMB_ATD_ID );
@@ -434,12 +435,9 @@ class ctrClienteAtendimento extends Controller
             $atm->where( 'IMB_CLIENTEATENDIMENTO.IMB_CLA_STATUS','<>','Finalizado' );
 
 
-        
-        //    dd( '$request->filtroatendimento '.$request->filtroatendimento.' - $request->atendimentostatus '.$request->atendimentostatus) ;
-
-
 
       return DataTables::of($atm)->make(true);
+
     }
 
     public function transferirAtendimento( Request $request )
@@ -660,6 +658,39 @@ class ctrClienteAtendimento extends Controller
         return response()->json($atm,200);
 
     }
+
+    public function primeiroAtendimentoCliente( $id )
+    {
+        $atm =mdlClienteAtendimento::
+        where( 'IMB_CLIENTEATENDIMENTO.IMB_CLT_ID','=',$id )
+        ->where('IMB_CLIENTEATENDIMENTO.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID )
+        ->whereNotNull( 'IMB_CLIENTEATENDIMENTO.IMB_ATD_ID')
+        ->leftJoin( 'IMB_ATENDENTE','IMB_ATENDENTE.IMB_ATD_ID','IMB_CLIENTEATENDIMENTO.IMB_ATD_ID')
+        ->orderBy( 'IMB_CLA_DATACADASTRO','asc')
+        ->first();
+        if( $atm == '' )
+            return response()->json( 'NA', 404 );
+
+        return response()->json($atm,200);
+    }
+
+    public function fecharAtendimento( Request $request )
+    {
+        $idatendimento = $request->IMB_CLA_ID;
+        $comentarios = $request->IMB_CLA_COMENTARIO;
+        
+        //dd( $request->all() );
+        $cliatm = mdlClienteAtendimento::find( $idatendimento );
+        $cliatm->IMB_CLA_DATAATUALIZACAO = date('Y-m-d H:i:s');
+        $cliatm->IMB_CLA_COMENTARIO = $comentarios;
+        if( $request->tipo =='encerrar' )
+            $cliatm->IMB_CLA_STATUS = 'Finalizado';
+        $cliatm->IMB_CLA_PERSPECTIVA = $request->IMB_CLA_PERSPECTIVA;
+        $cliatm->save();
+        return response()->json( 'ok',200);
+    }
+
+
     
 
 }

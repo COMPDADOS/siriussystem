@@ -1,6 +1,9 @@
 @extends('layout.app')
 @section('scripttop')
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
 <style>
+    
 th, td, tr{
     vertical-align: middle !important; /* alinha verticalmente */
     height: 36px; /* altura customizada da celula */
@@ -25,9 +28,12 @@ th, td, tr{
     </tbody>
 </table>
 
-    <div class="table-footer" >
-        <button class="btn btn-primary" onClick="incluir()">Adicionar Índice do Mês</button>
-    </div>
+<a href="javascript:incluir()" 
+        style="position:fixed;width:250px;height:30px;top:200px;right:40px;background-color:rgb(5, 43, 94);
+        color: white;border-radius:50px;text-align:center;font-size:15px;box-shadow: 1px 1px 2px #888;
+        z-index:1000;">
+        Adicionar Índice
+</a>
 
 
 

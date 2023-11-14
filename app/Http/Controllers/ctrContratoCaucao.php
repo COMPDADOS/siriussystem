@@ -69,6 +69,7 @@ class ctrContratoCaucao extends Controller
 //        dd( $idseguradora );
         $inicio =  $request->inicio;
         $termino =  $request->termino ;
+        $somenteativos = $request->somenteativos;
 
         $inicio = $this->formatarData( $inicio );
         $termino =$this->formatarData(  $termino );
@@ -100,6 +101,9 @@ class ctrContratoCaucao extends Controller
         ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_CONTRATOCAUCAO.IMB_CTR_ID')
         ->leftJoin( 'IMB_IMOVEIS','IMB_IMOVEIS.IMB_IMV_ID','IMB_CONTRATO.IMB_IMV_ID');
 
+        if( $somenteativos == 'S' )
+            $cs = $cs->where( 'IMB_CTR_SITUACAO','=','ATIVO' );
+        
         if( $id )
         {
             $cs = $cs->where( 'IMB_CAU_ID','=',$id );

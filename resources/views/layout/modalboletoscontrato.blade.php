@@ -172,6 +172,13 @@
 
     });
 
+    $('#preloader').bind('ajaxStart', function()
+    {
+      $(this).show();
+    }).bind('ajaxStop', function(){
+        $(this).hide();
+    });    
+
 
   });
 
@@ -183,6 +190,9 @@ function cargaBoletos()
     url = "{{route('cobranca.cargaboletoscontrato')}}/"+$("#IMB_CTR_ID-BOLETO").val();
     $("#IMB_CTR_ID-REPR").val( $("#IMB_CTR_ID-BOLETO").val());
     console.log( url );
+
+    $("#preloader").show();
+
 
     $.ajax(
       {
@@ -268,6 +278,12 @@ function cargaBoletos()
 
           }
         }
+        ,
+          complete:function()
+          {
+            $("#preloader").hide();
+
+          }
       }
     )
   }
@@ -279,25 +295,25 @@ function imprimirBoleto( id,banco )
 
   debugger;
 
-    if( banco == '033' )
+    if( parseInt(banco) == 33 )
         window.open("{{route('boleto.santander')}}/"+id+'/N/X', '_blank');
-    if( banco == '237' )
+    if(  parseInt(banco)  == 237 )
         window.open("{{route('boleto.237')}}/"+id+'/N/X', '_blank');
-    if( banco == '341' )
+    if( parseInt(banco) == 341 )
         window.open("{{route('boleto.itau')}}/"+id+'/N/X', '_blank');
-    if( banco == '756' )
+    if(  parseInt(banco)  == 756 )
         window.open("{{route('boleto.756')}}/"+id+'/N/X', '_blank');
 
-    if( banco == '084' )
+    if(  parseInt(banco)  == 084 )
         window.open("{{route('boleto.084')}}/"+id+'/N/X', '_blank');
 
-    if( banco == '077' )
+    if(  parseInt(banco)  == 77 )
         window.open("{{route('boleto.077')}}/"+id+'/N/X', '_blank');
 
-    if( banco == '001' )
+    if(  parseInt(banco) == 1 )
         window.open("{{route('boleto.001')}}/"+id+'/N/X', '_blank');
 
-    if( banco == '748' )
+    if(  parseInt(banco) == 748 )
         window.open("{{route('boleto.748')}}/"+id+'/N/X', '_blank');
 
 
@@ -359,7 +375,9 @@ function enviarBoletoPorEmail( )
   var url = '';
   var erro = 1;
   //debugger;
-  if( banco == 1 )
+  $("#preloader").show();
+
+  if( banco ==  1 )
   {
      url ="{{route('boleto.001')}}/"+id+'/S/'+$("#i-email-modal").val();
      $.ajax(
@@ -368,8 +386,12 @@ function enviarBoletoPorEmail( )
          dataType: 'json',
          type:'get',
          async:false,
+         beforeSend: function()
+         {
+        },
          success:function()
          {
+          $("#preloader").hide();
           alert('Email enviado!');
           $("#modalenviandoemail").hide();
           erro=0;
@@ -450,6 +472,26 @@ function enviarBoletoPorEmail( )
      );
   }
 
+  
+  if( banco == 341 )
+  {
+     url ="{{route('boleto.itau')}}/"+id+'/S/'+$("#i-email-modal").val();
+     $.ajax(
+       {
+         url    : url,
+         dataType: 'json',
+         type:'get',
+         async:false,
+         success:function()
+         {
+          alert('Email enviado!');
+          $("#modalenviandoemail").hide();
+          erro=0;
+
+         }
+       }
+     );
+  }
   if( banco == 84 )
   {
      url ="{{route('boleto.084')}}/"+id+'/S/'+$("#i-email-modal").val();
@@ -489,6 +531,8 @@ function enviarBoletoPorEmail( )
        }
      );
   }
+
+  $("#preloader").hide();
 
   if( erro == 1 )
     alert('Email não enviado. Verifique se o endereço de email está correto!');
@@ -816,8 +860,10 @@ function boletoWhatsApp( id,banco )
   $("#IMB_TLF_NUMERO").val('');  
   $("#IMB_TLF_TIPOTELEFONE").val('');  
 
+//alert( id );
+
     url = "{{route('boleto.pegartellocatarios')}}/"+id;
-    console.log( url );
+  //  console.log( url );
 
     $.ajax(
       {
@@ -832,6 +878,8 @@ function boletoWhatsApp( id,banco )
           {
             $("#i-nomecliente-telefone").html( data[nI].IMB_CLT_NOME) ;
             $("#IMB_CTR_ID_MSGWS").val( data[nI].IMB_CTR_ID );
+            $("#IMB_CLT_ID_MSGWS").val(data[nI].IMB_CLT_ID ); 
+
             var ddi = '55';
             if( data[nI].IMB_TLF_DDI != null && data[nI].IMB_TLF_DDI != '')
               ddi = data[nI].IMB_TLF_DDI;

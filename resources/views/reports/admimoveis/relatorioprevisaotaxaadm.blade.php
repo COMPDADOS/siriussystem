@@ -131,14 +131,6 @@ td, th
                     </div>
                 </div>
 
-                <div class="col-md-2 div-center lbl-medidas-valores">
-                    <Label class="control-label div-center">Taxa Admistrativa:</label>
-                    <input class="form-control div-center" type="text" id="i-total">
-                </div>
-                <div class="col-md-2 div-center lbl-medidas-valores">
-                    <Label class="control-label div-center">Taxa de Contrato:</label>
-                    <input class="form-control div-center" type="text" id="i-totaltc">
-                </div>
                 <div class="col-md-4 div-center">
                     <label><b>Atenção: Taxas Zeradas podem se as que já saíram da previsão, pois respectivo repasse já foi realizado.</b> </label>
 
@@ -256,7 +248,7 @@ var table = $('#resultTable').DataTable(
             },
             complete:function()
             {
-                totalizar() ;
+//                totalizar() ;
             }
         },
         "drawCallback":function()
@@ -271,10 +263,7 @@ var table = $('#resultTable').DataTable(
             taxacontrato = api.column(6, {page:'current'}).data().sum();
             taxacontrato = taxacontrato.toFixed(2);
             taxacontrato = formatarValor( taxacontrato );
-
-             
-
-
+            
             $(api.column(5).footer()).html(
                           '<div class="div-right">'+taxadm+'</div>'
                       ),

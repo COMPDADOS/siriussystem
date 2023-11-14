@@ -26,9 +26,20 @@ class ctrParametrizacao extends Controller
     public function pegarParametros1( Request $request )
     {
 
+
         $par = mdlParametros::where( 'IMB_PARAMETROS.IMB_IMB_ID','=', $request->id )
         ->leftJoin( 'IMB_PARAMETROS2','IMB_PARAMETROS2.IMB_IMB_ID', 'IMB_PARAMETROS.IMB_IMB_ID')
         ->first();
         return response()->json( $par,200);
+    }
+
+    public function pegarParametrosTodos( $id )
+    {
+        
+
+        $par = mdlParametros::where( 'IMB_PARAMETROS.IMB_IMB_ID','=', $id )
+        ->leftJoin( 'IMB_PARAMETROS2','IMB_PARAMETROS2.IMB_IMB_ID', 'IMB_PARAMETROS.IMB_IMB_ID')
+        ->first();
+        return $par;
     }
 }

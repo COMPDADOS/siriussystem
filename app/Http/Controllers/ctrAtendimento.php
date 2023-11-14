@@ -451,10 +451,10 @@ class ctrAtendimento extends Controller
         ->where( 'VIS_ATENDIMENTO.VIS_ATM_ID','=', $idultimo)
         ->leftJoin( 'IMB_ATENDENTE', 'IMB_ATENDENTE.IMB_ATD_ID', 'VIS_ATENDIMENTO.IMB_ATD_ID')
         ->leftJoin( 'IMB_CLIENTE', 'IMB_CLIENTE.IMB_CLT_ID', 'VIS_ATENDIMENTO.IMB_CLT_ID')
-       ->get();
+       ->first();
 
 
-         return $atm;
+         return response()->json($atm,200);
      }
 
 
@@ -482,6 +482,7 @@ class ctrAtendimento extends Controller
          ->where( 'VIS_ATENDIMENTO.IMB_CLT_ID','=', $cliente)
          ->leftJoin( 'IMB_ATENDENTE', 'IMB_ATENDENTE.IMB_ATD_ID', 'VIS_ATENDIMENTO.IMB_ATD_ID')
          ->leftJoin( 'IMB_CLIENTE', 'IMB_CLIENTE.IMB_CLT_ID', 'VIS_ATENDIMENTO.IMB_CLT_ID')
+         ->orderBy( )
         ->get();
 
          return $atm;

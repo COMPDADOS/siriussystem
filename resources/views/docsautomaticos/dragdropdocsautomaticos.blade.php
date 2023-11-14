@@ -64,11 +64,12 @@
     <input type="hidden" id="i-imagem-pendente">
     <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">Selecione o arquivo</h3>
+          <h3 class="panel-title">Selecione o arquivo do modelo</h3>
         </div>
         <div class="panel-body">
           <form id="dropzoneForm" class="dropzone" action="{{ route('docsautomaticos.upload') }}">
               <input type="hidden" name="id" id="IMB_CTR_ID_NODANE" value="{{$idcontrato}}">
+              <input type="file" name="fileToUpload" id="fileToUpload">
             @csrf
           </form>
           <div align="center">

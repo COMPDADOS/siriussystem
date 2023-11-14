@@ -309,6 +309,8 @@ class ctrBoleto756 extends Controller
 
                         if( $a <>'' )
                         {
+                            $a = str_replace( ' ','', $a );                            
+                            Log::info( 'enviado para '.$a );
                             $pdf=PDF::loadHtml( $html,'UTF-8');
 //                                $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
                             $message->to( $a  );
@@ -1486,9 +1488,12 @@ class ctrBoleto756 extends Controller
 
                     $locatario =  substr( $linha, 148,40);
 
+                    Log::info( 'id: '.$id );
+
                     $cgp = mdlCobrancaGeradaPerm::find( $id );
                     if( $cgp )
                     {
+                        Log::info('Ctr: '.$cgp->IMB_CTR_ID);
                         $IMB_CTR_ID=$cgp->IMB_CTR_ID;
                         $ctr = mdlContrato::find( $cgp->IMB_CTR_ID );
                         if( $ctr )
@@ -1550,7 +1555,7 @@ class ctrBoleto756 extends Controller
                     if( $cgp <> '' )
                     {
                         $japago = 'N';
-                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                         if( $valorjapago <> 0 ) 
                             $japago='S';
                         else
@@ -1599,7 +1604,14 @@ class ctrBoleto756 extends Controller
                                             'boleto' );
 
                         if( $ocorrencia == '06')
+                        {
+                            if( $ctr <> '' )
+                            app('App\Http\Controllers\ctrRotinas')
+                          ->gravarObs( $ctr->IMB_IMV_ID, $ctr->IMB_CTR_ID,0,0,0,'Leitura do arquivo retorno '.$rb->nomedoarquivo.
+                           ' como LIQUIDAÇÃO, Vencimento: '.implode("-", array_reverse(explode("-", trim($rb->datavencimento)))));
+
                             $rb->selecionado = 'S';
+                        }
 
                         $rb->save();
                     //setando o status do boleto depois de lido o boleto
@@ -1609,6 +1621,11 @@ class ctrBoleto756 extends Controller
                             $cgp = mdlCobrancaGeradaPerm::find( $id );
                             $cgp->IMB_CGR_ENTRADACONFIRMADA = 'S';
                             $cgp->save();
+                            if( $ctr <> '' )
+                            app('App\Http\Controllers\ctrRotinas')
+                          ->gravarObs( $ctr->IMB_IMV_ID, $ctr->IMB_CTR_ID,0,0,0,'Leitura do arquivo retorno '.$rb->nomedoarquivo.
+                           ' como ENTRADA CONFIRMADA Vencimento: '.implode("-", array_reverse(explode("-", trim($rb->datavencimento)))));
+
                         }
                         else
                         if( $ocorrencia == '03')
@@ -1617,6 +1634,11 @@ class ctrBoleto756 extends Controller
                             $cgp->IMB_CGR_ENTRADACONFIRMADA = 'N';
                             $cgp->IMB_CGR_DTHINATIVO = date( 'Y/m/d');
                             $cgp->save();
+                            if( $ctr <> '' )
+                            app('App\Http\Controllers\ctrRotinas')
+                          ->gravarObs( $ctr->IMB_IMV_ID, $ctr->IMB_CTR_ID,0,0,0,'Leitura do arquivo retorno '.$rb->nomedoarquivo.
+                           ' como ENTRADA REJEITADA Vencimento: '.implode("-", array_reverse(explode("-", trim($rb->datavencimento)))));
+
                         }
                     }
                     else
@@ -1736,7 +1758,7 @@ class ctrBoleto756 extends Controller
 
 
                     $japago = 'N';
-                    $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                    $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                     if( $valorjapago <> 0 ) 
                         $japago='S';
                     else

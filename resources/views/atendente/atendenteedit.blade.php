@@ -32,7 +32,7 @@ input[type="checkbox"] {
       width: 40px;
       height: 20px;
       -webkit-appearance: none; /* Aparência padrão do checkbox é anulada */
-      background-color: red; /* cor de fundo */
+      background-color: rgb(226, 218, 218); /* cor de fundo */
       outline: none; /* sem borda externa */
       border-radius: 20px; /* arrendodamento dos cantos */
       box-shadow: inset 0 0 5px rgba(95, 85, 85, 0.2); /* sombra interna */
@@ -262,17 +262,17 @@ td
                                                 <div class="form-group">
                                                      <label class="control-label">Data Admissão</label>
                                                      <input class="form-control" class="form-control"
-                                                     id="I-IMB_ATD_DATAADMISSAO" type="text" />
+                                                     id="I-IMB_ATD_DATAADMISSAO" type="data" />
                                                 </div>
                                             </div>
                                             <div class="col-md-2">
                                                 <div class="form-group">
                                                      <label class="control-label">Data Demissão</label>
                                                      <input class="form-control" class="form-control"
-                                                     id="I-IMB_ATD_DATADEMISSAO" type="text" />
+                                                     id="I-IMB_ATD_DATADEMISSAO" type="date" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="control-label">Área/Equipe</label>
                                                 <select class="form-control" id="IMB_ATD_AREA">
                                                 <option value="Vendas">Vendas</option>
@@ -281,7 +281,7 @@ td
                                                     <option value="Administrativo">Administrativo</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="control-label">Tipo Atendente</label>
                                                 @php
                                                     $tas = app('App\Http\Controllers\ctrAtendente')->cargaTipoAtendente();
@@ -293,9 +293,16 @@ td
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-2 div-center">
                                                 <label class="control-form">Habilitar Fila
                                                         <input class="form-control" type="checkbox" id="I-IMB_ATD_HABILITARFILA">
+                                                    </label>
+
+                                            </div>
+                                            <div class="col-md-2 div-center">
+                                                <label class="control-form">Notificar Atendimento
+                                                        <input class="form-control" type="checkbox" 
+                                                        id="I-IMB_ATD_NOTIFICARNOVOATM">
                                                     </label>
 
                                             </div>
@@ -548,7 +555,7 @@ td
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label class="control-label">&nbsp;</label>
-                                <a class="form-control btn btn-danger" href="#" onclick="alterarSenha();">Confirmar Alteração</a>
+                                <a class="form-control btn btn-danger" href="javascript:alterarSenha();">Confirmar Alteração</a>
                             </div>
                         </div>
                     </div>
@@ -573,12 +580,7 @@ td
     {
         cargaAtendente();
         cargaPerfilAtendimento();
-        (function($) {
-            $('#I-IMB_ATD_DATAADMISSAO').mask('99/99/9999',{placeholder:"mm/dd/yyyy"});
-            $('#I-IMB_ATD_DATADEMISSAO').mask('99/99/9999',{placeholder:"mm/dd/yyyy"});
-        }
-        )(jQuery);
-        ;
+      
 
         $.ajaxSetup(
                 {
@@ -658,6 +660,7 @@ td
 
         var id = $("#I-IMB_ATD_IDLOCAL").val();
         var url = "{{route('atendente.find')}}/"+id;
+        console.log( url );        
         $.ajax(
         {
             url:url,
@@ -666,6 +669,8 @@ td
             success: function( data )
             {
 
+                console.log( data );
+                console.log( 'notifica: '+data.IMB_ATD_NOTIFICARNOVOATM );
                 if( ( $("#I-IMB_IMB_IDMASTER").val() != 0 )  && ( data.IMB_IMB_ID != $("#I-IMB_IMB_IDMASTER").val() )  )
                 {
                     window.history.back();
@@ -694,12 +699,13 @@ td
                 $("#I-IMB_ATD_TELEFONE_1").val( data.IMB_ATD_TELEFONE_1 );
                 $("#I-IMB_ATD_DDD2").val( data.IMB_ATD_DDD2 );
                 $("#I-IMB_ATD_TELEFONE_2").val( data.IMB_ATD_TELEFONE_2 );
-                $("#I-IMB_ATD_DATAADMISSAO").val( moment(data.IMB_ATD_DATAADMISSAO).format('DD/MM/YYYY') );
-                $("#I-IMB_ATD_DATADEMISSAO").val( moment(data.IMB_ATD_DATADEMISSAO).format('DD/MM/YYYY') );
+                $("#I-IMB_ATD_DATAADMISSAO").val( data.IMB_ATD_DATAADMISSAO) ;
+                $("#I-IMB_ATD_DATADEMISSAO").val( data.IMB_ATD_DATADEMISSAO) ;
                 $("#I-IMB_ATD_TELEFONE_2").val( data.IMB_ATD_TELEFONE_2 );
                 $("#IMB_TIPATE_ID").val( data.IMB_TIPATE_ID );
                 $("#IMB_ATD_ATIVO").prop( "checked", (data.IMB_ATD_ATIVO =='A') );
                 $("#I-IMB_ATD_HABILITARFILA").prop( "checked", (data.IMB_ATD_HABILITARFILA =='S') );
+                $("#I-IMB_ATD_NOTIFICARNOVOATM").prop( "checked", (data.IMB_ATD_NOTIFICARNOVOATM =='S') );
                 $("#IMB_ATD_COMISSAOCAPVENDA").val(dolarToReal(data.IMB_ATD_COMISSAOCAPVENDA));
                 $("#IMB_ATD_COMISSAOCAPLOC").val(dolarToReal(data.IMB_ATD_COMISSAOCAPLOC));
                 $("#IMB_ATD_COMISSAOCORVENDA").val(dolarToReal(data.IMB_ATD_COMISSAOCORVENDA));
@@ -839,21 +845,6 @@ td
             }
         });
 
-        var dataadm='';
-        var data = $("#I-IMB_ATD_DATAADMISSAO").val();
-        if ( data != '' )
-            dataadm =   data.substr( 6,4 )+'-'+
-                    data.substr( 3,2 )+'-'+
-                    data.substr( 0,2 );
-
-        var datadem ='';
-        data = $("#I-IMB_ATD_DATADEMISSAO").val();
-        if ( data != '' )
-            datadem =   data.substr( 6,4 )+'-'+
-                    data.substr( 3,2 )+'-'+
-                    data.substr( 0,2 );
-
-
         var ativo = 'I';
 
         if ( $( "#IMB_ATD_ATIVO" ).is(":checked") )
@@ -886,8 +877,8 @@ td
             IMB_ATD_TELEFONE_2 :  $("#I-IMB_ATD_TELEFONE_2").val(),
             IMB_IMB_ID :  $("#i-select-unidade").val(),
             IMB_IMB_ID2 : $("#i-select-unidade2").val(),
-            IMB_ATD_DATAADMISSAO: dataadm,
-            IMB_ATD_DATADEMISSAO: datadem,
+            IMB_ATD_DATAADMISSAO: $("#I-IMB_ATD_DATAADMISSAO").val(),
+            IMB_ATD_DATADEMISSAO: $("#I-IMB_ATD_DATADEMISSAO").val(),
             IMB_ATD_ATIVO: ativo,
             IMB_ATP_ID  : $("#IMB_ATP_ID").val(),
             IMB_ATD_CPF  : $("#IMB_ATD_CPF").val(),
@@ -901,8 +892,11 @@ td
             IMB_ATD_COMISSAOPAGDIAFIXO:$("#IMB_ATD_COMISSAOPAGDIAFIXO").val(),
             IMB_ATD_COMISSAOPAGDIASEMANA:$("#IMB_ATD_COMISSAOPAGDIASEMANA").val(),
             IMB_ATD_HABILITARFILA : $("#I-IMB_ATD_HABILITARFILA").prop( "checked" )   ? 'S' : 'N',
-
+            IMB_ATD_NOTIFICARNOVOATM : $("#I-IMB_ATD_NOTIFICARNOVOATM").prop( "checked" )   ? 'S' : 'N',
+            
         };
+
+        console.log( atm );
 
         var url="{{ route( 'atendente.update')}}";
 
@@ -917,7 +911,7 @@ td
                 {
                     alert('Gravado!');
                     cargaAtendente();
-                    window.history.back();
+                    window.location = "{{route('atendente.index')}}";
                 },
                 error: function( error )
                 {
@@ -975,8 +969,8 @@ td
             async:false,
             success: function(data)
                 {
-                    alert('senha alterada!')/
-                    $("i-modal-senha").modal('hide');
+                    alert('senha alterada!');
+                    $("#i-modal-senha").modal('hide');
 
 
                 },

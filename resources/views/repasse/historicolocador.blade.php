@@ -98,6 +98,7 @@
               @endphp
               <tr class="{{$classe}}">
                 <td style="text-align:center" valign="center">
+                <a title="Alterar data de Repasse" href="javascript:alterarDataRepasse({{$registro->IMB_RLD_NUMERO}})" class="btn btn-sm btn-warning"><span class="fa fa-pencil"></span></a> 
                 <a href="javascript:cargaHistDet({{$registro->IMB_RLD_NUMERO}})" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-zoom-in"></span></a> 
                 <a href="javascript:verRecibo({{$registro->IMB_RLD_NUMERO}})" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-print"></span></a> 
                   <a title="Estornar o recibo" href="javascript:estornarRecibo({{$registro->IMB_RLD_NUMERO}})" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span></a> 
@@ -119,8 +120,8 @@
   </div>
 </div>
 
+@include(' layout.modaldata')
 @include( 'layout.modalhistlddet')
-
 @endsection      
 
 @push('script')
@@ -266,7 +267,13 @@
 
     }
   
+    function alterarDataRepasse( id )
+    {
+      $("#i-tipo-alteracao-data").val('recibolocador');
+      $("#i-numero-recibo").val(id);
+      $("#modaldata").modal('show');
 
+    }
 
 </script>
 

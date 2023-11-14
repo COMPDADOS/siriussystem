@@ -349,8 +349,11 @@
     {
         carga();
         cargaConta();
+        cargaContaRepasse();
         cargaFormaRecebimento();
+        cargaFormaRepasse();
         cargaCFC();
+        cargaStatus();
         $("#sirius-menu").click();
 
         $('.valor-4').inputmask('decimal', 
@@ -462,6 +465,10 @@
         $("#FIN_CFC_IDDESCONTO").val( '');
         $("#FIN_CFC_IDMULTA").val( '');
         $("#FIN_CFC_IDJUROS").val( '');
+        $("#VIS_STA_IDALUGADO").val( '');
+        $("#IMB_PRM_MODRECLOCATARIO").val(''),
+        
+                    
         
         $("#mdlDadosImob").modal('show');
     }
@@ -617,6 +624,7 @@
             IMB_PRM_COBBANTOLERANCIA:  $("#IMB_PRM_COBBANTOLERANCIA").val(),
             IMB_PRM_COBMULTANDIASPER:  realToDolar( $("#IMB_PRM_COBMULTANDIASPER").val()),
             IMB_PRM_COBMULTANDIAS:  $("#IMB_PRM_COBBANTOLERANCIA").val(),
+            IMB_PRM_USARPARCELAS : $("#IMB_PRM_USARPARCELAS").prop( "checked" )   ? 'S' : 'N',
 
 
                     //impostos
@@ -680,11 +688,21 @@
             IMB_PRM_TCPAR4COBRARTA : $("#IMB_PRM_TCPAR4COBRARTA").prop( "checked" )   ? 'S' : 'N',
             IMB_PRM_TCPAR4INCTA : $("#IMB_PRM_TCPAR4INCTA").prop( "checked" )   ? 'S' : 'N',
 
+            IMB_PRM_DEMONSTRATIVOPDF : $("#IMB_PRM_DEMONSTRATIVOPDF").prop( "checked" )   ? 'S' : 'N',
+
+            IMB_FORPAG_IDLOCADOR : $("#IMB_FORPAG_IDLOCADOR").val(),
+            FIN_CCX_ID_PADRAO_REP : $("#FIN_CCX_ID_PADRAO_REP").val(),
+
             IMB_PRM_WSAPELIDO: $("#IMB_PRM_WSAPELIDO").val(),
             IMB_PRM_WSWEBHOOK: $("#IMB_PRM_WSWEBHOOK").val(),
-            
+            IMB_TBE_IDSEGINC: $("#IMB_TBE_IDSEGINC").val(),
+
+            IMB_PRM_MODRECLOCATARIO: $("#IMB_PRM_MODRECLOCATARIO").val(),
 
             IMB_PRM_CODIGOIMOVELRECIBOS : $("#IMB_PRM_CODIGOIMOVELRECIBOS").prop( "checked" )   ? 'S' : 'N',
+
+            VIS_STA_IDALUGADO: $("#VIS_STA_IDALUGADO").val(),
+
         
         }
 
@@ -777,6 +795,8 @@
                     $("#IMB_PRM_BAIXAAUTOMTOTAL").prop( 'checked',(data.IMB_PRM_BAIXAAUTOMTOTAL == 'S') );
                     $("#IMB_PRM_COBIMPRECRETORNO").prop( 'checked',(data.IMB_PRM_COBIMPRECRETORNO == 'S') );
                     $("#IMB_PRM_COBRARTARALTVEN").prop( 'checked',(data.IMB_PRM_COBRARTARALTVEN == 'S') );
+                    $("#IMB_PRM_USARPARCELAS").prop( 'checked',(data.IMB_PRM_USARPARCELAS == 'S') );
+
                     $("#IMB_PRM_DIADMAIS").val( data.IMB_PRM_DIADMAIS);
                     $("#IMB_PRM_TOLERANCIABOLETO").val( data.IMB_PRM_TOLERANCIABOLETO);
                     $("#IMB_PRM_COBBANINSTRUCAO").val( data.IMB_PRM_COBBANINSTRUCAO);
@@ -788,7 +808,7 @@
 
                     //impostos
                     
-                    $("#IMB_PRM_TOKENNFS").val( dolarToReal(data.IMB_PRM_TOKENNFS));
+                    $("#IMB_PRM_TOKENNFS").val( data.IMB_PRM_TOKENNFS);
                     $("#IMB_PRM_ISSALIQUOTA").val( dolarToReal(data.IMB_PRM_ISSALIQUOTA));
                     $("#IMB_PRM_ISSALIQUOTA1005").val( dolarToReal(data.IMB_PRM_ISSALIQUOTA1005));
                     $("#IMB_PRM_TOTALIMPOSTOS").val( dolarToReal(data.IMB_PRM_TOTALIMPOSTOS));
@@ -852,10 +872,20 @@
                     $("#IMB_PRM_TCPAR3INCTA").prop( 'checked',(data.IMB_PRM_TCPAR3INCTA == 'S') );
                     $("#IMB_PRM_TCPAR4COBRARTA").prop( 'checked',(data.IMB_PRM_TCPAR4COBRARTA == 'S') );
                     $("#IMB_PRM_TCPAR4INCTA").prop( 'checked',(data.IMB_PRM_TCPAR4INCTA == 'S') );
+                    $("#VIS_STA_IDALUGADO").val(data.VIS_STA_IDALUGADO);
+                    $("#IMB_PRM_MODRECLOCATARIO").val(data.IMB_PRM_MODRECLOCATARIO);
+                                        
+                    $("#IMB_TBE_IDSEGINC").val(data.IMB_TBE_IDSEGINC);
+
 
                     $("#IMB_PRM_WSAPELIDO").val( data.IMB_PRM_WSAPELIDO);
                     $("#IMB_PRM_WSWEBHOOK").val( data.IMB_PRM_WSWEBHOOK);
+
+
+                    $("#IMB_FORPAG_IDLOCADOR").val( data.IMB_FORPAG_IDLOCADOR);
+                    $("#FIN_CCX_ID_PADRAO_REP").val( data.FIN_CCX_ID_PADRAO_REP);
                                         
+                    $("#IMB_PRM_DEMONSTRATIVOPDF").prop( 'checked',(data.IMB_PRM_DEMONSTRATIVOPDF == 'S') );
                     
                             
                 },
@@ -899,6 +929,38 @@
     }
 
 
+    function cargaStatus()
+    {
+        url = "{{route('statusimovel.carga')}}/0";
+
+        $.ajax(
+        {
+            url     : url,
+            datatype: 'json',
+            type    : 'get',
+            async   : false,
+            success : function( data )
+            {
+                console.log( data );
+                linha = "";
+                $("#VIS_STA_IDALUGADO").empty();
+                for( nI=0;nI < data.length;nI++)
+                {
+                    linha =
+                        '<option value="'+data[nI].VIS_STA_ID+'">'+
+                        data[nI].VIS_STA_NOME+"</option>";
+                    $("#VIS_STA_IDALUGADO").append( linha );
+                }
+            },
+            error   : function( e )
+            {
+                alert('Erro ao carregar os Status'+e);
+            }
+
+        });
+
+
+    }
 
 
     function cargaConta()
@@ -914,6 +976,23 @@
         '<option value="'+data[nI].FIN_CCX_ID+'">'+
                           data[nI].FIN_CCX_DESCRICAO+"</option>";
         $("#FIN_CCX_ID_PADRAO_REC").append( linha );
+      }
+    });
+
+  }
+  function cargaContaRepasse()
+  { 
+    $.getJSON( "{{ route('contacaixa.carga')}}/N", function( data )
+    {
+      $("#FIN_CCX_ID_PADRAO_REP").empty();
+      linha =  '<option value="-1">Selecione</option>';
+      $("#FIN_CCX_ID_PADRAO_REP").append( linha );
+      for( nI=0;nI < data.length;nI++)
+      {
+        linha = 
+        '<option value="'+data[nI].FIN_CCX_ID+'">'+
+                          data[nI].FIN_CCX_DESCRICAO+"</option>";
+        $("#FIN_CCX_ID_PADRAO_REP").append( linha );
       }
     });
 
@@ -944,7 +1023,7 @@
 
   }
 
-    function cargaFormaRecebimento()
+  function cargaFormaRecebimento()
   {
       
     $.getJSON( "{{ route('formapagamento.carga')}}", function( data )
@@ -959,6 +1038,26 @@
           '<option value="'+data[nI].IMB_FORPAG_ID+'">'+
                         data[nI].IMB_FORPAG_NOME+"</option>";
         $("#IMB_FORPAG-IDLOCATARIO").append( linha );
+      }
+    });
+
+  }
+
+  function cargaFormaRepasse()
+  {
+      
+    $.getJSON( "{{ route('formapagamento.carga')}}", function( data )
+    {
+      $("#IMB_FORPAG_IDLOCADOR").empty();
+                
+      linha =  '<option value="-1">Forma Repasse</option>';
+      $("#IMB_FORPAG_IDLOCADOR").append( linha );
+      for( nI=0;nI < data.length;nI++)
+      {
+        linha = 
+          '<option value="'+data[nI].IMB_FORPAG_ID+'">'+
+                        data[nI].IMB_FORPAG_NOME+"</option>";
+        $("#IMB_FORPAG_IDLOCADOR").append( linha );
       }
     });
 
@@ -1042,6 +1141,7 @@
   }  
 
   
+
   
   
 </script>

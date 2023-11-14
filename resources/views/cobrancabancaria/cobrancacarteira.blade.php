@@ -188,7 +188,7 @@ td, th
             <a href="javascript:gerarVariosBoletos();" title="Impressão dos Boletos Selecionados"><img src="{{asset('/global/img/boleto-50.png')}}" alt=""></a>
         </div>
         <div class="col-md-1 div-center">
-            <a href="javascript:enviarVariosBoletos()" title="Enviar por email aos selecionados"><img src="{{asset('/global/img/boleto-email-50.png')}}" alt=""></a>
+            <a href="javascript:enviarVariosBoletosJson()" title="Enviar por email aos selecionados"><img src="{{asset('/global/img/boleto-email-50.png')}}" alt=""></a>
         </div>
         <div class="col-md-1 div-center">
             <a href="javascript:gerarPDF()" title="Imprimir um Relatório com as Informações"><img src="{{asset('/global/img/printer-50.png')}}" alt=""></a>
@@ -198,6 +198,14 @@ td, th
         </div>
         <div class="col-md-1 div-center">
             <a href="javascript:exportTableToExcel('resultTable', 'boleto_da_carteira')" title="Exportar para o Excel"><img src="{{asset('/global/img/excel-50.png')}}" alt=""></a>
+        </div>
+        <div class="col-md-3">
+
+        </div>
+        <div class="col-md-4" id="div-email">;
+            <h3>Ultimo email enviado: </h5>
+            <div id="progress-bar"></div>
+
         </div>
     </div>
 
@@ -713,6 +721,8 @@ function enviarVariosBoletos()
             datafim     : moment( $("#i-data-fim").val()).format( 'YYYY-MM-DD'),
         }
 
+        $("#preloader").show();
+
         var url = "{{route('processosautomaticos')}}";
 
         $.ajax
@@ -725,6 +735,10 @@ function enviarVariosBoletos()
                 success:function()
                 {
                     alert('Os boletos enviados por email para o periodo, foram enviados!');
+                },
+                complete:function()
+                {
+                    $("#preloader").hide();
                 }
             }
         )
@@ -859,6 +873,268 @@ function exportTableToExcel(tableID, filename = ''){
         //triggering the function
         downloadLink.click();
     }
+}
+
+function enviarVariosBoletosJson()
+{
+    
+    if (confirm("Esta opção enviará todos os boletos "+
+            "RESPEITANDO O PERÍODO INFORMADO. Você pode confirmar e o sistema tratará de enviar os boleto. "+
+            "Assim você poderá continuar seu trabalho normalmente enquanto o sistema envia os boletos. "+
+            "Posso continuar?") == true) 
+    {
+        
+        
+        var dados = 
+        {
+            datainicio  : moment( $("#i-data-inicio").val()).format( 'YYYY-MM-DD'),
+            datafim     : moment( $("#i-data-fim").val()).format( 'YYYY-MM-DD'),
+        }
+
+        $("#preloader").show();
+
+        var url = "{{route('boleto.periodo.email.json')}}";
+        console.log(url);
+        var progressBar = $('#progress-bar');
+
+        $.ajax
+        (
+            {
+                url:url,
+                dataType:'json',
+                type:'get',
+                data:dados,
+                async:false,
+                success:function( data )
+                {
+                    $("#preloader").show();
+                    for( nI=0;nI < data.length;nI++)
+                    {
+                        
+                        if( data[nI].EMAIL  != '' )
+                            enviarBoletoPorEmailJson( data[nI].IMB_CGR_ID,data[nI].FIN_CCI_BANCONUMERO, data[nI].EMAIL);
+
+                    };
+
+                    alert('Boletos enviados!!!')
+
+                },
+                complete:function()
+                {
+                    $("#preloader").html( '');
+                    $("#preloader").hide();
+
+                    $("#div-email").html( 'Processo finalizado!!!!');
+                }
+            }
+        )
+
+    }
+    
+    
+
+}
+
+function enviarBoletoPorEmailJson( id, banco, email)
+{
+    //console.log('enviarBoletoPorEmailJson');
+//    alert('mail '+email );
+ if( email == '')
+   return false;
+
+  var url = '';
+  var erro = 1;
+
+
+
+  if( banco ==  1 )
+  {
+     url ="{{route('boleto.001')}}/"+id+'/S/'+email;
+     $.ajax(
+       {
+         url    : url,
+         dataType: 'json',
+         type:'get',
+         async:false,
+         beforeSend: function()
+         {
+        },
+         success:function()
+         {
+            $("#preloader").hide();
+          erro=0;
+         },
+         error:function()
+         {
+         }
+       }
+     );
+  }
+  if( banco == 33 )
+  {
+     url ="{{route('boleto.santander')}}/"+id+'/S/'+email;
+     console.log('ATENCAO: '+url );
+     $.ajax(
+       {
+         url    : url,
+         dataType: 'json',
+         type:'get',
+         async:false,
+         success:function()
+         {
+          erro=0;
+          $("#preloader").hide();
+         },
+         error:function(request, status, error)
+         {
+            //alert(request.responseText);
+         }
+       }
+     );
+  }
+  if( banco == 748 )
+  {
+     url ="{{route('boleto.748')}}/"+id+'/S/'+email;
+     $.ajax(
+       {
+         url    : url,
+         dataType: 'json',
+         type:'get',
+         async:false,
+         success:function()
+         {
+//          alert('Email enviado!');
+          $("#modalenviandoemail").hide();
+          $("#preloader").hide();
+
+          erro=0;
+
+         },
+         error:function(request, status, error)
+         {
+//           alert(request.responseText);
+         }
+       }
+     );
+  }
+
+  if( banco == 756 )
+  {
+     url ="{{route('boleto.756')}}/"+id+'/S/'+email;
+     $.ajax(
+       {
+         url    : url,
+         dataType: 'json',
+         type:'get',
+         async:false,
+         success:function()
+         {
+  //        alert('Email enviado!');
+          $("#preloader").hide();
+
+          $("#modalenviandoemail").hide();
+          erro=0;
+
+         }
+       }
+     );
+  }
+
+  
+  if( banco == 341 )
+  {
+    debugger;
+     url ="{{route('boleto.itau')}}/"+id+'/S/'+email;
+     $.ajax(
+       {
+         url    : url,
+         dataType: 'json',
+         type:'get',
+         async:false,
+         success:function()
+         {
+         // alert('Email enviado!');
+         $("#preloader").show();
+         $("#div-email").val('Email: '+email );
+          erro=0;
+
+         },
+         error:function(data)
+         {
+
+            alert('erro');
+            console.log(data);
+
+         }
+       }
+     );
+  }
+  if( banco == 84 )
+  {
+     url ="{{route('boleto.084')}}/"+id+'/S/'+email;
+     $.ajax(
+       {
+         url    : url,
+         dataType: 'json',
+         type:'get',
+         async:false,
+         success:function()
+         {
+          alert('Email enviado!');
+          $("#modalenviandoemail").hide();
+          erro=0;
+
+         }
+       }
+     );
+  }
+
+  if( banco == 237 )
+  {
+     url ="{{route('boleto.237')}}/"+id+'/S/'+email;
+     $.ajax(
+       {
+         url    : url,
+         dataType: 'json',
+         type:'get',
+         async:false,
+         success:function()
+         {
+//          alert('Email enviado!');
+          $("#modalenviandoemail").hide();
+          $("#preloader").hide();
+
+          erro=0;
+
+         }
+       }
+     );
+  }
+
+
+///  if( erro == 1 )
+    //alert('Email não enviado. Verifique se o endereço de email está correto!');
+  
+}
+function inativarBoleto( id )
+{
+    var url = "{{route('cobrancabancaria.inativar')}}/"+id;
+
+
+    $.ajax(
+    {
+        url : url,
+        dataType:'json',
+        type:'get',
+        success:function( data )
+        {
+            alert('Inativado');
+            cargaBoletos();
+        }
+
+
+    });
+
 }
 
 </script>

@@ -9,7 +9,7 @@ use App\mdlLocatarioContrato;
 use App\mdlFiadorContrato;
 use Auth;
 use Illuminate\Http\Request;
-
+use Log;
 class ctrTelefone extends Controller
 {
 
@@ -61,24 +61,25 @@ class ctrTelefone extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store( $id, $ddd, $numero, $tipo )
+    public function store( $idtelefone, $idcliente, $ddd, $numero, $tipo )
     {
            
-        $ver = mdlTelefone::select( 'IMB_TLF_ID')
-        ->where( 'IMB_TLF_ID_CLIENTE', $id)
-        ->where( 'IMB_TLF_DDD', $ddd)
-        ->where( 'IMB_TLF_NUMERO', $numero)
-        ->delete();
+        if( $idtelefone <> '' )
+        {
+            $ver = mdlTelefone::find($idtelefone );
+            if( $ver <> '' )
+                $ver->delete();
+        }
+        $t = new mdlTelefone;
 
-            $t = new mdlTelefone();
-            $t->IMB_TLF_ID_CLIENTE      = $id;
-            $t->IMB_TLF_DDD             = $ddd;
-            $t->IMB_TLF_NUMERO          = $numero;
-            $t->IMB_TLF_TIPOTELEFONE    = $tipo;
-            $t->IMB_TLF_TIPO='C'; 
-            $t->IMB_IMB_ID=Auth::user()->IMB_IMB_ID;
-            $t->IMB_ATD_ID=Auth::user()->IMB_ATD_ID;
-            $t->save();
+        $t->IMB_TLF_ID_CLIENTE      = $idcliente;
+        $t->IMB_TLF_DDD             = $ddd;
+        $t->IMB_TLF_NUMERO          = $numero;
+        $t->IMB_TLF_TIPOTELEFONE    = $tipo;
+        $t->IMB_TLF_TIPO='C'; 
+        $t->IMB_IMB_ID=Auth::user()->IMB_IMB_ID;
+        $t->IMB_ATD_ID=Auth::user()->IMB_ATD_ID;
+        $t->save();
 
         return  response( 'gravado', 200);
   

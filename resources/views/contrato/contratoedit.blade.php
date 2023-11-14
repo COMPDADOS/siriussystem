@@ -516,7 +516,7 @@
           <div class="col-md-2">
             <div class="form-group">
               <label>Término</label>
-              <input type="date" id="IMB_CTR_TERMINO"  readonly
+              <input type="date" id="IMB_CTR_TERMINO"  
                     class="form-control "  value = "{{$ctr->IMB_CTR_TERMINO}}" >
               <span class="span-class">Data de Término</span>
             </div>
@@ -831,7 +831,7 @@
                           Após dias
                       </span>
                     </div>
-                    <div class="col-md-2 div-center">
+                    <div class="col-md-1 div-center">
                       <label class="label-control">Garantido
                         <input type="checkbox" class="form-control"
                           id="IMB_CTR_ALUGUELGARANTIDO" 
@@ -847,7 +847,7 @@
                       </div>
                     </div>                    
 
-                    <div class="col-md-5 bg-1">
+                    <div class="col-md-4 bg-1">
                       <div class="col-md-12 div-center span-class"><b><u>Para repasses em dia fixo</u></b></div>
                       <div class="col-md-4">
                         <label class="control-label">Dia do Mês</label>
@@ -867,83 +867,134 @@
                   </div> <!--row -->
                 </div> <!--portlet body-->
               </div> <!-- portlet-->
-              <div class="portlet box blue-hoki">
-                <div class="portlet-title">
-                  <div class="caption">
-                    <i class="fa fa-gift"></i>Taxa de Contrato
-                  </div>
-                  <div class="tools">
-                    <a href="javascript:;" class="collapse"> </a>
+              <div class="col-md-12">
+                <div class="col-md-8">
+                  <div class="portlet box blue-hoki">
+                    <div class="portlet-title">
+                      <div class="caption">
+                        <i class="fa fa-gift"></i>Taxa de Contrato
+                      </div>
+                      <div class="tools">
+                        <a href="javascript:;" class="collapse"> </a>
+                      </div>
+                    </div>
+
+                    <div class="portlet-body">
+                        
+                      <div class="row">
+                          <div class="col-md-3">
+                            <label class="label-control">Valor Tx Contrato
+                              <input type="text" class="form-control valor"
+                              id="IMB_CTR_CONTRATOVALOR" value="{{number_format( $ctr->IMB_CTR_CONTRATOVALOR,2,',','.' )}}">
+                            </label>
+                            <label class="label-control">Parcelas
+                            <input type="text" class="form-control"
+                                  id="IMB_CTR_CONTRATOPARCELAS"
+                              onkeypress="return isNumber(event)" onpaste="return false;" 
+                              value="{{$ctr->IMB_CTR_CONTRATOPARCELAS}}" >
+                            </label>
+                          </div>
+                        <div class="col-md-2">
+                          <label class="label-control">Vencimento 1ª Parcela</label>
+                          <input type="date" class="form-control" id="IMB_CTR_CONTRATOVENPAR1"
+                            value="{{$ctr->IMB_CTR_CONTRATOVENPAR1}}">
+                          <span>
+                            <input type="text" class="form-control valor" id="IMB_CTR_CONTRATOVALPAR1"
+                            value="{{ number_format( $ctr->IMB_CTR_CONTRATOVALPAR1,2,',','.' )}}" >
+                          </span>
+                          <span class="span-check-class">
+                            <input type="checkbox"
+                              id="IMB_CTR_COBTAXAADM1" @if( $ctr->IMB_CTR_COBTAXAADM1 =='S' ) checked @endif>Cobrar Tx Adm. no Mês
+                          </span>
+                        </div>
+                        <div class="col-md-2">
+                          <label class="label-control">Vencimento 2ª Parcela</label>
+                          <input type="date" class="form-control" id="IMB_CTR_CONTRATOVENPAR2"
+                          value="{{$ctr->IMB_CTR_CONTRATOVENPAR2}}" >
+                          <span>
+                            <input type="text" class="form-control valor" id="IMB_CTR_CONTRATOVALPAR2"
+                            placeholder="Valor em R$" 
+                            value="{{ number_format( $ctr->IMB_CTR_CONTRATOVALPAR2,2,',','.' )}}" >
+                          </span>
+                          <span class="span-check-class">
+                            <input type="checkbox"
+                              id="IMB_CTR_COBTAXAADM2" @if( $ctr->IMB_CTR_COBTAXAADM2 =='S' ) checked @endif>
+                              Cobrar Tx Adm. no Mês
+                              
+                          </span>
+                        </div>
+                        <div class="col-md-2">
+                          <label class="label-control">Vencimento 3ª Parcela</label>
+                          <input type="date" class="form-control" id="IMB_CTR_CONTRATOVENPAR3">
+                          <span>
+                            <input type="text" class="form-control valor" id="IMB_CTR_CONTRATOVALPAR3"
+                            placeholder="Valor em R$" value='0'>
+                          </span>
+                          <span class="span-check-class">
+                            <input type="checkbox"
+                            id="IMB_CTR_COBTAXAADM3" @if( $ctr->IMB_CTR_COBTAXAADM3 =='S' ) checked @endif>Cobrar Tx Adm. no Mês
+                          </span>
+                        </div>
+                        <div class="col-md-2">
+                          <label class="label-control">Vencimento 4ª Parcela</label>
+                          <input type="date" class="form-control" id="IMB_CTR_CONTRATOVENPAR4">
+                          <span>
+                            <input type="text" class="form-control valor" id="IMB_CTR_CONTRATOVALPAR4"
+                              placeholder="Valor em R$" value='0'>
+                          </span>
+                          <span class="span-check-class">
+                            <input type="checkbox"
+                              id="IMB_CTR_COBTAXAADM4" @if( $ctr->IMB_CTR_COBTAXAADM4 =='S' ) checked @endif>Cobrar Tx Adm. no Mês
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                <div class="portlet-body">
+                <div class="col-md-4">
+                  
+                  <div class="portlet box green">
                     
-                  <div class="row">
-                      <div class="col-md-2">
-                        <label class="label-control">Valor Tx Contrato
-                          <input type="text" class="form-control valor"
-                          id="IMB_CTR_CONTRATOVALOR" value="{{number_format( $ctr->IMB_CTR_CONTRATOVALOR,2,',','.' )}}">
-                        </label>
-                        <label class="label-control">Parcelas
-                        <input type="text" class="form-control"
-                              id="IMB_CTR_CONTRATOPARCELAS"
-                          onkeypress="return isNumber(event)" onpaste="return false;" 
-                          value="{{$ctr->IMB_CTR_CONTRATOPARCELAS}}" >
-                        </label>
+                    <div class="portlet-title">
+                      <div class="col-md-12 div-center">
+                        <input type="checkbox" class="form-control" id="IMB_IMV_13COBRAR" 
+                        @if( $ctr->IMB_IMV_13COBRAR =='S' ) checked @endif>><b> Cobrar 13ª Parcela</b>
                       </div>
-                    <div class="col-md-2">
-                      <label class="label-control">Vencimento 1ª Parcela</label>
-                      <input type="date" class="form-control" id="IMB_CTR_CONTRATOVENPAR1"
-                        value="{{$ctr->IMB_CTR_CONTRATOVENPAR1}}">
-                      <span>
-                        <input type="text" class="form-control valor" id="IMB_CTR_CONTRATOVALPAR1"
-                        value="{{ number_format( $ctr->IMB_CTR_CONTRATOVALPAR1,2,',','.' )}}" >
-                      </span>
-                      <span class="span-check-class">
-                        <input type="checkbox"
-                          id="IMB_CTR_COBTAXAADM1" @if( $ctr->IMB_CTR_COBTAXAADM1 =='S' ) checked @endif>Cobrar Taxa Adm. no Mês
-                      </span>
                     </div>
-                    <div class="col-md-2">
-                      <label class="label-control">Vencimento 2ª Parcela</label>
-                      <input type="date" class="form-control" id="IMB_CTR_CONTRATOVENPAR2"
-                      value="{{$ctr->IMB_CTR_CONTRATOVENPAR2}}" >
-                      <span>
-                        <input type="text" class="form-control valor" id="IMB_CTR_CONTRATOVALPAR2"
-                        placeholder="Valor em R$" 
-                        value="{{ number_format( $ctr->IMB_CTR_CONTRATOVALPAR2,2,',','.' )}}" >
-                      </span>
-                      <span class="span-check-class">
-                        <input type="checkbox"
-                          id="IMB_CTR_COBTAXAADM2" @if( $ctr->IMB_CTR_COBTAXAADM2 =='S' ) checked @endif>Cobrar Taxa Adm. no Mês>
-                          Cobrar Taxa Adm. no Mês
-                          
-                      </span>
-                    </div>
-                    <div class="col-md-2">
-                      <label class="label-control">Vencimento 3ª Parcela</label>
-                      <input type="date" class="form-control" id="IMB_CTR_CONTRATOVENPAR3">
-                      <span>
-                        <input type="text" class="form-control valor" id="IMB_CTR_CONTRATOVALPAR3"
-                        placeholder="Valor em R$" value='0'>
-                      </span>
-                      <span class="span-check-class">
-                        <input type="checkbox"
-                        id="IMB_CTR_COBTAXAADM3" @if( $ctr->IMB_CTR_COBTAXAADM3 =='S' ) checked @endif>Cobrar Taxa Adm. no Mês>
-                      </span>
-                    </div>
-                    <div class="col-md-3">
-                      <label class="label-control">Vencimento 4ª Parcela</label>
-                      <input type="date" class="form-control" id="IMB_CTR_CONTRATOVENPAR4">
-                      <span>
-                        <input type="text" class="form-control valor" id="IMB_CTR_CONTRATOVALPAR4"
-                          placeholder="Valor em R$" value='0'>
-                      </span>
-                      <span class="span-check-class">
-                        <input type="checkbox"
-                          id="IMB_CTR_COBTAXAADM4" @if( $ctr->IMB_CTR_COBTAXAADM4 =='S' ) checked @endif>Cobrar Taxa Adm. no Mês>
-                      </span>
+
+                    <div class="portlet-body">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="col-md-4">
+                            <h5 class="div-center"><u> 1ª Parcela</u></h5>
+                            <label class="control-label">% Sobre Alug.</label>
+                            <input class="form-control valor" type="text" id="IMB_IMV_13PERCENTUAL"
+                            value="{{number_format( $ctr->IMB_IMV_13PERCENTUAL,2,',','.' )}}">
+                            <label class="control-label">Cobrar no Mês</label>
+                            <input class="form-control" type="number" id="IMB_IMV_13MES" max="12" min="1"
+                            value="{{$ctr->IMB_IMV_13MES}}">
+                          </div>
+                          <div class="col-md-4">
+                            <h5 class="div-center"><u> 2ª Parcela</u></h5>
+                            <label class="control-label">% Sobre Alug.</label>
+                            <input class="form-control valor" type="text" id="IMB_IMV_13_2PERCENTUAL"
+                            value="{{number_format( $ctr->IMB_IMV_13_2PERCENTUAL,2,',','.' )}}">
+                            <label class="control-label">Cobrar no Mês</label>
+                            <input class="form-control" type="number" id="IMB_IMV_13_2MES"  max="12" min="1"
+                            value="{{$ctr->IMB_IMV_13_2MES}}">
+                          </div>
+                          <div class="col-md-4">
+                           <h5 class="div-center"><u> 3ª Parcela</u></h5>
+                           <label class="control-label">% Sobre Alug.</label>
+                           <input class="form-control valor" type="text" id="IMB_IMV_13_3PERCENTUAL"
+                           value="{{number_format( $ctr->IMB_IMV_13_3PERCENTUAL,2,',','.' )}}">
+                           
+                           <label class="control-label">Cobrar no Mês</label>
+                            <input class="form-control" type="number" id="IMB_IMV_13_3MES"  max="12" min="1"
+                            value="{{$ctr->IMB_IMV_13_3MES}}">
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1080,13 +1131,16 @@
           </div>
       </div>
       <hr>
-      <div class="row">
+      <div class="row">  
         <div class="col-md-12 div-center">
           <label class="label-control"><span class="atrasado">JURÍDICO</span>
             <input type="checkbox" class="form-control" id="IMB_CTR_ADVOGADO" @if( $ctr->IMB_CTR_ADVOGADO=='S') Checked @endif>
           </label>
         </div>
-
+        <div class="col-md-12">
+            <h3 class="div-center"><u> Anotações para o Jurídico</u></h3>
+            <textarea cols="100%" rows="5" class="form-control" id="IMB_CTR_JURIDICOANOTACOES">{{$ctr->IMB_CTR_JURIDICOANOTACOES}}</textarea>
+        </div>
       </div>
     </div>
     <div id="tab-iptu">
@@ -1167,6 +1221,7 @@
                     </div>
                     <div class="col-md-3 div-center">
                       <div class="col-md-12">
+                        <label class="control-label">I.P.T.U.</label>
                         <input class="form-control" type="text" id="IMB_IMV_IPTU3"  value="{{$imv->IMB_IMV_IPTU3}}">
                       </div>
                       <div class="col-md-12">
@@ -1508,7 +1563,7 @@
 
       $("#div-geral").show();
       setarSelects();
-      imovelCarga();
+//      imovelCarga();
       CarregarCorCtr( $("#IMB_CTR_ID").val() );
       CarregarCapCtr( $("#IMB_CTR_ID").val() );
 //      contratoCarga();
@@ -1577,6 +1632,7 @@
 
     function contratoCarga()
     {
+      alert('carga');
       url = "{{ route( 'contrato.findfull')}}/"+$("#IMB_CTR_ID").val();
       $.ajax(
       {
@@ -1612,14 +1668,15 @@
           $("#IMB_CTR_OBSERVACAOLOCATARIO").val( data.IMB_CTR_OBSERVACAOLOCATARIO);
           $("#IMB_CTR_OBSERVACAO").val( data.IMB_CTR_OBSERVACAO);
           $("#imb_imv_codigocidaderaiz").val( data.imb_imv_codigocidaderaiz);
-                    
+          $("#IMB_CTR_JURIDICOANOTACOES").val( data.IMB_CTR_JURIDICOANOTACOES);
+                              
 
           $("#IMB_CTR_CONTRATOVALOR").val( dolarToReal(data.IMB_CTR_CONTRATOVALOR));
           console.log( 'ven par 1 '+data.IMB_CTR_CONTRATOVENPAR1);
-          $("#IMB_CTR_CONTRATOVENPAR1").val( moment(data.IMB_CTR_CONTRATOVENPAR1).format('YYYY-MM-DD'));
-          $("#IMB_CTR_CONTRATOVENPAR2").val( moment(data.IMB_CTR_CONTRATOVENPAR2).format('YYYY-MM-DD'));
-          $("#IMB_CTR_CONTRATOVENPAR3").val( moment(data.IMB_CTR_CONTRATOVENPAR3).format('YYYY-MM-DD'));
-          $("#IMB_CTR_CONTRATOVENPAR4").val( moment(data.IMB_CTR_CONTRATOVENPAR4).format('YYYY-MM-DD'));
+          $("#IMB_CTR_CONTRATOVENPAR1").val( data.IMB_CTR_CONTRATOVENPAR1);
+          $("#IMB_CTR_CONTRATOVENPAR2").val( data.IMB_CTR_CONTRATOVENPAR2);
+          $("#IMB_CTR_CONTRATOVENPAR3").val( data.IMB_CTR_CONTRATOVENPAR3);
+          $("#IMB_CTR_CONTRATOVENPAR4").val( data.IMB_CTR_CONTRATOVENPAR4);
           $("#IMB_CTR_CONTRATOVALPAR1").val( dolarToReal(data.IMB_CTR_CONTRATOVALPAR1) );
           $("#IMB_CTR_CONTRATOVALPAR2").val( dolarToReal(data.IMB_CTR_CONTRATOVALPAR2) );
           $("#IMB_CTR_CONTRATOVALPAR3").val( dolarToReal(data.IMB_CTR_CONTRATOVALPAR3) );
@@ -1646,6 +1703,13 @@
           $("#IMB_IMV_DAEINSCRICAO").val( data.IMB_IMV_DAEINSCRICAO);
           $("#IMB_IMV_CPFLINSCRICAO").val( data.IMB_IMV_CPFLINSCRICAO);
 
+          console.log( data );
+          $("#IMB_IMV_13PERCENTUAL").val( data.IMB_IMV_13PERCENTUAL);
+          $("#IMB_IMV_13MES").val( data.IMB_IMV_13MES);
+          $("#IMB_IMV_13_2PERCENTUAL").val( data.IMB_IMV_13_2PERCENTUAL);
+          $("#IMB_IMV_13_2MES").val( data.IMB_IMV_13_2MES);
+          $("#IMB_IMV_13_3PERCENTUAL").val( data.IMB_IMV_13_3PERCENTUAL);
+          $("#IMB_IMV_13_3MES").val( data.IMB_IMV_13_3MES);
           $("#IMB_CTR_SITUACAO").val( data.IMB_CTR_SITUACAO);
           $("#IMB_CTR_FINALIDADE").val( data.IMB_CTR_FINALIDADE);
           $("#IMB_IRJ_ID").val( data.IMB_IRJ_ID);
@@ -1832,10 +1896,13 @@
 
             $("#IMB_IMV_IPTU1").val(data.IMB_IMV_IPTU1);
             $("#IMB_IMV_IPTU1REFERENTE").val(data.IMB_IMV_IPTU1REFERENTE);
+            
             $("#IMB_IMV_IPTU2").val(data.IMB_IMV_IPTU2);
             $("#IMB_IMV_IPTU2REFERENTE").val(data.IMB_IMV_IPTU2REFERENTE);
-            $("#IMB_IMV_IPTU2").val(data.IMB_IMV_IPTU3);
-            $("#IMB_IMV_IPTU2REFERENTE").val(data.IMB_IMV_IPTU3REFERENTE);
+            
+            $("#IMB_IMV_IPTU3").val(data.IMB_IMV_IPTU3);
+            $("#IMB_IMV_IPTU3REFERENTE").val(data.IMB_IMV_IPTU3REFERENTE);
+            
             $("#IMB_IMV_IPTU4").val(data.IMB_IMV_IPTU4);
             $("#IMB_IMV_IPTU4REFERENTE").val(data.IMB_IMV_IPTU4REFERENTE);
 
@@ -2385,6 +2452,9 @@
               IMB_CTR_PERMANDIARIA : realToDolar($("#IMB_CTR_PERMANDIARIA").val()),
               IMB_CTR_PINTURANOVA : $("#IMB_CTR_PINTURANOVA").prop( "checked" )   ? 'S' : 'N',
               IMB_CTR_BOLETOVIAEMAIL : $("#IMB_CTR_BOLETOVIAEMAIL").prop( "checked" )   ? 'S' : 'N',
+              IMB_CTR_BOLETOVIAEMAIL : $("#IMB_CTR_BOLETOVIAEMAIL").prop( "checked" )   ? 'S' : 'N',
+              IMB_CTR_BOLETOVIAEMAIL : $("#IMB_CTR_BOLETOVIAEMAIL").prop( "checked" )   ? 'S' : 'N',
+              IMB_CTR_JURIDICOANOTACOES : $("#IMB_CTR_JURIDICOANOTACOES").val(),
                             
               IMB_CTR_PARCELALT : 1,
               IMB_CTR_PARCELALD : 1,
@@ -2419,9 +2489,23 @@
 
               IMB_CTR_ADVOGADO : $("#IMB_CTR_ADVOGADO").prop( "checked" )   ? 'S' : 'N',
 
+              IMB_IMV_13PERCENTUAL: realToDolar($("#IMB_IMV_13PERCENTUAL").val()),
+              IMB_IMV_13MES: $("#IMB_IMV_13MES").val(),
+
+              IMB_IMV_13_2PERCENTUAL: realToDolar($("#IMB_IMV_13_2PERCENTUAL").val()),
+              IMB_IMV_13_2MES: $("#IMB_IMV_13_2MES").val(),
+
+              IMB_IMV_13_3PERCENTUAL: realToDolar($("#IMB_IMV_13_3PERCENTUAL").val()),
+              IMB_IMV_13_3MES: $("#IMB_IMV_13_3MES").val(),
+
+
               IMB_IMV_DAESENHA: $("#IMB_IMV_DAESENHA").val(),
               IMB_IMV_DAEINSCRICAO: $("#IMB_IMV_DAEINSCRICAO").val(),
               IMB_IMV_CPFLINSCRICAO: $("#IMB_IMV_CPFLINSCRICAO").val(),
+
+              
+              
+              IMB_IMV_13COBRAR : $("#IMB_IMV_13COBRAR").prop( "checked" )   ? 'S' : 'N',
 
               IMB_IMV_RELIRRF : $("#IMB_IMV_RELIRRF").prop( "checked" )   ? 'S' : 'N',
               IMB_CTR_IRRF : $("#IMB_CTR_IRRF").prop( "checked" )   ? 'S' : 'N',
@@ -2436,10 +2520,13 @@
 
               IMB_IMV_IPTU1          :  $("#IMB_IMV_IPTU1").val(),
               IMB_IMV_IPTU1REFERENTE :  $("#IMB_IMV_IPTU1REFERENTE").val(),
+
               IMB_IMV_IPTU2          :  $("#IMB_IMV_IPTU2").val(),
               IMB_IMV_IPTU2REFERENTE :  $("#IMB_IMV_IPTU2REFERENTE").val(),
+
               IMB_IMV_IPTU3          :  $("#IMB_IMV_IPTU3").val(),
               IMB_IMV_IPTU3REFERENTE :  $("#IMB_IMV_IPTU3REFERENTE").val(),
+
               IMB_IMV_IPTU4          :  $("#IMB_IMV_IPTU4").val(),
               IMB_IMV_IPTU4REFERENTE :  $("#IMB_IMV_IPTU4REFERENTE").val(),
 
@@ -2458,6 +2545,7 @@
 
 
           url = "{{route('contrato.gravarnovo')}}";
+
 
           $.ajax(
           {

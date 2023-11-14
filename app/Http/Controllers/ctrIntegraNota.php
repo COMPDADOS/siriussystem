@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+
 
 use Illuminate\Support\Facades\Http;
 use CloudDfe\SdkPHP\Nfse;
+use Illuminate\Http\Request;
 
 use App\mdlNFSE;
 use App\mdlReciboLocador;
@@ -13,7 +14,7 @@ use App\mdlImobiliaria;
 use App\mdlParametros;
 use App\mdlParametros2;
 use App\mdlCliente;
-
+use DOMDocument;;
 use Auth;
 use DataTables;
 use Log;
@@ -123,8 +124,8 @@ class ctrIntegraNota extends Controller
 
         try {
             $params = [
-                'token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbXAiOjExOTIsInVzciI6MzM0LCJ0cCI6MiwiaWF0IjoxNjg5MTIyOTQyfQ.5SarxQJVMt1sOfTXkqRj8G7NKZlrK4gHIK3IZOCgItU',
-                'ambiente' => Nfse::AMBIENTE_HOMOLOGACAO,
+                'token' => $parm2->IMB_PRM_TOKENNFS,
+                'ambiente' => Nfse::AMBIENTE_PRODUCAO,
                 'options' => [
                     'debug' => false,
                     'timeout' => 60,
@@ -189,14 +190,19 @@ class ctrIntegraNota extends Controller
                 ]
             ];
             Log::info('passei pela monagem do payload');
+            //var_dump( $payload);
             $resp = $nfse->cria($payload);
 
             Log::info('Sucesso: '.$resp->sucesso);
             Log::info('Codigo: '.$resp->codigo);
 
+ 
+            //dd( $resp );
+          
             if ($resp->sucesso) 
             {
-                Log::info( 'Sucesso');
+              
+                //baixarXml($request );
                 $chave = $resp->chave;
                 if ($resp->codigo == 5023) {
                     /**
@@ -320,13 +326,16 @@ class ctrIntegraNota extends Controller
 public function cancelaNfes( Request $request)
 {
     $chave = $request->chave;
+    
+    $parm = mdlParametros::where( 'IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID)->first();
+    $parm2 = mdlParametros2::where( 'IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID)->first();
     if( $chave=='' ) 
         return response()->json( 'Chave não informada',404);
 
     try {
         $params = [
-            'token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbXAiOjExOTIsInVzciI6MzM0LCJ0cCI6MiwiaWF0IjoxNjg5MTIyOTQyfQ.5SarxQJVMt1sOfTXkqRj8G7NKZlrK4gHIK3IZOCgItU',
-            'ambiente' => Nfse::AMBIENTE_HOMOLOGACAO,
+            'token' => $parm2->IMB_PRM_TOKENNFS,  
+            'ambiente' => Nfse::AMBIENTE_PRODUCAO,
             'options' => [
                 'debug' => false,
                 'timeout' => 60,
@@ -340,8 +349,10 @@ public function cancelaNfes( Request $request)
             'justificativa' => 'Erro nas informações', //minimo de 15 caracteres
             'codigo_cancelamento' => '1'
         ];
+      
         //os payloads são sempre ARRAYS
         $resp = $nfse->cancela($payload);
+        dd( $resp );
    
         if( $resp->sucesso)
         {
@@ -370,10 +381,13 @@ public function gerarPdf( Request $request )
     if( $chave=='' ) 
         return response()->json( 'Chave não informada',404);
 
+        $parm = mdlParametros::where( 'IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID)->first();
+        $parm2 = mdlParametros2::where( 'IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID)->first();
+
     try {
         $params = [
-            'token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbXAiOjExOTIsInVzciI6MzM0LCJ0cCI6MiwiaWF0IjoxNjg5MTIyOTQyfQ.5SarxQJVMt1sOfTXkqRj8G7NKZlrK4gHIK3IZOCgItU',
-            'ambiente' => Nfse::AMBIENTE_HOMOLOGACAO,
+            'token' => $parm2->IMB_PRM_TOKENNFS,
+            'ambiente' => Nfse::AMBIENTE_PRODUCAO,
             'options' => [
                 'debug' => false,
                 'timeout' => 60,
@@ -389,8 +403,9 @@ public function gerarPdf( Request $request )
         $resp = $nfse->consulta($payload);
         $resp = $resp->pdf;
 
+        //dd( $resp );
         return view( 'nfe.nfsepdfview',compact( 'resp') );
-        //$pdf = base64_decode( $resp->pdf, true );
+        //$pdf = base64_decode( $resp->pdf, tru e );
         
         
         
@@ -441,6 +456,94 @@ public function gerarPdf( Request $request )
         return DataTables::of($nfs)->make(true);
 
 
+
+    }
+
+    public function mostrarDadosNova( Request $request )
+    {
+        try {
+            //defina os parametros basicos
+            $params = [
+                'token' => $parm2->IMB_PRM_TOKENNFS,
+                'ambiente' => Nfe::AMBIENTE_PRODUCAO,
+                'options' => [
+                    'debug' => false,
+                    'timeout' => 60,
+                    'port' => 443,
+                    'http_version' => CURL_HTTP_VERSION_NONE
+                ]
+            ];
+            //instancie a classe para a operação desejada
+            $nfe = new Nfe($params);
+        
+            //realize a operação desejada
+            $resp = $nfe->status();
+        
+            //$resp irá conter um OBJETO stdClass com o retorno da API
+            echo "<pre>";
+            print_r($resp);
+            echo "</pre>";
+        
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    
+    public function gerarXML( Request $request )
+    {
+        $chave = $request->chave;
+        if( $chave=='' ) 
+            return response()->json( 'Chave não informada',404);
+
+            $parm = mdlParametros::where( 'IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID)->first();
+            $parm2 = mdlParametros2::where( 'IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID)->first();
+
+        try {
+            $params = [
+                'token' => $parm2->IMB_PRM_TOKENNFS,                
+                'ambiente' => Nfse::AMBIENTE_PRODUCAO,
+                'options' => [
+                    'debug' => false,
+                    'timeout' => 60,
+                    'port' => 443,
+                    'http_version' => CURL_HTTP_VERSION_NONE
+                ]
+            ];
+            $nfse = new Nfse($params);
+            $payload = [
+                'chave' => strval($chave)
+            ];
+            //os payloads são sempre ARRAYS
+            $resp = $nfse->consulta($payload);
+            $numero = $resp->numero;
+            //dd( $resp );
+            $resp = $resp->xml;
+            $decoded_string = base64_decode($resp );
+
+            // Create a new DOMDocument object and load the decoded string into it.
+            $dom_document = new \DOMDocument();
+            $dom_document->loadXML($decoded_string);
+          
+            // Set the Content-Type header to application/xml.
+            header('Content-Type: application/xml');
+          
+            // Set the Content-Disposition header to attachment; filename="xml_file.xml".
+            header("Content-Disposition: attachment; filename=XML_$numero.xml");
+          
+            // Echo the DOMDocument object's saveXML() method to the output buffer.
+            echo $dom_document->saveXML();
+          
+            // Flush the output buffer to send the file to the browser.
+            flush();
+            //$pdf = base64_decode( $resp->pdf, tru e );
+            
+            
+            
+
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }        
 
     }
 

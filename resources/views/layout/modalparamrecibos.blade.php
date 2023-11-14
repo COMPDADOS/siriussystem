@@ -30,13 +30,21 @@
                                 <div class="col-md-6 div-center ">
                                     <div class="row">
                                         <div class="col-md-12 back-dark">Vias de Recibos</div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="control-label">Locador: Duas por recibo</label>
                                             <input type="checkbox" class="form-control" id="IMB_PRM_RECIBO2FL_LD">
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="control-label">Locatário: Duas por recibo</label>
                                             <input type="checkbox" class="form-control" id="IMB_PRM_RECIBO2FL_LT">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="control-label">Modelo Recibo</label>
+                                            <select  class="form-control" id="IMB_PRM_MODRECLOCATARIO">
+                                                <option value="" selected >Padrão(normal)</option>
+                                                <option value="H" >Padrao 'H'</option>
+                                            </select>
+                                            
                                         </div>
                                     </div>
                                 </div>

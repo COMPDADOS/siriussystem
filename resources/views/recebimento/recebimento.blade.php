@@ -313,6 +313,37 @@
 
     })
 
+    $("#i-total-pix").blur( function()
+    {
+      var nTotalApurado = realToDolar( $("#i-total-apurado").val() );
+      var nTotalDinheiro = realToDolar( $("#i-total-dinheiro").val() );
+      var nCheque = realToDolar( $("#i-total-cheque").val() );
+      var nPix = realToDolar( $("#i-total-pix").val() );
+
+
+      var nTroco =  parseFloat(nTotalApurado) - 
+                      ( parseFloat(nTotalDinheiro) +
+                        parseFloat(nPix) +
+                        parseFloat(nCheque) ) ;
+      
+      if( nTroco != 0 )
+      {
+        $("#div-troco-futuro").show();
+        if( nTroco > 0 ) 
+        {
+          $("#div-abater").show();
+        }
+        else
+        if( nTroco < 0 )
+        {
+          $("#div-abater").hide();
+        }
+      }
+      $("#i-troco").val(  formatarBRSemSimbolo( nTroco) );
+
+    })
+
+
   });
 
 
@@ -471,8 +502,13 @@
     if ( isNaN( nTotDin) )
        nTotDin = 0;
 
+    
 
-       
+
+    var nPix = realToDolar( $("#i-total-pix").val() );
+    if ( isNaN( nPix) )
+      nPix = 0;
+
     var nTotChe = parseFloat(realToDolar($("#i-total-cheque").val()));
     if ( isNaN( nTotChe) )
       nTotChe = 0;
@@ -489,7 +525,8 @@
       trocofuturo ='N';
       if( $("#i-troco-futuro").prop( "checked" ))
         trocofuturo = 'S';
-      
+    
+        console.log('valor pix vai acessar a funcao');
         recibogerado = gerandoReciboLocatario(
       "i-tlblf-resumo",
       moment( $("#i-data-base").val()).format( 'YYYY-MM-DD'), 
@@ -505,7 +542,9 @@
       parseFloat(realToDolar($("#i-total-apurado").val())),
       moment( $("#i-data-vencimento-rec").val() ).format( 'YYYY-MM-DD') ,
       'RECMES',
-      abater
+      abater,
+      nPix
+
     );
 
     if( confirm( "Processo concluído. Deseja emitir o recibo?") )

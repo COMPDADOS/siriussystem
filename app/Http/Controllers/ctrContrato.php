@@ -103,10 +103,25 @@ class ctrContrato extends Controller
                 'IMB_CTR_OBSERVACAOLOCADOR',
                 'IMB_CTR_OBSERVACAOLOCATARIO',
                 'IMB_CTR_EXIGENCIA',
+                'IMB_IMV_IPTU1',
+                'IMB_IMV_IPTU1REFERENTE',
+                'IMB_IMV_IPTU2REFERENTE',
+                'IMB_IMV_IPTU3REFERENTE',
+                'IMB_IMV_IPTU4REFERENTE',
+                'IMB_IMV_IPTU5REFERENTE',
+                'IMB_IMV_IPTU2',
+                'IMB_IMV_IPTU3',
+                'IMB_IMV_IPTU4',
+                'IMB_IMV_IPTU5',
+                'IMB_IMV_CPFLINSCRICAO',
+                'IMB_IMV_CPFLSENHA',
+                'IMB_IMV_DAEINSCRICAO',
+                'IMB_IMV_DAESENHA',
                 DB::raw( "(select coalesce(IMB_PRM_CODIGOIMOVELRECIBOS,'') from IMB_PARAMETROS2 P2 WHERE P2.IMB_IMB_ID = IMB_CONTRATO.IMB_IMB_ID) AS IMB_PRM_CODIGOIMOVELRECIBOS"),
                 DB::Raw( '( select IMB_FORPAG_NOME FROM IMB_FORMAPAGAMENTO WHERE IMB_CONTRATO.IMB_FORPAG_ID_LOCATARIO = IMB_FORMAPAGAMENTO.IMB_FORPAG_ID ) AS FORMAPAGLT' ),
                 DB::Raw( '( select coalesce(FIN_CCX_DESCRICAO,"") FROM FIN_CONTACAIXA WHERE FIN_CONTACAIXA.FIN_CCX_ID = IMB_CONTRATO.FIN_CCR_ID_COBRANCA ) AS CONTARECEB' ),
-             
+                DB::Raw( "( select  IMB_CAU_VALOR FROM IMB_CONTRATOCAUCAO WHERE IMB_CONTRATOCAUCAO.IMB_CTR_ID = IMB_CONTRATO.IMB_CTR_ID LIMIT 1) AS VALORCAUCAO" ),
+                DB::Raw( "( select IMB_CTR_VIGENCIATERMINO FROM IMB_CONTRATOSEGUROINCENDIO WHERE IMB_CONTRATOSEGUROINCENDIO.IMB_CTR_ID = IMB_CONTRATO.IMB_CTR_ID order by IMB_CTR_VIGENCIAINICIO desc LIMIT 1) AS SEGUROINCENDIO" ),
 
             ])
             ->leftjoin('IMB_IMOVEIS', 'IMB_IMOVEIS.IMB_IMV_ID', 'IMB_CONTRATO.IMB_IMV_ID')
@@ -117,6 +132,10 @@ class ctrContrato extends Controller
             $situacao = $request->situacao;
             $advogado = $request->advogado;
             $advogadoexceto = $request->advogadoexceto;
+
+            $diavencimento = $request->diavencimento;
+            $semseguro = $request->semseguro;
+            
             
             $contrato->where( 'IMB_IMOVEIS.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID );
 
@@ -144,6 +163,14 @@ class ctrContrato extends Controller
                 $cFiltrou = 'S';
                 $contrato->where('IMB_CONTRATO.IMB_CTR_ADVOGADO', 'S');
             };
+
+            if(  $diavencimento <> '' )
+            {
+                $cFiltrou = 'S';
+                $contrato->where('IMB_CONTRATO.IMB_CTR_DIAVENCIMENTO', $diavencimento );
+            };
+
+            
 
 
             if ($request->has('condominio') && strlen(trim($request->condominio)) > 0){
@@ -221,7 +248,16 @@ class ctrContrato extends Controller
 
         }
 
-//        Log::info( 'imprimir visao: '.$imprimirvisao );
+        if( $semseguro == 'S')
+        {
+            $cFiltrou = 'S';
+            $param2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID );
+            $idseguro = $param2->IMB_TBE_IDSEGINC;
+            $contrato->whereRaw("NOT EXISTS( SELECT IMB_LCF_ID FROM IMB_LANCAMENTOFUTURO A WHERE A.IMB_CTR_ID = IMB_CONTRATO.IMB_CTR_ID
+                            AND IMB_TBE_ID = $idseguro AND IMB_CONTRATO.IMB_CTR_VENCIMENTOLOCATARIO = IMB_LCF_DATAVENCIMENTO LIMIT 1)");
+
+        }
+
         if( $imprimirvisao == 'S') 
         {
             $contrato = $contrato->get();
@@ -247,8 +283,6 @@ class ctrContrato extends Controller
         if ( $cFiltrou == 'N') {
             $contrato->limit(0);
         }
-
-        //Log::info( $contrato->toSql());
 
         return DataTables::of($contrato)->make(true);
     }
@@ -293,11 +327,17 @@ class ctrContrato extends Controller
 
          ////Log::info('validade '.$request->IMB_CTR_PONTUALIDADEVALIDADE );
 
+         $novocontrato = 'N';
         if( $request->IMB_CTR_ID == '' )
+        {
             $contrato = new mdlContrato;
+            $novocontrato = 'S';
+        }
         else
         {
+            
             $contrato =  mdlContrato::find( $request->IMB_CTR_ID );
+
             //SETAR AS VARIAVEIS COMO ESTAVAM
             $IMB_CTR_INICIO                       = $contrato->IMB_CTR_INICIO;
             $IMB_CTR_TERMINO                      = $contrato->IMB_CTR_TERMINO;
@@ -392,6 +432,7 @@ class ctrContrato extends Controller
 
 
 
+
         $contrato->IMB_CTR_INICIO                       = formatarData($request->IMB_CTR_INICIO);
         $contrato->IMB_IMB_ID                           = Auth::user()->IMB_IMB_ID;
         $contrato->IMB_CTR_TERMINO                      = formatarData($request->IMB_CTR_TERMINO);
@@ -410,14 +451,10 @@ class ctrContrato extends Controller
         $contrato->IMB_CTR_DESCONTOMESES                = $request->IMB_CTR_DESCONTOMESES;
         $contrato->IMB_CTR_CONTRATOPARCELAS             = $request->IMB_CTR_CONTRATOPARCELAS;
         $contrato->IMB_CTR_CONTRATOVALOR                = $request->IMB_CTR_CONTRATOVALOR;
-        if( $contrato->IMB_CTR_CONTRATOVENPAR1 <> '')
-            $contrato->IMB_CTR_CONTRATOVENPAR1              = formatarData($request->IMB_CTR_CONTRATOVENPAR1);
-        if( $contrato->IMB_CTR_CONTRATOVENPAR2 <> '')
-            $contrato->IMB_CTR_CONTRATOVENPAR2              = formatarData($request->IMB_CTR_CONTRATOVENPAR2);
-        if( $contrato->IMB_CTR_CONTRATOVENPAR3 <> '')
-            $contrato->IMB_CTR_CONTRATOVENPAR3              = formatarData($request->IMB_CTR_CONTRATOVENPAR3);
-        if( $contrato->IMB_CTR_CONTRATOVENPAR4 <> '')
-            $contrato->IMB_CTR_CONTRATOVENPAR4              = formatarData($request->IMB_CTR_CONTRATOVENPAR4);
+            $contrato->IMB_CTR_CONTRATOVENPAR1              = $request->IMB_CTR_CONTRATOVENPAR1;
+            $contrato->IMB_CTR_CONTRATOVENPAR2              = $request->IMB_CTR_CONTRATOVENPAR2;
+            $contrato->IMB_CTR_CONTRATOVENPAR3              = $request->IMB_CTR_CONTRATOVENPAR3;
+            $contrato->IMB_CTR_CONTRATOVENPAR4              = $request->IMB_CTR_CONTRATOVENPAR4;
         $contrato->IMB_CTR_CONTRATOVALPAR1              = $request->IMB_CTR_CONTRATOVALPAR1;
         $contrato->IMB_CTR_CONTRATOVALPAR2              = $request->IMB_CTR_CONTRATOVALPAR2;
         $contrato->IMB_CTR_CONTRATOVALPAR3              = $request->IMB_CTR_CONTRATOVALPAR3;
@@ -426,7 +463,8 @@ class ctrContrato extends Controller
         $contrato->IMB_CTR_COBTAXAADM2                  = $request->IMB_CTR_COBTAXAADM2;
         $contrato->IMB_CTR_COBTAXAADM3                  = $request->IMB_CTR_COBTAXAADM3;
         $contrato->IMB_CTR_COBTAXAADM4                  = $request->IMB_CTR_COBTAXAADM4;
-        $contrato->IMB_CTR_SITUACAO                     = 'ATIVO';
+        if( $novocontrato == 'S')
+            $contrato->IMB_CTR_SITUACAO                     = 'ATIVO';
         $contrato->IMB_CTR_FINALIDADE                   = $request->IMB_CTR_FINALIDADE;
         $contrato->IMB_IRJ_ID                           = $request->IMB_IRJ_ID;
         $contrato->IMB_CTR_FORMAREAJUSTE                = $request->IMB_CTR_FORMAREAJUSTE;
@@ -503,7 +541,8 @@ class ctrContrato extends Controller
         $contrato->IMB_CTR_PROXIMOREPASSE                     = $request->IMB_CTR_PROXIMOREPASSE;
         $contrato->IMB_CTR_EMAIL                     = $request->IMB_CTR_EMAIL;
         $contrato->IMB_CTR_BOLETOVIAEMAIL                     = $request->IMB_CTR_BOLETOVIAEMAIL;
-                
+        $contrato->IMB_CTR_JURIDICOANOTACOES                     = $request->IMB_CTR_JURIDICOANOTACOES;
+                        
         
         //definir em qual parcela será o proximo reajuste
         if( $request->IMB_CTR_ID == '' )
@@ -613,22 +652,38 @@ class ctrContrato extends Controller
         if( $request->IMB_CTR_ID == '' )
             $imv->VIS_STA_ID = $par2->VIS_STA_IDALUGADO;
         $imv->IMB_IMV_RELIRRF=$request->IMB_IMV_RELIRRF;
+
         $imv->IMB_IMV_ALUGUELAGREGAR               = $request->IMB_IMV_ALUGUELAGREGAR;
         $imv->IMB_IMV_AGREGADOLDCREDEB             = $request->IMB_IMV_AGREGADOLDCREDEB;
         $imv->IMB_IMV_AGREGADOLTCREDEB             = $request->IMB_IMV_AGREGADOLTCREDEB;
-        $imv->IMB_IMV_DAESENHA             = $request->IMB_IMV_DAESENHA;
-        $imv->IMB_IMV_DAEINSCRICAO             = $request->IMB_IMV_DAEINSCRICAO;
-        $imv->IMB_IMV_CPFLINSCRICAO             = $request->IMB_IMV_CPFLINSCRICAO;
-        $imv->IMB_IMV_IPTU1             = $request->IMB_IMV_IPTU1;
-        $imv->IMB_IMV_IPTU1REFERENTE= $request->IMB_IMV_IPTU1REFERENTE;
-        $imv->IMB_IMV_IPTU2             = $request->IMB_IMV_IPTU2;
-        $imv->IMB_IMV_IPTU2REFERENTE= $request->IMB_IMV_IPTU2REFERENTE;
-        $imv->IMB_IMV_IPTU3             = $request->IMB_IMV_IPTU3;
-        $imv->IMB_IMV_IPTU3REFERENTE= $request->IMB_IMV_IPTU3REFERENTE;
-        $imv->IMB_IMV_IPTU4             = $request->IMB_IMV_IPTU4;
-        $imv->IMB_IMV_IPTU4REFERENTE= $request->IMB_IMV_IPTU4REFERENTE;
-        $imv->imb_imv_codigocidaderaiz= $request->imb_imv_codigocidaderaiz;
+        if( $novocontrato =='N')
+        {
+            $imv->IMB_IMV_DAESENHA             = $request->IMB_IMV_DAESENHA;
+            $imv->IMB_IMV_DAEINSCRICAO             = $request->IMB_IMV_DAEINSCRICAO;
+            $imv->IMB_IMV_CPFLINSCRICAO             = $request->IMB_IMV_CPFLINSCRICAO;
+            $imv->IMB_IMV_IPTU1             = $request->IMB_IMV_IPTU1;
+            $imv->IMB_IMV_IPTU1REFERENTE= $request->IMB_IMV_IPTU1REFERENTE;
+            $imv->IMB_IMV_IPTU2             = $request->IMB_IMV_IPTU2;
+            $imv->IMB_IMV_IPTU2REFERENTE= $request->IMB_IMV_IPTU2REFERENTE;
+            $imv->IMB_IMV_IPTU3             = $request->IMB_IMV_IPTU3;
+            $imv->IMB_IMV_IPTU3REFERENTE= $request->IMB_IMV_IPTU3REFERENTE;
+            $imv->IMB_IMV_IPTU4             = $request->IMB_IMV_IPTU4;
+            $imv->IMB_IMV_IPTU4REFERENTE= $request->IMB_IMV_IPTU4REFERENTE;
+
+
+            $imv->IMB_IMV_13COBRAR= $request->IMB_IMV_13COBRAR;
+            $imv->IMB_IMV_13PERCENTUAL= $request->IMB_IMV_13PERCENTUAL;
+            $imv->IMB_IMV_13MES= $request->IMB_IMV_13MES;
+
+            $imv->IMB_IMV_13_2PERCENTUAL= $request->IMB_IMV_13_2PERCENTUAL;
+            $imv->IMB_IMV_13_2MES= $request->IMB_IMV_13_2MES;
+
+            $imv->IMB_IMV_13_3PERCENTUAL= $request->IMB_IMV_13_3PERCENTUAL;
+            $imv->IMB_IMV_13_3MES= $request->IMB_IMV_13_3MES;
+        }
+
         $imv->save();
+
 
         return response()->json( $contrato->IMB_CTR_ID, 200);
 
@@ -1054,6 +1109,10 @@ class ctrContrato extends Controller
             $lf->save();
 
         }
+
+        $tb = "UPDATE IMB_COBRANCAGERADAPERM SET IMB_CGR_DTHINATIVO=curdate() where IMB_CTR_ID = $id ".
+        " AND IMB_CGR_DATAVENCIMENTO > curdate()";
+        DB::statement("$tb");
                     //3632859
         app('App\Http\Controllers\ctrRotinas')
             ->gravarObs( $ctr->IMB_IMV_ID, $id, 0, 0, 0, 'Rescisão Realizada ');
@@ -1222,6 +1281,49 @@ class ctrContrato extends Controller
             return view( 'contrato.dragdropdocumentos', compact( 'idcontrato'));
         }
 
-
+        public function findJson($id)
+        {
+            $contrato =mdlContrato::select(
+                [   'IMB_CTR_ID',
+                    'IMB_CTR_REFERENCIA',
+                    'IMB_IMV_ID',
+                    'IMB_CTR_TAXAADMINISTRATIVA',
+                    'IMB_CTR_TAXAADMINISTRATIVAFORMA',
+                    DB::Raw('( select imovel( IMB_CONTRATO.IMB_IMV_ID ) ) as ENDERECOCOMPLETO'),
+                    DB::Raw('( SELECT CEP_BAIRRO.CEP_BAI_NOME FROM IMB_IMOVEIS,CEP_BAIRRO WHERE IMB_IMOVEIS.IMB_IMV_ID = IMB_CONTRATO.IMB_IMV_ID AND IMB_IMOVEIS.CEP_BAI_ID = CEP_BAIRRO.CEP_BAI_ID LIMIT 1) AS BAIRRO'),
+                    DB::Raw('PEGALOCADORPRINCIPALIMV(IMB_IMV_ID) AS PROPRIETARIO'),
+                    DB::Raw('PEGALOCATARIOCONTRATO(IMB_CTR_ID) AS IMB_CLT_NOME_LOCATARIO'),
+                    'IMB_IMV_ID',
+                    'IMB_CTR_SITUACAO',
+                    'IMB_CTR_TOLERANCIA',
+                    'IMB_CTR_INICIO',
+                    'IMB_CTR_DATAREAJUSTE',
+                    'IMB_CTR_REPASSEDIA',
+                    'IMB_CTR_DIAVENCIMENTO',
+                    'IMB_CTR_VENCIMENTOLOCATARIO',
+                    'IMB_CTR_VENCIMENTOLOCADOR',
+                    'IMB_CTR_VALORALUGUEL',
+                    'IMB_CTR_PROXIMOREPASSE',
+                    'IMB_CTR_REPASSEDIAFIXO',
+                    DB::raw('( SELECT MAX( IMB_RLT_DATACOMPETENCIA)
+                    FROM IMB_RECIBOLOCATARIO WHERE IMB_RECIBOLOCATARIO.IMB_CTR_ID =
+                        IMB_CTR_ID ) AS ULTIMORECEBIMENTO'),
+                    DB::raw('( SELECT MAX( IMB_RLD_DATAVENCIMENTO)
+                    FROM IMB_RECIBOLOCADOR WHERE IMB_RECIBOLOCADOR.IMB_CTR_ID =
+                        IMB_CTR_ID ) AS ULTIMOREPASSE'),
+    
+                    //DB::raw('proximovencimentolocador( IMB_CONTRATO.IMB_CTR_ID ) AS VENCIMENTOLOCADOR'),
+                    //DB::raw('proximovencimentolocatario( IMB_CONTRATO.IMB_CTR_ID ) AS VENCIMENTOLOCATARIO')
+                ]
+                )->where( 'IMB_CTR_ID', '=', $id
+                )->orderBy('IMB_CTR_SITUACAO'
+                )->orderBy('ENDERECOCOMPLETO');
+    
+                //Log::info( $contrato->toSql());
+    
+                $contrato = $contrato->first();
+                return $contrato;
+            //
+        }
 
 }

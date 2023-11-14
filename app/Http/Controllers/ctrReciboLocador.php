@@ -51,6 +51,8 @@ class ctrReciboLocador extends Controller
 
         $idcontrato =$dados[0]['IMB_CTR_ID'];
         $dvencimento=$dados[0]['IMB_RLD_DATAVENCIMENTO'];
+        $troco = $dados[0]['troco'];
+        $trocofuturo = $dados[0]['trocofuturo'];
         $idlocatario = collect( DB::select("select PEGACODIGOLOCATARIOCONTRATO('$idcontrato') as id "))->first()->id;
 
         $contrato   = mdlContrato::find( $idcontrato );
@@ -99,7 +101,7 @@ class ctrReciboLocador extends Controller
             else
                 $lcx->FIN_LCX_CHEQUE         = $dados[0]['FIN_LCX_CHEQUE'];            
             $lcx->imb_imb_id2                       = Auth::user()->IMB_IMB_ID;
-            $lcx->FIN_LCX_CONCILIADO                = 'S';
+            $lcx->FIN_LCX_CONCILIADO                = 'N';
             $lcx->save();
 
             $sequencia = 0;
@@ -108,6 +110,7 @@ class ctrReciboLocador extends Controller
             {
 
 
+                $idcfc = '';
                 $idlcf      = $d['IMB_LCF_ID'];
                 $idtbe      = $d['IMB_TBE_ID'];
                 $idlocador  = $d['IMB_CLT_IDLOCADOR'];
@@ -117,19 +120,23 @@ class ctrReciboLocador extends Controller
 
                 if( $idtbe == 1 or $idtbe == 24 ) $lTemAluguel = 'S';
 
-                if( $idlcf <> 0 )
+                Log::info( 'idlcf '.$idlcf );
+                if( intval($idlcf) <> 0 )
                 {
                     $lf         = mdlLancamentoFuturo::find( $idlcf );
                     $idcfc      = $lf->FIN_CFC_ID;
                 }
 
-                $eve        = mdlTabelaEvento::where( 'IMB_TBE_ID', '=', $idtbe )->first();
+                $eve        = mdlTabelaEvento::where( 'IMB_TBE_ID', '=', $idtbe );
+                Log::info($eve->toSql());
+                $eve = $eve->first();
+
                 if( $eve == '' ) $idcfc == 'NDA';
 
                 if( $idcfc == '' and $eve <> '' )
                     $idcfc = $eve->FIN_CFC_ID;
 
-                $gravar = 'S';
+                    $gravar = 'S';
 
                 $recibo = new mdlReciboLocador;
                 $recibo->IMB_RLD_NUMERO         = $numerorecibo;
@@ -172,7 +179,7 @@ class ctrReciboLocador extends Controller
                     $recibo->FIN_LCX_CHEQUE         = 0;
                 else
                     $recibo->FIN_LCX_CHEQUE         = $d['FIN_LCX_CHEQUE'];
-                $recibo->FIN_CFC_ID             = $idcfc;
+             
                 $recibo->IMB_CLT_ID_LOCATARIO   = $idlocatario;
                 $recibo->IMB_CLT_ID     = $p->IMB_CLT_ID;
 
@@ -202,11 +209,13 @@ class ctrReciboLocador extends Controller
                     $catran = new mdlCaTran;
                     $catran->FIN_LCX_ID                 = $lcx->FIN_LCX_ID;
                     $catran->FIN_CAT_SEQUENCIA          = $sequencia;
+
                     if( $d['IMB_RLD_LOCADORCREDEB'] == 'C')
                         $catran->FIN_CAT_OPERACAO = 'D';
                     if( $d['IMB_RLD_LOCADORCREDEB'] == 'D')
                         $catran->FIN_CAT_OPERACAO = 'C';
-                    $catran->FIN_CAT_VALOR      = $d['IMB_RLD_VALOR'];
+
+                    $catran->FIN_CAT_VALOR      = $recibo->IMB_RLD_VALOR;
                     $catran->FIN_CFC_ID        = $recibo->FIN_CFC_ID;
                     $catran->FIN_SBC_ID         = $sbclocacao;
                     $catran->save();
@@ -247,6 +256,7 @@ class ctrReciboLocador extends Controller
                         $lf->IMB_CLT_IDLOCADOR       = $p->IMB_CLT_ID;;
                         $lf->IMB_LCF_DATAPAGAMENTO = $recibo->IMB_RLD_DATAPAGAMENTO;
                         $lf->IMB_RLD_NUMERO          = $recibo->IMB_RLD_NUMERO;
+                        $lf->FIN_CFC_ID              = $idcfc;
                         $lf->save();
                     }
                     else 
@@ -263,10 +273,49 @@ class ctrReciboLocador extends Controller
 
 
             }
-            $lcx->FIN_LCX_VALOR = $total;
+            $lcx = mdlLanctoCaixa::where( 'FIN_LCX_RECIBO','=', $recibo->IMB_RLD_NUMERO )
+            ->where( 'FIN_LCX_ORIGEM','=', 'RD' )->first();
+            $lcx->FIN_LCX_VALOR = $this->totaldoRecibo( $recibo->IMB_RLD_NUMERO);
             $lcx->save();
 
         }
+
+        //lancando o troco futuro
+        if( $troco <> 0 )
+        {
+        
+            $lf = new mdlLancamentoFuturo();
+
+            $lf->IMB_IMB_ID = Auth::user()->IMB_IMB_ID;
+            $lf->IMB_CTR_ID = $idcontrato;
+            $lf->IMB_LCF_VALOR           = abs($troco);
+            if( $troco < 0 )
+                $lf->IMB_LCF_LOCADORCREDEB   = 'D';
+            if( $troco > 0 )
+                $lf->IMB_LCF_LOCADORCREDEB   = 'C';
+            $lf->IMB_LCF_LOCATARIOCREDEB = 'N';
+            $lf->IMB_LCF_DATAVENCIMENTO  = app('App\Http\Controllers\ctrRotinas')
+                                        ->addMeses( $contrato->IMB_CTR_DIAVENCIMENTO,  1,$recibo->IMB_RLD_DATAVENCIMENTO );
+            $lf->IMB_IMV_ID              = $recibo->IMB_IMV_ID ;
+            $lf->IMB_TBE_ID              = 200;
+            $lf->IMB_ATD_ID              = Auth::user()->IMB_IMB_ID;
+            $lf->IMB_LCF_INCIRRF         = 'N';
+            $lf->IMB_LCF_INCTAX          = 'N';
+            $lf->IMB_LCF_INCJUROS        = 'N';
+            $lf->IMB_LCF_INCCORRECAO     = 'N';
+            $lf->IMB_LCF_INCISS          = 'N';
+            $lf->IMB_LCF_OBSERVACAO      = 'Transporte de valor do vencimento '.$recibo->IMB_RLD_DATAVENCIMENTO;
+            $lf->IMB_LCF_NUMEROCONTROLE  = '0';
+            $lf->IMB_LCF_NUMPARREAJUSTE  = '0';
+            $lf->IMB_LCF_NUMPARCONTRATO  = '0';
+            $lf->IMB_LCF_CHAVE           = '0';
+            $lf->IMB_LCF_TIPO            = 'A';
+            $lf->IMB_CLT_IDLOCADOR       = null;
+            $lf->IMB_LCF_DATAPAGAMENTO = null;
+            $lf->IMB_RLD_NUMERO          = null;
+            $lf->save();
+        }
+    
         app('App\Http\Controllers\ctrRotinas')
         ->gravarObs(  $contrato->IMB_IMV_ID,  $contrato->IMB_CTR_ID,0,0,0,'Repasse realizado - Vencto:  '.app( 'App\Http\Controllers\ctrRotinas')->formatarData($dados[0]['IMB_RLD_DATAVENCIMENTO']));
 
@@ -336,6 +385,7 @@ class ctrReciboLocador extends Controller
             ])
             ->leftJoin( 'IMB_CLIENTE','IMB_CLIENTE.IMB_CLT_ID', 'IMB_RECIBOLOCADOR.IMB_CLT_ID')
             ->where( 'IMB_CTR_ID','=',$idcontrato )
+            ->where( 'IMB_RLD_LOCADORCREDEB','<>','N')
             ->orderBy( 'IMB_RLD_DATAVENCIMENTO','desc')
             ->orderBy( 'IMB_RLD_NUMERO','ASC')
             ->get();
@@ -364,7 +414,125 @@ class ctrReciboLocador extends Controller
 
     }
 
+    public function pegarRecibosPorProcesso( $idprocesso )
+    {
+        $recibos = mdlReciboLocador::select(
+            [
+                'IMB_RLD_NUMERO'
+            ]
+            )->distinct('IMB_RLD_NUMERO')
+            ->where( 'IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID )
+            ->whereNull('IMB_RLD_DTHINATIVO')
+            ->orderBy( 'IMB_RLD_DATAPAGAMENTO')
+            ->where('IMB_PRM_NUMEROPROCESSO','=', $idprocesso );
+        
+        $recibos= $recibos->get();
+        
+        if( $imprimir == 'S' )
+        {
+            $pdf=PDF::loadView('reports.recibos.locador.recibolocador', compact( 'recibos') );
+            $pdf->setPaper('A4', 'portrait');
+            return $pdf->stream('recibolocador.pdf');
+        };
+    }
     public function pegarRecibo( $id, $imprimir )
+    {
+
+        if( $imprimir <> 'S')
+        {
+            Log::info( 'numero recino: '.$id );
+            $rec = mdlReciboLocador::select(
+            [
+                'IMB_RLD_ID',
+                'IMB_RECIBOLOCADOR.IMB_CLT_ID',
+                'IMB_RECIBOLOCADOR.IMB_IMV_ID',
+                'IMB_RLD_DATAVENCIMENTO',
+                'IMB_RLD_DATAPAGAMENTO',
+                'IMB_RLD_NUMERO',
+                'IMB_RLD_VALOR',
+                'IMB_RECIBOLOCADOR.IMB_TBE_ID',
+                'IMB_TBE_NOME',
+                'IMB_RLD_OBSERVACAO',
+                'IMB_RLD_TOTALRECIBO',
+                'FIN_LCX_DINHEIRO',
+                'FIN_LCX_CHEQUE',
+                DB::raw('( SELECT IMB_CLT_NOME
+                FROM IMB_CLIENTE WHERE IMB_CLIENTE.IMB_CLT_ID =
+                IMB_RECIBOLOCADOR.IMB_CLT_ID_LOCATARIO ) AS NOMELOCATARIO'),
+                DB::raw('( SELECT IMB_CLT_CPF
+                FROM IMB_CLIENTE WHERE IMB_CLIENTE.IMB_CLT_ID =
+                IMB_RECIBOLOCADOR.IMB_CLT_ID_LOCATARIO ) AS CPFLOCATARIO'),
+                DB::raw('( SELECT IMB_CLT_NOME
+                FROM IMB_CLIENTE WHERE IMB_CLIENTE.IMB_CLT_ID =
+                IMB_RECIBOLOCADOR.IMB_CLT_ID ) AS NOMELOCADOR'),
+                DB::raw('imovel( IMB_RECIBOLOCADOR.IMB_IMV_ID) AS ENDERECOIMOVEL'),
+                DB::raw('( SELECT CEP_BAI_NOME
+                FROM IMB_IMOVEIS WHERE IMB_IMOVEIS.IMB_IMV_ID =
+                IMB_CONTRATO.IMB_IMV_ID ) AS BAIRROIMOVEL'),
+                DB::raw('( SELECT IMB_IMV_CIDADE
+                FROM IMB_IMOVEIS WHERE IMB_IMOVEIS.IMB_IMV_ID =
+                IMB_CONTRATO.IMB_IMV_ID ) AS IMB_IMV_CIDADE'),
+                'IMB_RLD_LOCADORCREDEB',
+                DB::raw("(CASE WHEN IMB_RLD_LOCADORCREDEB = 'D'
+                THEN '-' WHEN IMB_RLD_LOCADORCREDEB = 'C'
+                THEN '+'
+                ELSE ' ' END) AS MAISMENOS"),
+                'IMB_CTR_DATALOCACAO',
+                'IMB_CTR_DATAREAJUSTE',
+                'IMB_IMB_NOME',
+                'CEP_BAI_NOME',
+                'CEP_UF_SIGLA',
+                'CEP_CID_NOME',
+                'IMB_IMB_CRECI',
+                'IMB_IMB_URL',
+                'IMB_CTR_REFERENCIA',
+                DB::raw("CONCAT( COALESCE(IMB_IMB_ENDERECO,''),' ', COALESCE(IMB_IMB_ENDERECONUMERO,''),' ', COALESCE(IMB_IMB_ENDERECOCOMPLEMENTO,'')) ENDERECO"),
+                DB::raw("CONCAT( COALESCE(IMB_IMB_TELEFONE1,''),' ', COALESCE(IMB_IMB_TELEFONE2,''),' ', COALESCE(IMB_IMB_TELEFONE3,'') ) TELEFONE"),
+
+                ])
+            ->leftJoin('IMB_TABELAEVENTOS','IMB_TABELAEVENTOS.IMB_TBE_ID','IMB_RECIBOLOCADOR.IMB_TBE_ID')
+            ->leftJoin('IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_RECIBOLOCADOR.IMB_CTR_ID')
+            ->leftJoin('IMB_IMOBILIARIA','IMB_IMOBILIARIA.IMB_IMB_ID','IMB_RECIBOLOCADOR.IMB_IMB_ID')
+            ->where( 'IMB_RECIBOLOCADOR.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
+            ->where( 'IMB_TABELAEVENTOS.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
+            ->where( 'IMB_RLD_LOCADORCREDEB','<>', 'N' )
+            ->where( 'IMB_RLD_NUMERO','=',$id)
+            ->orderBy( 'IMB_TBE_ID','ASC')->get();
+
+            $ppi = mdlPropImovel::select( 
+                [
+                    '*',
+                    DB::Raw( '(SELECT GER_BNC_NOME FROM GER_BANCOS WHERE GER_BANCOS.GER_BNC_NUMERO = IMB_PROPRIETARIOIMOVEL.GER_BNC_NUMERO LIMIT 1) AS GER_BNC_NOME')
+                ]
+            )->where( 'IMB_IMV_ID','=', $rec[0]->IMB_IMV_ID )
+            ->where( 'IMB_CLT_ID','=', $rec[0]->IMB_CLT_ID)
+            ->first();
+
+        return $rec;
+        }
+
+        $processo = mdlReciboLocador::select( [ 'IMB_PRM_NUMEROPROCESSO'])->where( 'IMB_RLD_NUMERO','=', $id )->first();
+
+        $recibos = mdlReciboLocador::select(
+            [
+                'IMB_RLD_NUMERO'
+            ]
+            )->distinct('IMB_RLD_NUMERO')
+            ->where( 'IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID )
+            //->where('IMB_PRM_NUMEROPROCESSO','=', $processo->IMB_PRM_NUMEROPROCESSO )
+            ->where('IMB_RLD_NUMERO','=', $id)
+            ->whereNull('IMB_RLD_DTHINATIVO')
+            ->orderBy( 'IMB_RLD_DATAPAGAMENTO')
+            ->get();
+
+        $pdf=PDF::loadView('reports.recibos.locador.recibolocador', compact( 'recibos') );
+        $pdf->setPaper('A4', 'portrait');
+        return $pdf->stream('recibolocador.pdf');
+
+    }
+
+
+    public function pegarReciboOld( $id, $imprimir )
     {
         $rec = mdlReciboLocador::select(
             [
@@ -419,7 +587,8 @@ class ctrReciboLocador extends Controller
             ->leftJoin('IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_RECIBOLOCADOR.IMB_CTR_ID')
             ->leftJoin('IMB_IMOBILIARIA','IMB_IMOBILIARIA.IMB_IMB_ID','IMB_RECIBOLOCADOR.IMB_IMB_ID')
             ->where( 'IMB_RECIBOLOCADOR.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
-            ->where( 'IMB_TABELAEVENTOS.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID);
+            ->where( 'IMB_TABELAEVENTOS.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
+            ->where( 'IMB_RLD_LOCADORCREDEB','<>', 'N' );
 
             if( $id == 0 )
             {
@@ -450,6 +619,88 @@ class ctrReciboLocador extends Controller
             return $pdf->stream('recibolocador.pdf');
         };
 
+
+        return $rec;
+
+    }
+
+    public function pegarReciboProcesso( $id )
+    {
+        $rec = mdlReciboLocador::select(
+            [
+                'IMB_RLD_ID',
+                'IMB_RECIBOLOCADOR.IMB_CLT_ID',
+                'IMB_RECIBOLOCADOR.IMB_IMV_ID',
+                'IMB_RLD_DATAVENCIMENTO',
+                'IMB_RLD_DATAPAGAMENTO',
+                'IMB_RLD_NUMERO',
+                'IMB_RLD_VALOR',
+                'IMB_RECIBOLOCADOR.IMB_TBE_ID',
+                'IMB_TBE_NOME',
+                'IMB_RLD_OBSERVACAO',
+                'IMB_RLD_TOTALRECIBO',
+                'FIN_LCX_DINHEIRO',
+                'FIN_LCX_CHEQUE',
+                DB::raw('( SELECT IMB_CLT_NOME
+                FROM IMB_CLIENTE WHERE IMB_CLIENTE.IMB_CLT_ID =
+                IMB_RECIBOLOCADOR.IMB_CLT_ID_LOCATARIO ) AS NOMELOCATARIO'),
+                DB::raw('( SELECT IMB_CLT_CPF
+                FROM IMB_CLIENTE WHERE IMB_CLIENTE.IMB_CLT_ID =
+                IMB_RECIBOLOCADOR.IMB_CLT_ID_LOCATARIO ) AS CPFLOCATARIO'),
+                DB::raw('( SELECT IMB_CLT_NOME
+                FROM IMB_CLIENTE WHERE IMB_CLIENTE.IMB_CLT_ID =
+                IMB_RECIBOLOCADOR.IMB_CLT_ID ) AS NOMELOCADOR'),
+                DB::raw('imovel( IMB_RECIBOLOCADOR.IMB_IMV_ID) AS ENDERECOIMOVEL'),
+                DB::raw('( SELECT CEP_BAI_NOME
+                FROM IMB_IMOVEIS WHERE IMB_IMOVEIS.IMB_IMV_ID =
+                IMB_CONTRATO.IMB_IMV_ID ) AS BAIRROIMOVEL'),
+                DB::raw('( SELECT IMB_IMV_CIDADE
+                FROM IMB_IMOVEIS WHERE IMB_IMOVEIS.IMB_IMV_ID =
+                IMB_CONTRATO.IMB_IMV_ID ) AS IMB_IMV_CIDADE'),
+                'IMB_RLD_LOCADORCREDEB',
+                DB::raw("(CASE WHEN IMB_RLD_LOCADORCREDEB = 'D'
+                THEN '-' WHEN IMB_RLD_LOCADORCREDEB = 'C'
+                THEN '+'
+                ELSE ' ' END) AS MAISMENOS"),
+                'IMB_CTR_DATALOCACAO',
+                'IMB_CTR_DATAREAJUSTE',
+                'IMB_IMB_NOME',
+                'CEP_BAI_NOME',
+                'CEP_UF_SIGLA',
+                'CEP_CID_NOME',
+                'IMB_IMB_CRECI',
+                'IMB_IMB_URL',
+                'IMB_CTR_REFERENCIA',
+                DB::raw("CONCAT( COALESCE(IMB_IMB_ENDERECO,''),' ', COALESCE(IMB_IMB_ENDERECONUMERO,''),' ', COALESCE(IMB_IMB_ENDERECOCOMPLEMENTO,'')) ENDERECO"),
+                DB::raw("CONCAT( COALESCE(IMB_IMB_TELEFONE1,''),' ', COALESCE(IMB_IMB_TELEFONE2,''),' ', COALESCE(IMB_IMB_TELEFONE3,'') ) TELEFONE"),
+
+                ])
+            ->leftJoin('IMB_TABELAEVENTOS','IMB_TABELAEVENTOS.IMB_TBE_ID','IMB_RECIBOLOCADOR.IMB_TBE_ID')
+            ->leftJoin('IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_RECIBOLOCADOR.IMB_CTR_ID')
+            ->leftJoin('IMB_IMOBILIARIA','IMB_IMOBILIARIA.IMB_IMB_ID','IMB_RECIBOLOCADOR.IMB_IMB_ID')
+            ->where( 'IMB_RECIBOLOCADOR.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
+            ->where( 'IMB_TABELAEVENTOS.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
+            ->where( 'IMB_RLD_LOCADORCREDEB','<>', 'N' );
+
+            if( $id == 0 )
+            {
+                $max = mdlReciboLocador::max( 'IMB_RLD_NUMERO');
+                $rec = $rec->where( 'IMB_RLD_NUMERO','=',$max);
+            }
+            else
+            $rec = $rec->where( 'IMB_RLD_NUMERO','=',$id);
+
+            $rec = $rec->orderBy( 'IMB_TBE_ID','ASC')
+                ->get();
+
+        $ppi = mdlPropImovel::select( 
+            [
+                '*',
+                DB::Raw( '(SELECT GER_BNC_NOME FROM GER_BANCOS WHERE GER_BANCOS.GER_BNC_NUMERO = IMB_PROPRIETARIOIMOVEL.GER_BNC_NUMERO LIMIT 1) AS GER_BNC_NOME')
+            ]
+        )->where( 'IMB_IMV_ID','=', $rec[0]->IMB_IMV_ID )
+        ->where( 'IMB_CLT_ID','=', $rec[0]->IMB_CLT_ID)
+        ->first();
 
         return $rec;
 
@@ -615,8 +866,8 @@ class ctrReciboLocador extends Controller
             ->where( 'IMB_PROPRIETARIOIMOVEL.IMB_CLT_ID','=',$idcliente )
             ->where( 'IMB_TABELAEVENTOS.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
             ->where( 'IMB_RECIBOLOCADOR.IMB_CLT_ID','=',$idcliente )
+            ->where( 'IMB_RLD_LOCADORCREDEB','<>', 'N' )
             ->whereNull( 'IMB_RLD_DTHINATIVO')
-
             ->where( 'IMB_RECIBOLOCADOR.IMB_RLD_DATAPAGAMENTO','>=',$datainicial )
             ->where( 'IMB_RECIBOLOCADOR.IMB_RLD_DATAPAGAMENTO','<=',$datafinal );
 
@@ -764,6 +1015,7 @@ class ctrReciboLocador extends Controller
             ->where( 'IMB_RECIBOLOCADOR.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
             ->where( 'IMB_RLD_DATAPAGAMENTO','>=', $datainicio)
             ->where( 'IMB_RLD_DATAPAGAMENTO','<=', $datafim)
+            ->where( 'IMB_RLD_LOCADORCREDEB','<>', 'N' )
             ->whereNull('IMB_RLD_DTHINATIVO');
 
             if( $empresa)
@@ -950,12 +1202,21 @@ class ctrReciboLocador extends Controller
             ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID', 'IMB_RECIBOLOCADOR.IMB_CTR_ID')
             ->leftJoin( 'IMB_IMOVEIS','IMB_IMOVEIS.IMB_IMV_ID', 'IMB_CONTRATO.IMB_IMV_ID')
             ->where( 'IMB_RECIBOLOCADOR.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
-            ->where( 'IMB_RLD_DATAPAGAMENTO','>=', $datainicio)
-            ->where( 'IMB_RLD_DATAPAGAMENTO','<=', $datafim)
             ->whereNull('IMB_RLD_DTHINATIVO');
 
+        if( $request->tipo == 'R')
+            $rec = $rec->where( 'IMB_RLD_DATAPAGAMENTO','>=', $datainicio)
+                ->where( 'IMB_RLD_DATAPAGAMENTO','<=', $datafim);
+                
+        else
+        if( $request->tipo == 'P')
+            $rec = $rec->where( 'IMB_RLD_DTHEMISSAO','>=', $datainicio)
+                ->where( 'IMB_RLD_DTHEMISSAO','<=', $datafim);
+            
+
+
         if( $dimob == 'D' )
-            $rec = $rec->where('IMB_IMV_RELIRRF','=','S' );
+        $rec = $rec->where('IMB_IMV_RELIRRF','=','S' );
 
         if( $empresa)
             $rec = $rec->where('IMB_CONTRATO.IMB_IMB_ID2','=',$empresa );
@@ -967,6 +1228,7 @@ class ctrReciboLocador extends Controller
         $rec = $rec->distinct('IMB_RLD_NUMERO')
             ->orderBy( 'IMB_RLD_DATAPAGAMENTO');
 
+        Log::info( $rec->toSql());
 
             return DataTables::of($rec)->make(true);
 
@@ -991,6 +1253,7 @@ class ctrReciboLocador extends Controller
     {
         $datainicio =  $request->recperdatainicio;
         $datafim =   $request->recperdatafim;
+        $tipo = $request->tipo;
         $IMB_CLT_ID = $request->IMB_CLT_ID;
 
         if( $datainicio=='') $datainicio = date( 'Y/m/d');
@@ -1001,16 +1264,23 @@ class ctrReciboLocador extends Controller
                 'IMB_RLD_NUMERO'
             ]
             )->distinct('IMB_RLD_NUMERO')
-            ->where( 'IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID )
-            ->where( 'IMB_RLD_DATAPAGAMENTO','>=', $datainicio )
-            ->where( 'IMB_RLD_DATAPAGAMENTO','<=', $datafim )
-            ->whereNull('IMB_RLD_DTHINATIVO')
+            ->where( 'IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID );
+
+        if( $tipo == 'R')
+            $recibos = $recibos->where( 'IMB_RLD_DATAPAGAMENTO','>=', $datainicio)
+                ->where( 'IMB_RLD_DATAPAGAMENTO','<=', $datafim);
+        else
+        if( $tipo == 'P')
+        $recibos = $recibos->where( 'IMB_RLD_DTHEMISSAO','>=', $datainicio)
+                ->where( 'IMB_RLD_DTHEMISSAO','<=', $datafim);
+            
+        $recibos = $recibos->whereNull('IMB_RLD_DTHINATIVO')
             ->orderBy( 'IMB_RLD_DATAPAGAMENTO');
 
-            if( $IMB_CLT_ID <> '' ) 
+        if( $IMB_CLT_ID <> '' ) 
                 $recibos = $recibos->where('IMB_CLT_ID','=', $IMB_CLT_ID );
 
-            $recibos= $recibos->get();
+        $recibos= $recibos->get();
 
             
 //            $pdf=PDF::loadView('reports.recibos.locador.recibolocadorlote', compact( 'recibos'));
@@ -1033,6 +1303,8 @@ class ctrReciboLocador extends Controller
             $email = $request->email;
             $idimovel = $request->IMB_IMV_ID;
             $pasta = $request->IMB_CTR_REFERENCIA;
+
+            $retornajson =$request->retornajson;
     
             if( $datainicial == '' or $datainicial == null  )
                 $datainicial = date('Y/m/d');
@@ -1067,6 +1339,7 @@ class ctrReciboLocador extends Controller
                     ->orderBy( 'IMB_TBE_ID','ASC')
                     ->get();
 
+            $param2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID);
             $datainicial = app('App\Http\Controllers\ctrRotinas')->formatarData($datainicial);
             $datafinal = app('App\Http\Controllers\ctrRotinas')->formatarData($datafinal);
             $regclt =  app('App\Http\Controllers\ctrRotinas')->clienteDadosFull( $idcliente );
@@ -1110,14 +1383,16 @@ class ctrReciboLocador extends Controller
                         $dados->TMP_PVR_TITULO2 = 'Periodo: '.$datainicial.' a '.
                                                             $datafinal;
                     //return $recs;                
-                    $nomearquivo='extratoderecebimento';
+                    $nomearquivopdf='extratoderecebimento';
 
+                    $imprimir = 'N';
                     $pasta="demonstrativos";
-                    $html = view( 'reports.locador.demonstrativonovaversao', compact( 'recs', 'idcliente', 'datainicial', 'datafinal','nomecliente'));
+                    $html = view( 'reports.locador.demonstrativonovaversao', compact( 'recs', 'idcliente', 'datainicial', 'datafinal','nomecliente','imprimir'));
                     $contents = (string) $html;
                     $filename = $idcliente.'_demonstrativo_'.$datainicial.'_a_'.$datafinal.'.html';
                     Storage::disk('public')->makeDirectory( $pasta);
                     Storage::disk('public')->put( $pasta.'/'.$filename, $contents);
+                    Storage::disk('public')->put( $pasta.'/'.$nomearquivopdf.'.pdf', $contents);
                     $linkdocto = env('APP_URL').'/storage/'.$pasta.'/'.$filename;
                     Log::info( $linkdocto );
 
@@ -1125,23 +1400,37 @@ class ctrReciboLocador extends Controller
                     {
                         $a=str_replace( ';','',$a);
                         //Log::info( 'email antes: '.$a );
-                        ini_set('memory_limit', '1024M');
+                        ini_set('memory_limit', '2048M');
                         if( $a <> '' )
                         {
                   
 
+
+                            try
+                            {
                             Mail::send('reports.locador.demonstrativomail', compact( 'nomecliente','dados', 'linkdocto'),
-                            function( $message ) use ($a, $html,$nomearquivo, $imovel_log, $contrato_log, $pasta, $filename)
+                            function( $message ) use ($a, $html,$nomearquivopdf, $imovel_log, $contrato_log, $pasta, $filename, $param2)
                             {
 
                                 //Log::info('demonstrativo enviando para  '.$a );
                                 //Log::info( date('d/m/Y H:i:s').' - Demonstrativo email: '.$a );
 
                                 $copiaend = env('APP_MAILBOLETOCOPIA');                            
-//                                $pdf=PDF::loadHtml( $html,'UTF-8');
-                              //$message->attachData($pdf->output(), $nomearquivo.'.pdf');
-  //                            $message->attach( $pasta.'/'.$filename);
-            //                        $message->to( "suporte@compdados.com.br" );
+                                if( $param2->IMB_PRM_DEMONSTRATIVOPDF == 'S')
+                                {
+                                    Log::info( 'aNEXANDO');
+                                    
+                                    try
+                                    {
+                                            $pdf=PDF::loadHtml( $html,'UTF-8');
+                                            $message->attachData($pdf->output(), $nomearquivopdf.'.pdf');
+
+                                    }
+                                    catch (\Illuminate\Database\QueryException $e) {
+                                        Log::info( 'Erro gerar PDF' );
+                                    }                    
+        
+                                }                                
                                 $a = filter_var( $a, FILTER_SANITIZE_EMAIL );
                                 
                                 Log::info( 'A$ '.$a );
@@ -1152,7 +1441,11 @@ class ctrReciboLocador extends Controller
                                 app('App\Http\Controllers\ctrRotinas')
                                 ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Extrato de Recebimentos enviado para '.$a.' com cópia para '.$copiaend);
     
-                                });
+                            });
+                            }
+                            catch (\Illuminate\Database\QueryException $e) {
+                                Log::info( 'Erro: '.$e->getCode() );
+                            }                    
                         }
 
                     }
@@ -1162,9 +1455,17 @@ class ctrReciboLocador extends Controller
                 else
                 {   
 //                    $html = view( 'reports.locador.demonstrativonew', compact( 'recs', 'idcliente', 'datainicial', 'datafinal','nomecliente'));
-                    $html = view( 'reports.locador.demonstrativonovaversao', compact( 'recs', 'idcliente', 'datainicial', 'datafinal','nomecliente'));
    //                 $pdf=PDF::loadHtml( $html,'UTF-8');
                     //return $pdf->stream('demonstrativo.pdf');
+                    if( $retornajson =='S')
+                    {
+                        $imprimir = 'N';
+                        $html = view( 'reports.locador.demonstrativonovaversao', compact( 'recs', 'idcliente', 'datainicial', 'datafinal','nomecliente','imprimir'));
+                        return $html;
+                    }
+
+                    $imprimir = 'S';
+                    $html = view( 'reports.locador.demonstrativonovaversao', compact( 'recs', 'idcliente', 'datainicial', 'datafinal','nomecliente','imprimir'));
                     return $html;
                 }
             }
@@ -1279,14 +1580,17 @@ class ctrReciboLocador extends Controller
                     $tmp->IMB_BNC_AGENCIADV   = $ppi->IMB_BNC_AGENCIADV;
                     $tmp->IMB_CLTCCR_NUMERO   = $ppi->IMB_CLTCCR_NUMERO;
                     $tmp->IMB_CLTCCR_DV   = $ppi->IMB_CLTCCR_DV;
-                    $tmp->IMB_CLTCCR_NOME   = $ppi->IMB_CLTCCR_NOME;
+                    if( $ppi->IMB_CLTCCR_NOME == '' )
+                        $tmp->IMB_CLTCCR_NOME   = $clt->IMB_CLT_NOME;
+                    else
+                        $tmp->IMB_CLTCCR_NOME   = $ppi->IMB_CLTCCR_NOME;
                     $tmp->IMB_CLTCCR_CPF   = $ppi->IMB_CLTCCR_CPF;
                     $tmp->GER_BNC_AGENCIA   = $ppi->GER_BNC_AGENCIA;
                     $tmp->IMB_CLTCCR_PESSOA   = $ppi->IMB_CLTCCR_PESSOA;
                     $tmp->IMB_CLTCCR_DOC   = $ppi->IMB_CLTCCR_DOC;
                     $tmp->IMB_CLTCCR_POUPANCA   = $ppi->IMB_CLTCCR_POUPANCA;
                     $tmp->IMB_IMV_CHEQUENOMINAL   = $ppi->IMB_IMV_CHEQUENOMINAL;
-                    $tmp->IMB_IMV_PIX   = $ppi->IMB_IMV_PIX;
+                    $tmp->IMB_IMV_PIX   = $ppi->IMB_IMVCLT_PIX;
                 }
                 $tmp->ENDERECOIMOVEL   = app( 'App\Http\Controllers\ctrRotinas')->imovelEndereco( $rld->IMB_IMV_ID);
                 $tmp->FAVORECIDO   = $favorecido;
@@ -1406,7 +1710,9 @@ class ctrReciboLocador extends Controller
         ->leftJoin('IMB_PROPRIETARIOIMOVEL','IMB_PROPRIETARIOIMOVEL.IMB_IMV_ID','IMB_RECIBOLOCADOR.IMB_IMV_ID')
         ->where( 'IMB_RECIBOLOCADOR.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
 //        ->where( 'IMB_TABELAEVENTOS.IMB_TBE_IRRF','=','S')
-        ->where( 'IMB_TABELAEVENTOS.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID);
+        ->where( 'IMB_TABELAEVENTOS.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
+        ->where( 'IMB_RLD_LOCADORCREDEB','<>', 'N' );
+
 
         if( $idcliente <> '' )
         {
@@ -1892,6 +2198,18 @@ class ctrReciboLocador extends Controller
 
     public function recibosPorProcesso( $aProcessos )
     {
+    }
+
+    public function alterarDataPagto( Request $request )
+    {
+       $data = $request->novadata;
+       $recibo = $request->recibo;
+
+       $sql = "UPDATE IMB_RECIBOLOCADOR SET IMB_RLD_DATAPAGAMENTO = '$data' where IMB_RLD_NUMERO = $recibo";
+       DB::statement("$sql");
+
+       return response()->json('ok',200);
+
     }
 //
 }

@@ -167,6 +167,7 @@ tr
                             @include( 'layout.localizarcontrato')
                             @php
                               $fixos = app('App\Http\Controllers\ctrLancamentoFuturo')->fixosCount( $idcontratopesquisa);
+                              $par = app('App\Http\Controllers\ctrImobiliaria')->parametros(Auth::user()->IMB_IMB_ID);
                             @endphp
                             <input type="hidden" id="i-quantidade-fixos" value="{{$fixos}}">
                             @if( $fixos > 0 )
@@ -259,12 +260,13 @@ tr
                                                 <th width="100"class="reg-lcf div-center"> Locatário </th>
                                                 <th width="100"class="reg-lcf div-center"> Locador </th>
                                                 <th class="reg-lcf div-center" width="100"> Vencimento </th>
+                                                <th width="50" class="reg-lcf div-center">Nº Controle</th>
                                                 <th width="50" class="reg-lcf div-center"></th>
                                                 <th width="200" class="reg-lcf div-center"> Direcionado para </th>
                                                 <th width="100" class="reg-lcf div-center"> Receb. em </th>
                                                 <th width="100" class="reg-lcf div-center"> Repasse em </th>
                                                 <th width="500" class="reg-lcf div-center"> Descrição</th>
-                                                <th width="100" class="reg-lcf div-center"> Dt. Lacto.</th>
+                                                <th width="100" class="reg-lcf div-center"> Dt. Lcto.</th>
                                                 
                                             </tr>
                                         </thead>
@@ -282,6 +284,7 @@ tr
                                            {
                                               $fixo = 'FIXO';
                                               $datavencimento="Todos Meses";
+                                              $datavencimentoEUA = date( 'Y-m-d', strtotime( $lf->IMB_LCF_DATAVENCIMENTO));
                                           }
                                           else
                                           {
@@ -319,7 +322,7 @@ tr
                                           if ( ( $datapagamento and $datarecebimento  ) or
                                                ( $IMB_LCF_LOCADORCREDEB   <> 'N' and $IMB_LCF_LOCATARIOCREDEB =='N' and $datapagamento   ) or
                                                ( $IMB_LCF_LOCATARIOCREDEB <>'N' and $IMB_LCF_LOCADORCREDEB =='N' and $datarecebimento ) )
-                                             $trclasse = 'linha-quitado';                                        
+                                             $trclasse = 'linha-quitado';   
                                         @endphp
                                         <tr class="{{$trclasse}}">
                                           <td><input  id="{{$lf->IMB_LCF_ID}}" type="checkbox" name="registroslf" class="columncheck"></td>
@@ -343,6 +346,12 @@ tr
                                           <td class="reg-lcf-content  div-center">
                                             <a href="javascript:resumoParcela({{$datavencimentoEUA}})">{{$datavencimento}}</a>
                                           </td>
+                                          @if( $par->IMB_PRM_USARPARCELAS == 'S' )
+                                             <td class="reg-lcf-content  div-center">{{$lf->IMB_LCF_NUMPARREAJUSTE}}</td>
+                                          @else
+                                             <td class="reg-lcf-content  div-center"></td>
+                                          @endif
+
                                           <td class="reg-lcf-content  div-center" > @if( $tdboleto == 'S') <span class='glyphicon glyphicon-barcode'></span>@endif
                                           <td class="reg-lcf-content  div-center">{{$nomelocador}}</td>
                                           <td class="reg-lcf-content  div-center">{{$datarecebimento}}</td>
@@ -713,10 +722,16 @@ tr
                   </select>
                 </div>
 
-              <div class="col-md-4">
+                <div class="col-md-3">
                   <label class="control-label">Iniciando em</label>
                   <input type="date" class="form-control" id="IMB_LCF_DATAVENCIMENTO" />
                 </div>
+                @if( $par->IMB_PRM_USARPARCELAS == 'S' )
+                <div class="col-md-1" id="div-controle">
+                  <label class="control-label">Controle</label>
+                  <input type="number" class="form-control" id="IMB_LCF_NUMPARREAJUSTE" />
+                </div>
+                @endif
                 <div class="col-md-1">
                   <label class="control-label" >Qtde. de</label>
                   <input type="text" class="form-control div-center" id="i-meses"
@@ -733,21 +748,32 @@ tr
 
             <div class="row">
               <div class="col-md-12">
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <label class="control-label">Somente para o Locador Abaixo:</label>
                   <select class="form-control"  id="i-select-locadorsomente">
                   </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <label for="i-replicar">
                     <input  type="checkbox" class="icheck" id="i-replicar">
                     Em caso de alteração do registro, replicar para meses subsequentes
                   </label>
                   <label>
                     <input type="checkbox" class="icheck" id="i-autopreenchimento"> Auto-Preenchimento
+                    
                   </label>
-
-
+                </div>
+                <div class="col-md-4 escondido " id="div-entreparcelas">
+                  <div class="col-md-6">
+                    <label class="control-label">Ref. Inicial</label>
+                    <input class="form-control" type="number" id="i-ref-inicial">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="control-label">Ref. Final</label>
+                    <input class="form-control" type="number" id="i-ref-final">
+                  </div>
+                  <label ></label>
+                  
                 </div>
 
               </div>
@@ -891,8 +917,24 @@ tr
 <script>
 $( document ).ready(function()
   {
+    
+    $("#i-ref-final").val( 1) ;
+      $("#i-ref-inicial").val(1);
+      
+    $("#i-meses").change( function()
+    {
+      $("#i-ref-final").val( $("#i-meses").val() ) ;
+      $("#i-ref-inicial").val(1);
+      
+    })
+    $("#div-entreparcelas").hide();
+    $("#i-autopreenchimento").change( function()
+    {
+      if(  $("#i-autopreenchimento").prop('checked') ==  true )
+       $("#div-entreparcelas").show();
+        
+    })
 
-    debugger;
     $("#div-processando").show();
   $("#i-dataderecebimentoavulso").val(moment().format('YYYY-MM-DD'));
     $("#i-btn-novo").show();
@@ -1357,6 +1399,12 @@ function buscaIncremental()
               fixo = '';
           
 
+          console.log( data.data[nI]);
+          tdnumerparcela = '<td></td>';
+          if( data.data[nI].IMB_PRM_USARPARCELAS == 'S' && data.data[nI].IMB_LCF_NUMPARREAJUSTE != null)
+            tdnumerparcela  = '<td class="reg-lcf-content  div-center">'+data.data[nI].IMB_LCF_NUMPARREAJUSTE+"</td>";
+
+
           tdboleto='';
           if( data.data[nI].IMB_CGR_ID != null )
             var tdboleto='<a href=javascript:imprimirBoleto('+data.data[nI].IMB_CGR_ID+','
@@ -1383,7 +1431,8 @@ function buscaIncremental()
             '<td class="reg-lcf-content  div-center">'+data.data[nI].IMB_LCF_LOCADORCREDEB+'</td>' +
             '<td class="reg-lcf-content  div-center"><a href=javascript:resumoParcela("'+
             moment( data.data[nI].IMB_LCF_DATAVENCIMENTO).format('YYYY-MM-DD')+'")>'+datavencimento+'</a></td>' +
-            '<td class="reg-lcf-content  div-center" > '+tdboleto+
+            tdnumerparcela+
+            '<td class="reg-lcf-content  div-center">'+tdboleto+
             '<td class="reg-lcf-content  div-center">'+nomelocador+'</td>' +
             '<td class="reg-lcf-content  div-center">'+datarecebimento+'</td>' +
             '<td class="reg-lcf-content  div-center">'+datapagamento+'</td>' +
@@ -1469,6 +1518,7 @@ function buscaIncremental()
       $("#i-div-regerarparcelas").hide();
       $("#i-div-salvarparcelas").hide();
       $("#i-div-gerarparcelas").show();
+      $("#div-controle").hide();
       $( "#i-inc-multa" ).prop( "checked", false );
       $( "#i-inc-juros" ).prop( "checked", false );
       $( "#i-inc-taxa" ).prop( "checked", false );
@@ -1481,6 +1531,10 @@ function buscaIncremental()
       $("#i-locadorcredeb").val('N');
       $("#i-locatariocredeb").val('N');
       $("#i-descricao").val('');
+      $("#IMB_LCF_NUMPARREAJUSTE").val('0');
+      $("#i-ref-final").val( 1) ;
+      $("#i-ref-inicial").val(1);
+                  
       
       //$("#IMB_LCF_DATAVENCIMENTO").val(moment().format('DD/MM/YYYY') );
       $("#IMB_LCF_VALOR").val('');
@@ -1547,6 +1601,16 @@ function buscaIncremental()
 
   function gerarParcelas()
   {
+
+    debugger;
+    dif = parseFloat($("#i-ref-final").val()) - parseFloat($("#i-ref-inicial").val()) + 1;
+       
+    if( dif != $("#i-meses").val())
+    {
+      alert( 'Quantidade de meses informado não bate com o referencia inicial e final');
+      return false;
+      
+    }
     $("#i-dia").val( moment( $("#IMB_LCF_DATAVENCIMENTO").val()).format( 'DD') );
 
     lcont = true;
@@ -1610,6 +1674,7 @@ function buscaIncremental()
       return false;
     }
 
+    debugger;
 
     $("#i-parcelas").show();
 
@@ -1627,11 +1692,19 @@ function buscaIncremental()
     descricao='';
     nMes = datainicial.getMonth();
     nAno = datainicial.getFullYear();
-
-    $("#i-yyy>tbody").empty();
-    for( nParcelas=0;nParcelas < meses;nParcelas++)
+    nIni = 1;
+    nFim = $("#i-meses").val()
+    nLinha = 0;
+    //nFim = nParcelas;
+    if( $("#i-autopreenchimento").prop( 'checked' ) == true )
     {
-      if( nParcelas != 0 )
+        nIni = $("#i-ref-inicial").val();
+        nFim = $("#i-ref-final").val();
+    }
+    $("#i-yyy>tbody").empty();
+    for( nParcelas=nIni ;nParcelas <= nFim;nParcelas++)
+    {
+      if( nParcelas != nIni )
       {
         nMes++;
         if( nMes > 11 )
@@ -1641,6 +1714,7 @@ function buscaIncremental()
         }
         nUltimoDia = ultimoDiaMes( nMes+1, nAno );
 
+        
         if ( nUltimoDia < nDiaVencimento )
           nDiaVencimento = nUltimoDia;
 
@@ -1648,24 +1722,26 @@ function buscaIncremental()
 
       };
 
-      numpar = nParcelas + 1;
+  
+      nLinha++;
       descricao = $( "#i-descricao" ).val();
 
-      if( $("#i-autopreenchimento").is(":checked") == true )
-        descricao = $( "#i-descricao" ).val() + ' - Parcela '+(numpar)+'/' + $( "#i-meses" ).val();
+      if( $("#i-autopreenchimento").prop('checked') == true )
+        descricao = $( "#i-descricao" ).val() + ' - Parcela '+(nParcelas)+'/' + nFim;
 
       linha =
         '<tr>'+
-        '<td style="text-align:center valign="center">'+numpar+'</td>' +
+        '<td style="text-align:center valign="center">'+nParcelas+'</td>' +
         '<td style="text-align:center valign="center">'+$( "#i-select-evento option:selected" ).text()+'</td>' +
         '<td style="text-align:center valign="center">'+locadorcredeb+'</td>' +
         '<td style="text-align:center valign="center">'+locatariocredeb+'</td>' +
         '<td style="text-align:center valign="center">'+moment(datainicial).format('DD/MM/YYYY')+'</td>' +
         '<td style="text-align:center valign="center">'+valor+'</td>' +
-        '<td  style="text-align:center valign="center"><div><input class="form-control" id="i-lf-inp'+nParcelas+'" value="'+descricao+'"></div></td>'
+        '<td  style="text-align:center valign="center"><div><input class="form-control" id="i-lf-inp'+nLinha+'" value="'+descricao+'"></div></td>'
         '</tr>';
 
       $("#i-yyy").append( linha );
+
 
 
     }   ;
@@ -1679,10 +1755,10 @@ function buscaIncremental()
 
   function gravarParcelasEmBanco()
   {
-    //debugger;
+    debugger;
 
     aLF = [];
-    var linha = 0;
+    var linha = 1;
     $('#i-yyy tbody tr').each(function ()
     {
       $.ajaxSetup(
@@ -1725,6 +1801,7 @@ function buscaIncremental()
       aLF.push( lf );
     } );
 
+    console.log( aLF )
     debugger;
      var url = "{{ route('lancamento.gravararray')}}";
 
@@ -1794,6 +1871,7 @@ function buscaIncremental()
         IMB_LCF_FIXO: $("#IMB_LCF_FIXO").prop( "checked" )   ? 'S' : 'N',
         replicaralteracao : $("#i-replicar").prop( "checked" )   ? 'S' : 'N',
         IMB_LCF_COBRARTAXADMMES: $("#IMB_LCF_COBRARTAXADMMES").prop( "checked" )   ? 'S' : 'N',        
+        IMB_LCF_NUMPARREAJUSTE: $("#IMB_LCF_NUMPARREAJUSTE").val(),
     };
     var url = "{{ route('lancamento.gravar')}}";
 
@@ -1835,6 +1913,7 @@ function buscaIncremental()
       $( "#i-inc-iss" ).prop( "checked", false );
       $("#i-replicar").prop( "checked" , false );
       $("#IMB_LCF_FIXO").prop( "checked" , false );
+      $("#div-controle").show();
 
       $("#IMB_LCF_COBRARTAXADMMES").prop( "checked" , false );
 
@@ -1894,6 +1973,8 @@ function buscaIncremental()
       $("#i-locatariocredeb").val( data[0].IMB_LCF_LOCATARIOCREDEB );
       $("#IMB_LCF_DATAVENCIMENTO").val( data[0].IMB_LCF_DATAVENCIMENTO );
       $("#i-descricao").val( data[0].IMB_LCF_OBSERVACAO );
+      $("#IMB_LCF_NUMPARREAJUSTE").val( data[0].IMB_LCF_NUMPARREAJUSTE );
+      
 
 
       nValor = parseFloat( data[0].IMB_LCF_VALOR );
@@ -2668,7 +2749,8 @@ function imprimirBoleto( id,banco )
 function receberRepassar()
 {
     
-  //debugger;
+  debugger;
+  $("#preloader").show();  
   $("#i-div-dados-receber").hide();
   $("#i-div-dados-repassar").hide();
   linha = "";
@@ -2689,6 +2771,8 @@ function receberRepassar()
     var lcf = $(data).find('td:eq(1)').text();
 
   
+
+
     url = "{{route('lancamento.edit')}}/"+lcf;
 
     $.ajax(
@@ -2810,6 +2894,11 @@ function receberRepassar()
 
         linha = linha + '</tr>';
         $("#i-tblselecionados").append( linha );
+      },
+    
+      complete:function()
+      {
+        $("#preloader").hide();
       }
       
     });
@@ -2905,13 +2994,15 @@ function receberRepassar()
 function receberLocatario()
 {
 
-  if( $("#i-totalareceber").val() == '0,00' )
+/*  if( $("#i-totalareceber").val() == '0,00' )
   {
     alert('Nada a receber');
     return false;
   }
-
+*/
   $("#i-div-dados-receber").show();
+  
+
 
 }
 
@@ -2919,11 +3010,13 @@ function receberLocatario()
 function repassarLocador()
 {
 
+  /*
   if( $("#i-totalarepassar").val() == '0,00' )
   {
     alert('Nada a repassar');
     return false;
   }
+  */
 
   $("#i-div-dados-repassar").show();
 
@@ -3631,7 +3724,10 @@ function totalizar()
 
     item = realToDolar(  table.rows[r].cells[4].innerHTML );
     item = parseFloat( item );
-    totalitem = parseFloat( totalitem ) + item ;
+    if( table.rows[r].cells[5].innerHTML =='D' )
+      totalitem = parseFloat( totalitem ) + item ;
+    if( table.rows[r].cells[5].innerHTML =='C' )
+      totalitem = parseFloat( totalitem ) - item ;
 
   }
 

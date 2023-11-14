@@ -68,8 +68,7 @@
 
 @section('content')
 
-
-
+@include( 'layout.modalarquivoconciliacao')
 
 <div class="portlet light bordered">
     <div class="portlet-title">
@@ -85,18 +84,27 @@
         <button class="btn green pull-right" type="button" onClick="relatorioCaixa()">Relatório Caixa</button>
         <button class="btn blue  pull-right" type="button" onClick="consolidadoCFC()">Visão por C.F.C.</button>
         <button class="btn green  pull-right" type="button" onClick="consolidadoSubConta()">Visão por Sub-Conta(CC)</button>
+        
         <button class="btn yeloow pull-right" type="button" onClick="conciliacaoArquivo()">Conciliação Via Arquivo</button>
 
     </div>
+    @php
+        $acessoAlt = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'MovimentacaoCaixa', 'Movimentação Bancos/Caixa', 'FIN', 'Financeiro','N', 'A', 'Botão');
+        $acessoInc = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'MovimentacaoCaixa', 'Movimentação Bancos/Caixa', 'FIN', 'Financeiro','N', 'I', 'Botão');
+        $acessoExc = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'MovimentacaoCaixa', 'Movimentação Bancos/Caixa', 'FIN', 'Financeiro','N', 'E', 'Botão');
+    @endphp
     <div class="portlet-body form">
        <form role="form" id="search-form">
            <input type="hidden" id="I-FIN_CCX_ID" name="conta" >
+           <input type="hidden" id="i-permissaoinc" value="{{$acessoInc}}">
+           <input type="hidden" id="i-permissaoalt" value="{{$acessoAlt}}">
+           <input type="hidden" id="i-permissaoexc" value="{{$acessoExc}}">
             <div class="form-body">
                 <input type="hidden" id="i-conta" name="conta">
                 <div class="col-md-3">
                     <div class="form-group">
                         <label  class="control-label">conta</label>
-    		    		<select class="form-control" id="FIN_CCX_ID" >
+    		    		<select class="form-control" id="FIN_CCX_ID_CONCAI" >
 				    	</select>
                     </div>
                 </div>
@@ -438,7 +446,7 @@
                                             <th style="width: 20%">Sub-Conta Descrição</th>
                                             <th style="width: 5%">C/D</th>
                                             <th style="width: 13%">Valor</th>
-                                            <th</th>
+                                            <th></th>
                                         </thead>
                                         <tbody>
                                         </tbody>
@@ -530,8 +538,8 @@
 
     $(document).ready(function()
     {
-        $( "#FIN_CCX_ID" ).change(function() {
-            var cConta = $('#FIN_CCX_ID').val();
+        $( "#FIN_CCX_ID_CONCAI" ).change(function() {
+            var cConta = $('#FIN_CCX_ID_CONCAI').val();
             $("#I-FIN_CCX_ID").val( cConta );
         });
 
@@ -703,6 +711,12 @@
 
     $('#resultTable tbody').on( 'click', '.del-lcx', function ()
         {
+            acesso = "{{$acessoExc}}";
+            if( acesso != 'normal')
+            {
+                alert('Sem permissão para a operação!');
+                return false;
+            }
             var data = table.row( $(this).parents('tr') ).data();
             desativarLancamento( data.FIN_LCX_ID );
             calcularSaldos();
@@ -718,6 +732,12 @@
 
         $('#resultTable tbody').on( 'click', '.alt-lcx', function ()
         {
+            acesso = "{{$acessoAlt}}";
+            if( acesso != 'normal')
+            {
+                alert('Sem permissão para a operação!');
+                return false;
+            }
             var data = table.row( $(this).parents('tr') ).data();
             verLcx( data.FIN_LCX_ID, true );
         });
@@ -749,16 +769,17 @@
     function cargaConta()
     {
         var url = "{{ route('contacaixa.carga')}}/N";
+        console.log( url );
 
         $.getJSON( url, function( data )
         {
-            $("#FIN_CCX_ID").empty();
+            $("#FIN_CCX_ID_CONCAI").empty();
             $("#inc-FIN_CCX_IDORIGEM").empty();
             $("#inc-FIN_CCX_IDDESTINO").empty();
 
 
                 linha = '<option value="">Escolha a Conta</option>';
-                $("#FIN_CCX_ID").append( linha );
+                $("#FIN_CCX_ID_CONCAI").append( linha );
                 $("#inc-FIN_CCX_IDORIGEM").append( linha );
                 $("#inc-FIN_CCX_IDDESTINO").append( linha );
 
@@ -768,7 +789,7 @@
                         '<option value="'+data[nI].FIN_CCX_ID+'">'+
                         data[nI].FIN_CCX_DESCRICAO+"</option>";
                     $("#inc-FIN_CCX_IDORIGEM").append( linha );
-                    $("#FIN_CCX_ID").append( linha );
+                    $("#FIN_CCX_ID_CONCAI").append( linha );
                     $("#inc-FIN_CCX_IDDESTINO").append( linha );
                 }
         });
@@ -964,6 +985,13 @@
 
     function incluir()
     {
+        acesso = "{{$acessoInc}}";
+        if( acesso != 'normal')
+        {
+            alert('Sem permissão para a operação!');
+            return false;
+        }
+
         $("#inc-FIN_LCX_DATACADASTRO").val( moment().format( 'YYYY-MM-DD'));
         $("#inc-FIN_LCX_DATAENTRADA").val( moment().format( 'YYYY-MM-DD'));
         $("#inc-FIN_LCX_VALOR").val(0);
@@ -1268,7 +1296,7 @@
 
     function calcularSaldos()
     {
-        var conta = $("#FIN_CCX_ID").val();
+        var conta = $("#FIN_CCX_ID_CONCAI").val();
         var datainicio =  $("#i-inicio").val();
         var url = "{{route('caixa.saldoinicial')}}";
 
@@ -1276,6 +1304,7 @@
         {
             conta : conta,
             data : datainicio,
+            conciliado : $("#i-conciliado").val(),
         }
 
         $.ajax(
@@ -1302,6 +1331,8 @@
         {
             conta : conta,
             data : datatermino,
+            conciliado : $("#i-conciliado").val(),
+
         }
 
         $.ajax(
@@ -1393,7 +1424,7 @@
 
     function relatorioCaixa()
     {
-        if( $("#FIN_CCX_ID").val() == '' )
+        if( $("#FIN_CCX_ID_CONCAI").val() == '' )
         {
             alert('Para impressão do relatório é necessário informar a conta');
             return false;
@@ -1407,6 +1438,36 @@
         url = "{{ route('caixa.carga') }}?conta="+conta+"&inicio="+inicio+"&termino="+termino+"&situacao="+conciliado+"&conciliado="+conciliado+"&destino=RELATORIO";
         window.open( url, '_blank');
     }
+
+    function conciliacaoArquivo()
+    {
+
+        var url = "{{ route('contacaixa.carga')}}/S";
+        console.log( url );
+
+        $.ajax(
+            {
+                url : url,
+                dataType:'Json',
+                type:'get',
+                async:false,
+                success: function(data)
+                {
+                    $("#FIN_CCX_ID-ofx").empty();
+                    for( nI=0;nI < data.length;nI++)
+                    {
+                        linha =
+                            '<option value="'+data[nI].FIN_CCX_ID+'">'+
+                            data[nI].FIN_CCX_DESCRICAO+"</option>";
+                            $("#FIN_CCX_ID-ofx").append( linha );
+                    }
+                }
+            }
+        );
+        $("#modalconciacaoarquivo").modal('show');
+
+    }
+
 
 
 

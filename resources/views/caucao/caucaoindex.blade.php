@@ -105,13 +105,13 @@
 				    	</select>
                     </div>
                 </div>
-                <div class="col-md-2"></div>
+                
                 <div class="col-md-4 fundo-grey  ">
                     <div class="col-md-12 div-center fundo-black font-white">
                         Com depósito entre as datas
 
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <input type="text" class="form-control dpicker" name="inicio" placeholder="Data Inicial" id="i-inicio">
                         </div>
@@ -119,12 +119,16 @@
                     <div class="col-md-2 div-center font-20">
                     <i class="fa fa-arrows-h" aria-hidden="true"></i>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <input type="text" class="form-control dpicker" name="termino" placeholder="Data Final" id="i-termino">
                         </div>
-                    </div>                
+                    </div>              
                 </div>
+                <div class="col-md-2 div-center">
+                        <label class="control-label" for="chk-caucao">Somente Ativos</label>
+                        <input class="form-control" type="checkbox" id="chk-caucao" checked>
+                    </div>  
                 <div class="form-actions noborder">
                     <button class="btn blue pull-right" id='search-form' >Pesquisar</button>
                 </div>
@@ -366,6 +370,10 @@ $(document).ready(function()
     var table = $('#resultTable').DataTable(
     {
         "pageLength": -1,
+        dom: 'Blfrtip',
+        buttons: [
+            'excel'
+        ],
         "language": 
         {
             "sEmptyTable": "Nenhum registro encontrado",
@@ -400,6 +408,8 @@ $(document).ready(function()
                 d.inicio = $("#i-inicio").val();
                 d.termino = $("#i-termino").val();
                 d.idcontrato = $('input[name=idcontrato]').val();
+                d.somenteativos = $('#chk-caucao').prop('checked') ? 'S' : 'N';
+                
             }
 
         },

@@ -44,6 +44,16 @@
                                         </div>
                             
                             </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label class="control-label">Anexar PDF Email Demonstrativo</label>
+                                    <input class="form-control" type="checkbox" id="IMB_PRM_DEMONSTRATIVOPDF">
+                                </div>
+                                
+
+                                
+
+                            </div>
                         </div>
                     </div>
                 </div>

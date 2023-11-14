@@ -26,7 +26,7 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <th width="10%" style="text-align:center"><button onClick="totalizar()">Totalizar</button></th>
+                      <th width="10%" style="text-align:center"><button onClick="totalizarModIna()">Totalizar</button></th>
                       <th width="20%" style="text-align:center"></th>
                       <th width="10%" style="text-align:right" id="i-sumitem">0,00</th>
                       <th width="10%" style="text-align:right" id="i-summulta" >0,00 </th>
@@ -238,7 +238,7 @@ function formatarTotalRegistroDetalhe(data, type, full, meta)
 
 }
 
-function totalizar( idcontrato)
+function totalizarModIna( idcontrato)
 {
   var url = "{{route('inadimplentes.totalizar')}}";
 

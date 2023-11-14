@@ -420,9 +420,10 @@ function gerarDOCX( id, tipo )
                 vis_codigo: id,
                 template:
                 { pk: tipo },
-                "docx": true
+                "typepdf": false
             }    
 
+    console.log( dados);
         $.ajax(
         {
             url:url,
@@ -440,7 +441,7 @@ function gerarDOCX( id, tipo )
             success:function(data)
             {
             var url = '<a href="'+data+'" download>Click no Link para Baixar</a>';
-             $("#i-filename-title").html( 'Geração de PDF Laudo de Vistoria');
+             $("#i-filename-title").html( 'Geração de Word Laudo de Vistoria');
              $("#div-download").empty();
              $("#div-download").append(url);
              $("#modaldownload").modal('show');

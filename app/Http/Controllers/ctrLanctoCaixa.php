@@ -8,8 +8,11 @@ use App\mdlViewLanctoCaixa;
 use App\mdlCaTran;
 use App\mdlCFC;
 use App\mdlSubConta;
+use App\mdlContaCaixa;
 use App\mdlTmpDREApuracao1;
-USE App\mdlTmpDREApuracaoPre;
+use App\mdlTmpDREApuracaoPre;
+use App\mdlCaixaConciliadaoArquivo;
+
 use DataTables;
 use Auth;
 use DB;
@@ -40,22 +43,38 @@ class ctrLanctoCaixa extends Controller
 
         $lc = mdlLanctoCaixa::
         whereRaw( "IMB_IMB_ID = ".Auth::user()->IMB_IMB_ID." and FIN_LCX_DATAENTRADA  between '".$rDataIni."' AND '".$rDataFim."'" )
+        ->orderBy( 'FIN_LCX_DATAENTRADA')
+        ->orderBy( 'FIN_LCX_ORIGEM')
+        ->orderBy( 'FIN_LCX_RECIBO')
         ->whereNull( 'FIN_LCX_DTHINATIVO');
 
         if( $conta <> '' )
             $lc->whereRaw( "FIN_CCX_ID = $conta" );
 
         
-        if( $conciliado == 'S' ) $lc = $lc->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
+        if( $conciliado == 'C' ) $lc = $lc->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='S' ");
         if( $conciliado == 'D' ) $lc = $lc->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
 
         $lc->orderBy( 'FIN_LCX_DATAENTRADA');
 
         if( $destino == 'RELATORIO')
         {
+
+            $data = $request->data;
+            $conta = $request->conta;
+            $conciliado = $request->conciliado;
+            
+
+            $myrequest = new \Illuminate\Http\Request();
+            $myrequest->replace(['data' => $rDataIni, 'conta' => $conta,'conciliado' => $conciliado ] );
+
+            $saldoinicial = $this->saldoInicial( $myrequest );
+            $saldofinal = $this->saldoFinal( $myrequest );
+        
+
             $lc = $lc->get();
             $periodo = date( 'd/m/Y', strtotime( $rDataIni ) ).' a '. date( 'd/m/Y', strtotime( $rDataFim ) );
-            return view( 'reports.admimoveis.relatoriocaixa', compact( 'lc', 'periodo'));
+        return view( 'reports.admimoveis.relatoriocaixa', compact( 'lc', 'periodo', 'saldoinicial','saldofinal'));
         }
 
         
@@ -174,37 +193,37 @@ class ctrLanctoCaixa extends Controller
         $conta = $request->conta;
         $conciliado = $request->conciliado;
         
-
+        Log::info( "**** SALDO INICIAL ****");
         Log::info( "Conciliado: $conciliado ");
         Log::info( "Data: $data ");
+        Log::info( "Conta: $conta ");
         $si = mdlLanctocaixa::where("FIN_CCX_ID","=", $conta )
         ->where( 'FIN_LCX_DATAENTRADA','<', $data )
         ->where( 'FIN_LCX_OPERACAO','=','C')
         ->whereNull('FIN_LCX_DTHINATIVO');
 
-        if( $conciliado == 'S' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
+        if( $conciliado == 'C' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='S' ");
         if( $conciliado == 'D' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
-
-        Log::info( "sql: ".$si->toSql() );
+        Log::info( "sql credito: ".$si->toSql() );
         $si = $si->sum('FIN_LCX_VALOR');
 
+
         $totalCredito = $si;
+        Log::info("total credito $totalCredito");
 
         $si = mdlLanctocaixa::where("FIN_CCX_ID","=", $conta )
         ->where( 'FIN_LCX_DATAENTRADA','<', $data )
         ->where( 'FIN_LCX_OPERACAO','=','D')
         ->whereNull('FIN_LCX_DTHINATIVO');
-        if( $conciliado == 'S' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
+        if( $conciliado == 'C' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='S' ");
         if( $conciliado == 'D' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
 
+        Log::info( "sql debito: ".$si->toSql() );
         $si = $si->sum('FIN_LCX_VALOR');
-        
         $totalDebito = $si;
-
-        Log::info( $data );
-        Log::info( $conta );
-
-//        Log::info( $si->toSql() );
+        Log::info("total debito $totalDebito");
+        
+       
 
         return $totalCredito - $totalDebito;
     }
@@ -215,12 +234,16 @@ class ctrLanctoCaixa extends Controller
         $conta = $request->conta;
         $conciliado = $request->conciliado;
 
+        Log::info( "**** SALDO FINAL ****");
+
+        Log::info( "Conciliado: $conciliado ");
+        Log::info( "Data: $data ");
   
         $si = mdlLanctocaixa::where("FIN_CCX_ID","=", $conta )
         ->where( 'FIN_LCX_DATAENTRADA','<=', $data )
         ->where( 'FIN_LCX_OPERACAO','=','C')
         ->whereNull('FIN_LCX_DTHINATIVO');
-        if( $conciliado == 'S' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
+        if( $conciliado == 'C' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='S' ");
         if( $conciliado == 'D' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
 
         $si = $si->sum('FIN_LCX_VALOR');
@@ -231,7 +254,7 @@ class ctrLanctoCaixa extends Controller
         ->where( 'FIN_LCX_DATAENTRADA','<=', $data )
         ->where( 'FIN_LCX_OPERACAO','=','D')
         ->whereNull('FIN_LCX_DTHINATIVO');
-        if( $conciliado == 'S' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
+        if( $conciliado == 'C' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='S' ");
         if( $conciliado == 'D' ) $si = $si->whereRaw( "coalesce(FIN_LCX_CONCILIADO,'N')='N' ");
 
         $si = $si->sum('FIN_LCX_VALOR');
@@ -433,10 +456,10 @@ class ctrLanctoCaixa extends Controller
   
 
                         
+        Log::info( $lctos->toSql() );
 
         if( $gerarrelatorio == 'S' )
         {
-            Log::info( $lctos->toSql() );
             $lctos = $lctos->get();
             $datainicio = app('App\Http\Controllers\ctrRotinas')->formatarData( $datainicio );
             $datafim = app('App\Http\Controllers\ctrRotinas')->formatarData( $datafim );
@@ -668,6 +691,7 @@ class ctrLanctoCaixa extends Controller
         $tipocompetencia = $request->tipocompetencia;
         $tipocfc = $request->tipocfc;
         $subid = $request->FIN_SBC_ID;
+        $relatorio = $request->relatorio;
 
         $filtrosub='';
         if( $subid <> '-1' )
@@ -680,6 +704,7 @@ class ctrLanctoCaixa extends Controller
             $datafim = date( 'Y/m/d');
         }
 
+        Log::info('competencia '.$tipocompetencia );
         if( $tipocompetencia == 'E')
             $dados = mdlCFC::select( 
             [
@@ -802,6 +827,11 @@ class ctrLanctoCaixa extends Controller
             if( $idcfc <> '' )
                 $dados->where( 'FIN_CFC_ID','=', $idcfc );
 
+            if( $relatorio == 'S')
+            {
+                $dados = $dados->get();
+                return view('reports.financeiro.relconsolidadocfc', compact( 'dados', 'datainicio','datafim'));
+            }
             Log::info( 'tipo de cfc '.$tipocfc );
             Log::info( $dados->toSql());
             return DataTables::of($dados)->make(true);
@@ -1067,6 +1097,93 @@ class ctrLanctoCaixa extends Controller
 
 
     }
+
+    public function cargaOfx( $arquivo, $conta )
+    {
+        $ofxParser = new \OfxParser\Parser();
+        $ofx = $ofxParser->loadFromFile(  $arquivo );     
+
+        return $ofx;
+
+    }
+
+    public function conciliacaoArquivoPasso2( Request $request )
+    {
+
+        $contabanco = $request->conta;
+        
+        $arquivofx = $this->cargaOfx( $request->arquivo, $request->conta);
+
+        $cnc = mdlCaixaConciliadaoArquivo::whereRaw('1=1')->delete();
+
+        foreach ($arquivofx->bankAccounts as $accountData) 
+        {
+            // Loop over transactions
+            foreach ($accountData->statement->transactions as $ofxEntity) {
+                // Keep in mind... not all properties are inherited for all transaction types...
+        
+                // Maybe you'll want to do something based on the transaction properties:
+                $nodeName = $ofxEntity->type;
+
+
+                $numeroconta = $accountData->accountNumber;
+                $ccx = mdlContaCaixa::whereRaw( "concat( FIN_CCI_CONCORNUMERO,'-', FIN_CCI_CONCORDIGITO ) = '$numeroconta'" )->first();
+
+                if( $ccx->FIN_CCX_ID <>  $contabanco )
+                    return response()->json( 'Conta Diferente!',404);
+
+                $operacao='X';
+                if ($nodeName == 'DEBIT' or $nodeName == 'XFER'  ) 
+                    $operacao = 'D';
+                if ($nodeName == 'CREDIT' or $nodeName == 'DEP' ) 
+                    $operacao = 'C';
+
+                $amount = abs($ofxEntity->amount);
+                $cusip = $ofxEntity->uniqueId;
+                $data  = $ofxEntity->date;
+                $ref= $ofxEntity->memo;
+
+                $idlcx=0;
+                $lcx = mdlLanctoCaixa::where( 'FIN_LCX_UNIQUEIDBANK','=', $cusip )->first();
+                if( $lcx <> '' )
+                    $idlcx = $lcx->FIN_LCX_ID;
+                
+                $cnc = new mdlCaixaConciliadaoArquivo;
+                $cnc->FIN_CCX_ID            = $ccx->FIN_CCX_ID;
+                $cnc->FIN_CNC_OPERACAO      = $operacao;
+                $cnc->FIN_CNC_VALOR         = $amount;
+                $cnc->FIN_CNC_DATA          = $data;
+                $cnc->FIN_CNC_DESCRICAO     = $nodeName.'-'.$ref;
+                $cnc->FIN_CFC_UNIQUEID      = $cusip;
+                $cnc->FIN_LCX_ID            = $idlcx;
+                $cnc->save();
+                }
+        
+                // Maybe you'll want to do something based on the entity:
+                if ($ofxEntity instanceof InvEntities\Transaction\BuyStock) {
+                    // ...
+                }
+        
+            }
+            $cnc = mdlCaixaConciliadaoArquivo::select(
+                [
+                    'FIN_CCX_ID',
+                    'FIN_CNC_OPERACAO',
+                    'FIN_CNC_VALOR',
+                    'FIN_CNC_DATA',
+                    'FIN_CNC_DESCRICAO',
+                    'FIN_CFC_UNIQUEID',
+                    'FIN_LCX_ID',
+                    DB::raw( '( SELECT FIN_LCX_HISTORICO FROM FIN_LANCTOCAIXA WHERE FIN_LANCTOCAIXA.FIN_LCX_ID = FIN_TABELACONCILIACAOARQUIVO.FIN_LCX_ID LIMIT 1) AS CONCHOW')
+
+                ]
+            )->orderBy( 'FIN_CNC_DATA')->get();
+        
+            return view('financeiro.conciliacaoarquivovisualizar', compact('cnc') );            
+        }
+        
+        
+            
 
 
 

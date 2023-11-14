@@ -366,7 +366,7 @@
       <tr><td colspan=11 class=BoletoPontilhado>&nbsp;</td></tr>
       <TR>
         <TD colspan=4 class=BoletoLogo><img src="{{asset('/global/img/logobanco237.png')}}"></TD>
-        <TD colspan=2 class=BoletoCodigoBanco>237-2</TD>
+        <TD colspan=2 class=BoletoCodigoBanco>077-9</TD>
         <TD colspan=6 class=BoletoLinhaDigitavel>{{$dadosboleto["linha_digitavel"]}}</TD>
       </TR>
       <TR>

@@ -21,6 +21,12 @@ label
     font-weight: bold;
 }
 
+.fwhitebgreen{
+    color:white;
+    background-color: green;
+    font-weight: : bold;
+    font-size:30px;
+}
 
 div.inset
 {
@@ -592,10 +598,7 @@ color: #999999;
     $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'Imovel', 'Imóveis(Acessar/Incluir/alterar/excluir)', 'CRM', 'Imóveis','S', 'I', 'Botão')
     @endphp
 
-    <div class="col-md-12 div-center {{$acesso}}">
-        <form action="{{route( 'imovel.add' )}}" method="get" target="_blank">
-            <button type="submit" class="btn green pull-right" type="button" id="i-btn-novo">Novo Imóvel</button>
-        </form>
+    <div class="col-md-12 div-center {{$acesso}}" id="i-continuar-atendimento">
     </div>
 
 </div>
@@ -667,12 +670,14 @@ color: #999999;
                         </div>
                         <div class="col-md-3 row-top-menor">
                             <div class="form-group">
-                                <label class="control-label"><b>Selecione o Tipo</b><br></label>
+                                <label class="control-label"><b>Selecione o Tipo</b></label>
+                                <p>
                                 <select id="i-select-tipo" multiple class="form-control escondido" placeholder="Pesquise" >
                                     @foreach( $tipos as $tipo)
                                     <option value="{{$tipo->IMB_TIM_ID}}">{{$tipo->IMB_TIM_DESCRICAO}}</option>
                                     @endforeach
                                 </select>
+                                </p>
                                 
                             </div>
                         </div>
@@ -717,28 +722,29 @@ color: #999999;
                             </div>
                         </div>
                         <div class="col-md-3 row-top-menor">
-                        <div class="form-group">
-                            <label class="control-label"><b>Selecione o Bairro</b></label>
-
-                            <select id="i-select-bairro" multiple class="form-control escondido" placeholder="Pesquise" >
-                                @foreach( $bairros as $bairro)
-                                <option value="{{$bairro->CEP_BAI_NOME}}">{{$bairro->CEP_BAI_NOME}}({{$bairro->IMB_IMV_CIDADE}})</option>
-                                @endforeach
-                            </select>
-    
+                            <div class="form-group">
+                                <label class="control-label"><b>Selecione o Bairro</b></label>
+                                <p>
+                                <select id="i-select-bairro" multiple class="form-control escondido" placeholder="Pesquise" >
+                                    @foreach( $bairros as $bairro)
+                                    <option value="{{$bairro->CEP_BAI_NOME}}">{{$bairro->CEP_BAI_NOME}}({{$bairro->IMB_IMV_CIDADE}})</option>
+                                    @endforeach
+                                </select>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                     <div class="col-md-12">
-                        <div class="col-md-3 row-top-menor">
+                        <div class="col-md-2 row-top-menor">
                             <div class="form-group">
                                 <label class="control-label"><b>Condomínio</b></label>
                                 <input type="text" class="form-control"  name="condominio" id="i-nome-condominio">
                             </div>
                         </div>
-                        <div class="col-md-3 row-top-menor">
+                        <div class="col-md-2 row-top-menor">
                             <div class="form-group">
                                 <label for="cidade"><b>Cidade</b></label>
                                 <input type="text" class="form-control"
@@ -765,21 +771,35 @@ color: #999999;
                         <div class="col-md-2 row-top-menor">
                             <div class="form-group">
                                 <label class="control-label"><b>Status</b></label>
+                                <p>
                                 <select id="i-select-status" multiple class="form-control escondido" placeholder="Pesquise" >
                                     @foreach( $status as $statu)
                                     <option value="{{$statu->VIS_STA_ID}}">{{$statu->VIS_STA_NOME}}</option>
                                     @endforeach
                                 </select>
-                                
+                                </p>                                
                             </div>
                         </div>
+
+                        <div class="col-md-1 div-center">
+                            <label class="control-label">Em Destaque</label>
+                            <input  type="checkbox" id="i-destaque">
+                            <p></p>
+                            <label class="control-label">Em Super Destaque</label>
+                            <input  type="checkbox" id="i-superdestaque">
+                        </div>
+
                         <div class="col-md-1 row-top-menor div-right">
-                            <button class="btn blue btn-lg glyphicon glyphicon-search form-control" id='search-form'></button>
+                            <button class="btn blue btn-lg form-control glyphicon glyphicon-search form-control" id='search-form'></button>
                         </div>
                         <div class="col-md-1">
-                            <button class="btn btn-danger pull-right" type="button" id="btn-limpar"
+                            <button class="btn btn-danger form-control pull-right" type="button" id="btn-limpar"
                             onClick="limparCampos()">Limpar Filtro</button>
                         </div>
+                        <div class="col-md-1 row-top-menor">
+                            <button type="submit" class="form-control btn dark pull-right" type="button" onClick="novoImovel()">Novo Imóvel</button>
+                        </div>
+
                     </div>
                     </div>
                 </div>
@@ -1068,7 +1088,7 @@ color: #999999;
     </div>
 </div>
 
-
+@include("layout.modalencerraratendimento")
 @include("layout.modaldadosimovel")
 
 <div class="modal" tabindex="-1" role="dialog" id="modalstatus">
@@ -1204,6 +1224,30 @@ $(document).ready(function() {
             alert(e)
         }
     });
+    
+    $(".select2").select2(
+        {
+                    width: null
+                });
+
+    let idatendimento = getCookie('3wt2oowd3ooo2oowt4');
+
+    
+
+    
+    if( idatendimento > 0 )
+    {
+        $("#i-continuar-atendimento").html('<a href=javascript:encerrarAtendimento('+idatendimento+') class="btn btn-green form-control"><h4 class="fwhitebgreen">Você está num atendimento de número: '+idatendimento+'. Click aqui caso queira encerrar o atendimento</h4></a>');
+        
+
+    }
+    else
+    {
+        $("#i-continuar-atendimento").html("<a href=javascript:iniciarNovoAtendimento() class='btn btn-danger form-control'><h4>Você está no modo de procura de imóveis sem ter iniciado um atendimento. Caso queira click aqui para iniciar um atendimento</h4></a>");
+        $("#i-continuar-atendimento").css('background-color:red');
+
+    }
+
 
     $('.valor').inputmask('decimal',
       {
@@ -1465,6 +1509,8 @@ ajax:
         d.condominio      = $('input[name=condominio]').val();
 
         d.radar         = $('input[name=radar]').prop('checked') ? 'S' : 'N';
+        d.destaque         = $("#i-destaque").prop('checked') ? 'S' : 'N';
+        d.superdestaque    = $("#i-superdestaque").prop('checked') ? 'S' : 'N';
     }
 },
 columns:
@@ -2803,6 +2849,10 @@ function CarregarImagens()
 
         }
 
+    function novoImovel()
+    {
+        window.open( "{{route( 'imovel.add' )}}", "_blank");
+    }
 
 </script>
 

@@ -36,6 +36,7 @@
     {
         padding: 1px 10px; 
         text-align:center;
+        border:.5px;
 
     }
 
@@ -124,13 +125,13 @@
                         <th style="width: 6%">Dt Pagto</th>
                         <th style="width: 6%">Taxa Adm.</th>
                         <th style="width: 6%">Taxa Cont.</th>
-                        <th style="width: 6%">Número Nota</th>
-                        <th style="width: 6%">Número RPS</th>
+                        <th style="width: 6%">Nº Nota</th>
+                        <th style="width: 6%">Nº Recibo</th>
                         <th style="width: 15%">Locador</th>
                         <th style="width: 20%">Imóvel</th>
-                        <th style="width: 6%">Valor dos Serviços</th>
-                        <th style="width: 6%">Valor ISS</th>
-                        <th style="width: 6%">Valor Retido</th>
+                        <th style="width: 6%">$  Serviços</th>
+                        <th style="width: 6%">$ ISS</th>
+                        <th style="width: 6%">$ Retido</th>
                         <th width="15%">Ações</th>
                     </thead>
                 </table>
@@ -212,8 +213,8 @@ $(document).ready(function()
             {data: 'TOTALTAXAADM',render:formatarValor},
             {data: 'TOTALTAXACONT',render:formatarValor},
                       
-            {data: 'IMB_NFE_NOTA'},
-            {data: 'IMB_PRM_RPSNUMERO'},
+            {data: 'IMB_NFE_NOTA', render:notafiscal},
+            {data: 'IMB_RLD_NUMERO'},
             {data: 'IMB_CLT_NOME'},
             {data: 'ENDERECO' },
             {data: 'IMB_NFE_VALORISSBASE',render:formatarValor},
@@ -280,6 +281,12 @@ $(document).ready(function()
         });
 
         $('#resultTable tbody').on( 'click', '.btn-pdf', function () 
+        {
+            var data = table.row( $(this).parents('tr') ).data();
+            gerarPDF( data.IMB_NFE_CHAVE );
+        });
+
+        $('#resultTable tbody').on( 'click', '.btn-xml', function () 
         {
             var data = table.row( $(this).parents('tr') ).data();
             gerarPDF( data.IMB_NFE_CHAVE );
@@ -385,8 +392,9 @@ $(document).ready(function()
             },
             error:function(data)
             {
-                console.log( data );
-                alert('erro ao gerar nota '+data);
+                console.log( data.responseText );
+                
+                alert('Verifique se apareceu o numero da nota!');
             }
         });
 
@@ -402,6 +410,13 @@ $(document).ready(function()
         window.open( url, '_blank');
 
     }
+   function gerarXML( chave )
+    {
+        var url = "{{route('gerarnfexml')}}?chave="+chave;
+
+        window.open( url, '_blank');
+
+    }
 
     function dimob( data )
     {
@@ -410,6 +425,13 @@ $(document).ready(function()
         else
             return '<div>-</div>';
     
+    }
+
+    function notafiscal( data )
+    {
+        if( data === null )
+            return '<div>-</div>';
+        return '<div><h5><b>'+data+'</b></h5></div>';
     }
         
     

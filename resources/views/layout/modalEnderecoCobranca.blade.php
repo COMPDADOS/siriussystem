@@ -141,6 +141,7 @@
                     $('#IMB_CCB_ENDERECO-ALT').val(data.IMB_CCB_ENDERECO);
                     $('#IMB_CCB_BAIRRO-ALT').val(data.IMB_CCB_BAIRRO);
                     $('#CEP_CID_NOME-ALT').val(data.CEP_CID_NOME);
+                    $("#CEP_UF_SIGLA-ALT").val( data.CEP_UF_SIGLA);                  
                     $('#IMB_CCB_DESTINATARIO-ALT').val(data.IMB_CCB_DESTINATARIO);
                     $('#IMB_CCB_ENDERECONUMERO-ALT').val(data.IMB_CCB_ENDERECONUMERO);
                     $('#IMB_CCB_ENDERECOCOMPLEMENTO-ALT').val(data.IMB_CCB_ENDERECOCOMPLEMENTO);

@@ -398,6 +398,7 @@ function reajustarTodos()
             },
             error:function( data )
             {
+                console.log( data );
                 alert( data );
             }
         }

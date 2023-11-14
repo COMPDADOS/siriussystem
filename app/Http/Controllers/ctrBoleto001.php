@@ -287,6 +287,9 @@ class ctrBoleto001 extends Controller
                     $a=str_replace( ';','',$a);
                     //Log::info( date( 'd/m/Y H:i:s').' - Email para:'.$a );
                     $html = view('boleto.001.boleto001', compact( 'dadosboleto', 'im','ctr', 'imv','barcode', 'cpi' ) );
+                    try
+                    {
+
                     Mail::send('boleto.boletoemail', compact( 'dadosboleto', 'im','ctr', 'imv','banconumber' ) ,
                     function( $message ) use ($a, $html,$nossonumero_email, $imovel_log, $contrato_log, $datavencimento)
                     {
@@ -295,8 +298,12 @@ class ctrBoleto001 extends Controller
                         app('App\Http\Controllers\ctrRotinas')
                         ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Inicio envio Boleto vencimento '.$datavencimento.' enviado para '.$a.' com cópia para '.$copiaend);
                         $a = trim( $a );
+                        Log::info('Email encontrado: '.$a );
                         if( $a <>'' and filter_var($a, FILTER_VALIDATE_EMAIL))
                         {
+                            Log::info('Usando TRY');
+                            Log::info('entre pra enviar email encontrado: '.$a );
+
                             //Log::info( 'Enviando em definitivo para: '.$a );
                             //Log::info( 'Vencimento: '.$datavencimento.' - Pasta: '.app('App\Http\Controllers\ctrRotinas')->pegarReferencia( $contrato_log));
 
@@ -310,8 +317,14 @@ class ctrBoleto001 extends Controller
                             Log::info( 'enviado para '.$a );
                             app('App\Http\Controllers\ctrRotinas')
                             ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Enviado Boleto vencimento '.$datavencimento.' enviado para '.$a.' com cópia para '.$copiaend);
+                            Log::info('Gravei log para o contrato: '.$contrato_log);
+
                         }
                     });
+                }
+                catch (\Illuminate\Database\QueryException $e) {
+                    Log::info( 'Erro: '.$e->getCode() );
+                }                                        
                 }
                 //echo "<script>window.close();</script>";
                 return response()->json('ok',200);
@@ -1011,7 +1024,7 @@ class ctrBoleto001 extends Controller
                         {
                             //verificar pagagameto
                             $japago = 'N';
-                            $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                            $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                             Log::info( "Valor já pago $valorjapago" );
                             if( $valorjapago <> 0 ) 
                                 $japago='S';
@@ -1233,7 +1246,7 @@ class ctrBoleto001 extends Controller
                     $japago = 'N';
                     
                     $japago = 'N';
-                    $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                    $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                     if( $valorjapago <> 0 ) 
                         $japago='S';
                     

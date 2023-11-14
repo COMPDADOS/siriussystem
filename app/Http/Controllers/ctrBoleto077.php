@@ -966,7 +966,7 @@ class ctrBoleto077 extends Controller
 
                             //verificar pagagameto
                             $japago = 'N';
-                            $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                            $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                             if( $valorjapago <> 0 ) 
                                 $japago='S';
                             else
@@ -1135,6 +1135,7 @@ class ctrBoleto077 extends Controller
 
         $ccx = mdlContaCaixa::find( $conta );
 
+        Log::info( 'acessei o retorno 400 acessar o 77');
 	    while(!$file->eof())
 	    {
 
@@ -1142,23 +1143,27 @@ class ctrBoleto077 extends Controller
 		    $linha = $file->fgets();
             if( substr( $linha,0,1 ) == '1' )
             {
-                $id =  trim(substr( $linha, 116,10 ));
-                $nossonumero = substr( $linha, 70,11 );
+                $id =  trim(substr( $linha, 97,10 ));
+                $nossonumero = substr( $linha, 107,11 );
                 //$motivorejeicao = substr( $linha, 213,10 );
-                $ocorrencia =substr( $linha, 108,2 );
-                $valorcobranca = substr( $linha, 152,13 );
+                $ocorrencia =substr( $linha, 89,2 );
+                Log::info('|Ocorrencia: '. $ocorrencia);
+                Log::info('|nosso numero: '. $nossonumero);
+
+
+                $valorcobranca = substr( $linha, 124,13 );
                 if( substr( $linha, 146,6) <>'000000')
-                    $datavencimento = '20'.substr( $linha, 150,2).'-'.
-                                  substr( $linha, 148,2).'-'.
-                                  substr( $linha, 146,2);
+                    $datavencimento = '20'.substr( $linha, 122,2).'-'.
+                                  substr( $linha, 120,2).'-'.
+                                  substr( $linha, 118,2);
                 else
                     $datavencimento=null;
 
-                    $valorpago = substr( $linha, 253,13 );
-                    if( substr($linha, 175,6) <> '000000' )
-                        $datacredito =    '20'.substr( $linha, 179,2).'-'.
-                        substr( $linha, 177,2).'-'.
-                        substr( $linha, 175,2);
+                    $valorpago = substr( $linha, 159,13 );
+                    if( substr($linha, 91,6) <> '000000' )
+                        $datacredito =    '20'.substr( $linha, 176,2).'-'.
+                        substr( $linha, 174,2).'-'.
+                        substr( $linha, 172,2);
                     else
                         $datacredito = null;
 
@@ -1174,7 +1179,7 @@ class ctrBoleto077 extends Controller
                     {
                         //verificar pagagameto
                         $japago = 'N';
-                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                         if( $valorjapago <> 0 ) 
                             $japago='S';
 
@@ -1205,10 +1210,10 @@ class ctrBoleto077 extends Controller
 
 
 
-                    if( substr($linha, 114,6) <> '000000' )
-                        $datapagamento =  '20'.substr( $linha, 114,2).'-'.
-                                    substr( $linha, 112,2).'-'.
-                                    substr( $linha, 110,2);
+                    if( substr($linha, 91,6) <> '000000' )
+                        $datapagamento =   '20'.substr( $linha, 95,2).'-'.
+                             substr( $linha, 93,2).'-'.
+                              substr( $linha, 91,2);
                     else
                         $datapagamento = null;
 

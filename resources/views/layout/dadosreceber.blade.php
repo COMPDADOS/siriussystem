@@ -20,6 +20,10 @@
           <input type="text" class="form-control valor" id="i-total-cheque" value="0">
         </div>
         <div class="col-md-2 ">
+          <label class="label-control">$ em Pix</label>
+          <input type="text" class="form-control valor" id="i-total-pix" value="0">
+        </div>
+        <div class="col-md-1 ">
           <label class="label-control">$ Troco</label>
           <input type="text" class="form-control valor" id="i-troco" value="0" readonly>
         </div>

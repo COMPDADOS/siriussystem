@@ -98,8 +98,11 @@
                 <span class="caption-subject "><b>RECEBIDOS: </b>Movimentações por Evento - Detalhado - Período: <b>
                     {{app('App\Http\Controllers\ctrRotinas')->formatarData($datainicio)}} a {{app('App\Http\Controllers\ctrRotinas')->formatarData($datafim)}}</b> - <b>{{$label}}</b></span>
             </div>
-            <div class="col-md-5 div-center font-white fundo-black">
+            <div class="col-md-4 div-center font-white fundo-black">
                 <span class="caption-subject "><b>*** EVENTO: <b><u><i>{{$nomeeve->IMB_TBE_NOME}} ***</i></u></b></b><span>
+            </div>
+            <div class="col-md-1">
+                <button class="form-control btn btn-primary" onClick="ImprimirMovEveDet()">Imprimir</button>
             </div>
         </div>
 
@@ -146,13 +149,12 @@ $(document).ready(function()
 
 
     var table = $('#resultTable').DataTable(
-    {   "pageLength": 40,
-        "lengthChange": true,
-        "lengthMenu": [
-            [10, 25, 50, -1],
-            [10, 25, 50, 'All'],
-        ],
-        "language": 
+    {   
+        "paging": true,
+        "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+        "pagingType": "full_numbers",
+        "pageLength": -1,
+            "language": 
         {
             "sEmptyTable": "Nenhum registro encontrado",
             "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
@@ -163,19 +165,20 @@ $(document).ready(function()
             sLoadingRecords: '<img src="{{asset('/layouts/layout/img/loader.gif')}}"/>',
                 sProcessing: '<img src="{{asset('/layouts/layout/img/loader.gif')}}"/>',
             "sZeroRecords": "Nenhum registro encontrado",
-            "sSearch": "Pesquisar",
-            "oPaginate": 
+            "sSearch": "Pesquisar"
+        },
+        "oPaginate": 
             {
                 "sNext": "Próximo",
                 "sPrevious": "Anterior",
                 "sFirst": "Primeiro",
                 "sLast": "Último"
             },
-        },
-        bSort : true,
+        ordering: false,
+        bSort : false,
         responsive: false,
         processing: true,
-        serverSide: true,
+        
         ajax: 
         {
             url:"{{ route('movimentacaoporeventodetalherecebido.carga') }}",
@@ -185,6 +188,8 @@ $(document).ready(function()
                 d.termino = "{{$datafim}}";
                 d.eventos = "{{$eventos}}";
                 d.porcompetencia = "{{$porcompetencia}}";
+                d.pasta = "{{$pasta}}";
+                d.debcre = "{{$debcre}}";
             }
             
 
@@ -264,6 +269,24 @@ $(document).ready(function()
         if( data == 'C' ) return '<b>-</b>';
         if( data == 'D' ) return '<b>+</b>';
         return '';
+    }
+
+    function ImprimirMovEveDet()
+    {
+
+        inicio = "{{$datainicio}}";
+        termino = "{{$datafim}}";
+        eventos = "{{$eventos}}";
+        porcompetencia = "{{$porcompetencia}}";
+        pasta = "{{$pasta}}";
+        relatorio='S';
+
+        url = "{{ route('movimentacaoporeventodetalherecebido.carga') }}?inicio={{$datainicio}}&termino={{$datafim}}"+
+                "&eventos={{$eventos}}&porcompetencia={{$porcompetencia}}&pasta={{$pasta}}&relatorio=S";
+
+        window.open( url, '_blank');
+
+
     }
     
 </script>

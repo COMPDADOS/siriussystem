@@ -92,7 +92,7 @@
                                         <label class="control-label">Cobrar Junto Aluguel</label>
                                     </p>
                                     <p>
-                                        <input type="checkbox" id="i-acordo-detalhar" checked>
+                                        <input type="checkbox" id="i-acordo-detalhar" >
                                         <label class="control-label">Detalhar</label>
                                     </p>
                                     <p>

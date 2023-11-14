@@ -45,7 +45,7 @@
                                     </table>
                                     <div class="row escondido" id="div-novonumero">
                                         <div class="col-md-12"><h5>Adicionar Número</h5>
-                                            <div class="col-md-1">
+                                            <div class="col-md-2">
                                                 <label class="control-label">DDI</label>
                                                 <input type="text" id="IMB_TLF_DDI" class="form-control">
                                             </div>
@@ -57,7 +57,7 @@
                                                 <label class="control-label">Número</label>
                                                 <input type="text" id="IMB_TLF_NUMERO" class="form-control">
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
                                                 <label class="control-label">Tipo</label>
                                                 <input type="text" id="IMB_TLF_TIPOTELEFONE" class="form-control">
                                             </div>
@@ -107,16 +107,32 @@
                 dataType:'json',
                 type:'get',
                 data : dados,
-                success:function( )
+                success:function( data )
                 {
-                    alert('Mensagem enviada');
+
+                    var retorno = data;
+                    if (retorno.substring(0,3)=='999') 
+                        document.getElementById("i-ws").style.color = "red"
+                    else
+                        document.getElementById("i-ws").style.color = "green"
+                    alert(data);
+                },
+                error:function( data )
+                {
+                    console.log( data );
                 }
+                
             }
         )
     }
 
     function EnviarMsgNumeroNovo()
     {
+        if(  $("#IMB_TLF_TIPOTELEFONE").val() == '' )
+        {
+            alert('Informe o tipo de telefone(Whatsapp, recado, trabalho, etc...)');
+            return false;
+        }
         var ddi         = $("#IMB_TLF_DDI").val();
         var ddd         = $("#IMB_TLF_DDD").val(); 
         var numero      = $("#IMB_TLF_NUMERO").val();  

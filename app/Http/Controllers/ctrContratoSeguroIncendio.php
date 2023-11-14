@@ -44,6 +44,8 @@ class ctrContratoSeguroIncendio extends Controller
                 'IMB_SCT_OBSERVACAO',
                 'IMB_CTR_DATAAQUISICAO',
                 'IMB_CLT_NOME AS SEGURADORA',
+                'IMB_SCT_VALORSEGURO',
+                'IMB_SCT_VALORCOBERTURA',
                 DB::Raw('( select PEGALOCATARIOCONTRATO( IMB_CONTRATOSEGUROINCENDIO.IMB_CTR_ID ) ) AS LOCATARIO'),
                 'IMB_CTR_REFERENCIA',
                 DB::Raw('( select imovel( IMB_CONTRATO.IMB_IMV_ID ) ) AS ENDERECO'),
@@ -117,6 +119,8 @@ class ctrContratoSeguroIncendio extends Controller
         $stc->IMB_CLT_ID = $request->IMB_CLT_ID;
         $stc->IMB_ATD_ID = Auth::user()->IMB_ATD_ID;
         $stc->IMB_IMB_ID = Auth::user()->IMB_IMB_ID;
+        $stc->IMB_SCT_VALORSEGURO = $request->IMB_SCT_VALORSEGURO;
+        $stc->IMB_SCT_VALORCOBERTURA = $request->IMB_SCT_VALORCOBERTURA;
         $stc->save();
 
         return response()->json( 'ok',200 );

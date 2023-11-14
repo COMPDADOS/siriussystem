@@ -166,7 +166,7 @@
                     <button class="form-control btn btn-success" id='search-form' onClick="cargaResult()"> Processar</button>
                 </div>
                 <div class="col-md-1 div-center">
-                    <button class="form-control btn btn-dark" id='search-form' onClick="totalizar()"> Totalizar</button>
+                    <button class="form-control btn btn-dark" id='search-form' onClick="totalizarInad()"> Totalizar</button>
                 </div>
               </div>
               <div class="col-md-12">
@@ -183,7 +183,7 @@
                 </div>
                 <div class="col-md-2 subtotal escondido" id="div-total">
                   <label class="control-label">Total R$</label>
-                  <input type="text" class="form-control subtotal div-center valor" id="i-total">
+                  <input type="text" class="form-control subtotal div-center valor" id="i-totalinad">
                 </div>
               </div>
             </div>
@@ -545,7 +545,7 @@ function cartaFiador( idFiador, idContrato )
    
 }
 
-function totalizar()
+function totalizarInad()
 {
   var url = "{{route('inadimplentes.totalgeral')}}";
 
@@ -557,7 +557,7 @@ function totalizar()
       type:'get',
       success:function(data)
       {
-        $("#i-total").val( data );
+        $("#i-totalinad").val( data );
         $("#div-total").show();
       }
     }

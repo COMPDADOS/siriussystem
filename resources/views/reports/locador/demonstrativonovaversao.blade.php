@@ -30,9 +30,22 @@
 
 }
 
+.font-9
+{
+    font-size:9px;
+}
+.font-16
+{
+    font-size:16px;
+}
+.font-14
+{
+    font-size:24px;
+}
 .divTableRow {
     display: table-row;
     padding: 0px;
+    border:0px;
     
 
 }
@@ -51,7 +64,7 @@
 
 .divTableCell,
 .divTableHead {
-    border: .5px solid #999999;
+    border:0px;
     display: table-cell;
     padding: 0px;
 
@@ -59,7 +72,7 @@
 
 .divTableCellLogo,
 .divTableHead {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 20%;
@@ -76,7 +89,7 @@
 }
 .divTableCellNomes,
 .divTableHead {
-    border: .5px solid #999999;
+    border:0px;
     display: table-cell;
     padding: 5px;
     width : 50%;
@@ -85,11 +98,11 @@
 
 .divTableCellUSUARIO
 {
-    border: .5px solid #999999;
+    border:0px;
     display: table-cell;
     padding: 0px;
     width : 20%;
-    font-size:9px;
+    font-size:14px;
     text-align:left;
 
 }
@@ -98,13 +111,13 @@
     border: 0px;
     display: table-cell;
     padding: 0px;
-    font-size:9px;
+    font-size:14px;
     text-align:left;
 
 }
 .divTableCell80
 {
-    border: .5px solid #999999;
+    border:0px;
     display: table-cell;
     padding: 0px 0px 0px 0px ;
     width : 80%;
@@ -115,7 +128,7 @@
 
 .divTableCellDadosConta
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px 0px 0px 0px;
     width : 100%;
@@ -125,7 +138,7 @@
 }
 .divTableCell20
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px 0px 0px 0px;
     width : 20%;
@@ -135,11 +148,11 @@
 }
 .divTableCellImovel
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 100%;
-    font-size:12px;
+    font-size:14px;
     text-align:left;
 
 }
@@ -153,17 +166,17 @@
     padding: 0px;
     width : 40%;
     border:0;
-    font-size:9px;
+    font-size:14px;
     text-align:center;
 
 }
 .divTableImovel
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 100%;
-    font-size:12px;
+    font-size:14px;
     text-align:center;
 
 }
@@ -174,7 +187,7 @@
     padding: 0px;
     width : 40%;
     border:0;
-    font-size:9px;
+    font-size:14px;
     text-align:center;
 
 }
@@ -184,34 +197,34 @@
 
 .divTableCellTBE_ID
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 6%;
     text-align:center;
     font-style:underline;    
-    font-size:9px;
+    font-size:14px;
 
 }
 
 .divTableCellTBE_NOME
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 20%;
-    font-size:9px;
-    text-align:center;
+    font-size:10px;
+    text-align:left;
 
 
 }
 .divTableCellLCF_LOCADORCREDEB
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 3%;
-    font-size:9px;
+    font-size:10px;
     text-align:center;
 
 
@@ -219,17 +232,17 @@
 
 .divTableCellLCF_VALOR
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 10%;
-    font-size:9px;
+    font-size:10px;
     text-align:center;
 
 }
 .divTableCellLCF_OBSERVACAO
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 51%;
@@ -239,11 +252,11 @@
 }
 .divTableCellLCF_DATAVENCIMENTO
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 10%;
-    font-size:9px;
+    font-size:14px;
     text-align:center;
 
 }
@@ -252,7 +265,7 @@
 
 .divTableCellEndereco,
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px 0px;
     width : 100%;
@@ -289,38 +302,39 @@
     display: table-cell;
     padding: 0px;
     width : 50%;
-    font-size:10px;
+    font-size:14px;
     text-align:left;
-    font-weight: bold;
 
 }
 .divTableCellVencimento
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 15%;
-    font-size:10px;
+    font-size:14px;
     text-align:left;
 }
 .divTableCellPagamento
 {
-    border: .4px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 15%;
-    font-size:10px;
+    font-size:14px;
     text-align:left;
 }
 
 .divTableCellValor
 {
-    border: .5px solid #999999;
+    border: 0px;
     display: table-cell;
     padding: 0px;
     width : 20%;
-    font-size:10px;
+    font-size:16px;
     text-align:right;
+    font-weight: bold;
+
 }
 
 
@@ -376,14 +390,14 @@ hr.dashed-vencimento
             .nomes-locador-locatario
             {
                 text-align:left;
-                font-size: 12px;
+                font-size: 14px;
                 color:#003366;
                 
             }
 
             .titulo-movimento
             {
-                font-size: 12px;
+                font-size: 14px;
                 font-style:underline;
 
                 
@@ -443,7 +457,7 @@ hr.dashed-vencimento
             .titulo-12
             {
                 text-align:center;
-                font-size: 12px;
+                font-size: 14px;
                 color:#003366;
                 font-weight: bold;
 
@@ -634,8 +648,8 @@ hr.dashed-vencimento
                 <div class="divTable semborda">
                     <div class="divTableBody semborda">
                         <div class="divTableRow semborda">
-                            <div class=" divTableCellImovel semborda ">
-                                Imóvel: {{$dadosrecibo[0]->IMB_CTR_REFERENCIA}} ({{$dadosrecibo[0]->IMB_IMV_ID}})-{{$dadosrecibo[0]->ENDERECOIMOVEL}} - {{$dadosrecibo[0]->BAIRROIMOVEL}}                                
+                            <div class=" divTableCellImovel semborda font-16">
+                                Imóvel: <b>{{$dadosrecibo[0]->IMB_CTR_REFERENCIA}} ({{$dadosrecibo[0]->IMB_IMV_ID}})-{{$dadosrecibo[0]->ENDERECOIMOVEL}} - {{$dadosrecibo[0]->BAIRROIMOVEL}} </b>                               
                             </div>
                         </div>
                     </div>
@@ -643,14 +657,14 @@ hr.dashed-vencimento
                 <div class="divTable">
                     <div class="divTableBody semborba">
                         <div class="divTableRow semborba">
-                            <div class=" divTableCellLocatario ">
-                                Locatário: {{$dadosrecibo[0]->NOMELOCATARIO}} <p>CPF/CNPJ: {{$dadosrecibo[0]->CPFLOCATARIO}}</p> 
+                            <div class=" divTableCellLocatario font-16">
+                                Locatário: <b> {{$dadosrecibo[0]->NOMELOCATARIO}}</b> <p>CPF/CNPJ: <b>{{$dadosrecibo[0]->CPFLOCATARIO}}</p> </b>
                             </div>
-                            <div class=" divTableCellVencimento ">
-                                Vencimento <p>{{ app('App\Http\Controllers\ctrRotinas')->formatarData($dadosrecibo[0]->IMB_RLD_DATAVENCIMENTO)}}</p> 
+                            <div class=" divTableCellVencimento font-16">
+                                Vencimento <p><b> {{ app('App\Http\Controllers\ctrRotinas')->formatarData($dadosrecibo[0]->IMB_RLD_DATAVENCIMENTO)}}</b></p> 
                             </div>
-                            <div class=" divTableCellPagamento ">
-                                Pagamento <p> {{ app('App\Http\Controllers\ctrRotinas')->formatarData($dadosrecibo[0]->IMB_RLD_DATAPAGAMENTO)}}</p> 
+                            <div class=" divTableCellPagamento font-16">
+                                Pagamento <p> <b>{{ app('App\Http\Controllers\ctrRotinas')->formatarData($dadosrecibo[0]->IMB_RLD_DATAPAGAMENTO)}}</b></p> 
                             </div>
                             <div class=" divTableCellValor ">
 
@@ -672,21 +686,19 @@ hr.dashed-vencimento
                         $sinal='';
                         if( $item->IMB_RLD_LOCADORCREDEB == 'D' ) 
                             $sinal =  '-';
-                        else
-                        if( $item->IMB_LCF_LOCADORCREDEB == 'C' ) 
-                            $sinal =  '+';
                         
+                        if( $item->IMB_RLD_LOCADORCREDEB == 'C' ) 
+                            $sinal =  '+';
+
                         $observacao = $item->IMB_RLD_OBSERVACAO;
                         if( $observacao == null ) $observacao='-';
                     @endphp
                     <div class="divTable">
                         <div class="divTableBody">
                             <div class="divTableRow ">
-                                <div class="divTableCellTBE_ID ">{{$item->IMB_TBE_ID}}</div>
-                                <div class="divTableCellTBE_NOME">{{$item->IMB_TBE_NOME}}</div>
-                                <div class="divTableCellLCF_LOCADORCREDEB">{{$sinal}}</div>
-                                <div class="divTableCellLCF_VALOR ">{{ number_format($item->IMB_RLD_VALOR,2,",",".")}}</div>
-                                <div class="divTableCellLCF_OBSERVACAO ">{{$observacao}}</div>
+                                <div class="divTableCellTBE_NOME font-14">{{$item->IMB_TBE_NOME}}</div>
+                                <div class="divTableCellLCF_VALOR  font-14 div-right">{{ number_format($item->IMB_RLD_VALOR,2,",",".")}}({{$sinal}})</div>
+                                <div class="divTableCellLCF_OBSERVACAO  ">{{$observacao}}</div>
                             </div>
                         </div>
                     </div>
@@ -748,7 +760,9 @@ hr.dashed-vencimento
 
         <script>
                 $("#i-column1").html('NOVA COLUNA');
-                window.print();
+                var imprimir = "{{$imprimir}}";
+                if( imprimir == 'S') 
+                    window.print();
 
         </script>
 

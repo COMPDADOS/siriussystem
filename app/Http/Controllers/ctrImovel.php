@@ -257,6 +257,19 @@ class ctrImovel extends Controller
 
             }
 
+            if( $request->destaque == 'S')
+            {
+                $cFiltrou = 'S';
+                $imoveis->whereRaw("coalesce(IMB_IMV_DESTAQUE,'N') = 'S' ");
+            }
+
+            if( $request->superdestaque == 'S')
+            {
+                $cFiltrou = 'S';
+                $imoveis->whereRaw("coalesce(IMB_IMV_SUPERDESTAQUE,'N') = 'S' ");
+            }
+
+
 
 
             /*
@@ -417,8 +430,9 @@ class ctrImovel extends Controller
     }
 
 
-    public function index()
+    public function index( Request $request)
     {
+        $idatendimento = $request->IMB_CLA_ID;
         $bairros = DB::table('IMB_IMOVEIS')->distinct()->orderBy('CEP_BAI_NOME')
         ->where( 'IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
         ->get(['CEP_BAI_NOME','IMB_IMV_CIDADE']);
@@ -437,7 +451,7 @@ class ctrImovel extends Controller
 
         $tipos= mdlTipoImovel::orderBy('IMB_TIM_DESCRICAO')->get();
 
-        return view('imovel.index', compact('bairros','condominios','tipos','status') );
+        return view('imovel.index', compact('bairros','condominios','tipos','status','idatendimento') );
     }
 
     public function bairrosCadastrados( $cidade )
@@ -516,6 +530,7 @@ class ctrImovel extends Controller
         $IMB_IMV_SUSPENSO                =  $request->input('IMB_IMV_SUSPENSO');
         $IMB_IMV_DORAE                =  $request->input('IMB_IMV_DORAE');
         $IMB_IMV_SACADA                =  $request->IMB_IMV_SACADA;
+        
         $IMB_IMV_ELEVADORES                =  $request->IMB_IMV_ELEVADORES;
 
 
@@ -726,6 +741,7 @@ class ctrImovel extends Controller
             $sub=$tipoimovel->imb_tim_prefixo   ;
             $referencia = collect( DB::select("select NovaReferencia('$sub') as ref "))->first()->ref;
             $imv->IMB_IMV_REFERE = $referencia;
+            $imv->IMB_IMV_RELIRRF               =  'S';
             $imv->save();
 
             $atends = mdlAtendente::where( 'IMB_ATD_ATIVO','=','A')->get();

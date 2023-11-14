@@ -41,9 +41,13 @@
                                     <input type="checkbox" class="form-control" id="IMB_PRM_REPASSEPEGATUDOABERTO">
                                 </div>
 
-                               <div class="col-md-6 div-center dark-soft-plus">
+                                <div class="col-md-6 div-center dark-soft-plus">
                                     <label class="control-label">Desconto Pontualidade Sobre Liquido (Aluguel - Desconto)</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_PONTUAL_SOB_ACORDO">
+                                </div>
+                                <div class="col-md-6 div-center dark-soft-plus">
+                                    <label class="control-label">Exibir Número da Parcela</label>
+                                    <input type="checkbox" class="form-control" id="IMB_PRM_USARPARCELAS">
                                 </div>
                             </div>
 

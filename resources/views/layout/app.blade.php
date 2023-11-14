@@ -113,6 +113,31 @@
               color:white;
             }
 
+            .liberado
+{
+    background-color:green;
+    color:white;
+}
+.rejeitado
+{
+    color:red;
+    text-decoration-line: italic;
+}
+
+.img-100px
+                {
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 50%;
+                }
+
+                .barra-titulo
+                {
+                background-color:#007399;
+                color:white;
+                font-weight: bold;
+                text-align: center;
+                }
 
 
             .escondido {
@@ -123,6 +148,8 @@
             {
                 text-align:center;
             }
+
+
 
             .div-right
             {
@@ -176,6 +203,20 @@
                 font-family: verdana, Arial;
             }
 
+            .font-black
+            {
+                color:black;
+            }
+            .font-red
+            {
+                color:red;
+            }
+
+            .font-riscado
+            {
+                text-decoration: line-through;
+            }
+
             .btn-notif {
                 background-color: #f0f5f5;
                 border: 2px;
@@ -200,7 +241,8 @@
                 width:100%;
                 background-size:15%;
                 position: fixed;
-                z-index:100;
+                z-index:90000;
+                opacity: 0.5;
             }
 
         </style>
@@ -244,7 +286,8 @@
                                 @endphp
 
                             <li class="{{$acesso}}">
-                                <a href="{{route('clienteatendimento.novo')}}" target="_blank">
+
+                                <a href="javascript:iniciarNovoAtendimento()" >
                                 <i class="fas fa-headset"></i> Novo Atendimento</a>
                             </li>
 
@@ -329,6 +372,11 @@
                                 <i class="fa fa-navicon"></i> <b> Menu de Relatórios</b>
                                 </a>
                             </li>
+                            <li>
+                                <a class="ultimolt" href="{{route('boleto.painelenviadosindex')}}" target="_blank">
+                                <i class="fa fa-navicon"></i> <b> Painel Boletos Enviados por Email</b>
+                                </a>
+                            </li>
 
                             <li><hr></li>
                             @php
@@ -360,7 +408,7 @@
 
                             <li>
                                 <a class="ultimolt" href="{{route('videostreinamentos.index')}}" target="_blank">
-                                <i class="fas fa-eye"></i><b> Videos para Auto-ajuda</b>
+                                <i class="fas fa-eye"></i><b> Videos Treinamento</b>
                                 </a>
                             </li>
 
@@ -376,6 +424,8 @@
                                 <option value="1">Imóveis</option>
                                 <option value="2">Interessado</option>
                                 <option value="3">Proprietário</option>
+                                <option value="4">Locatário</option>
+                                <option value="5">Fiador</option>
 
                             </select>
 
@@ -408,11 +458,19 @@
                         <input type="hidden" value = "{{Auth::User()->imb_imb_id2}}" id="I-IMB_IMB_ID2">
                         <input type="hidden" value = "{{Auth::User()->IMB_IMB_ID}}" id="I-IMB_IMB_IDMASTER">
                         <input type="hidden" value = "{{Auth::User()->IMB_IMB_ID}}" id="I-IMB_IMB_ID">
+
+                        @php
+                            $parametros2 = app('App\Http\Controllers\ctrRotinas')->parametros2( Auth::User()->IMB_IMB_ID );
+
+                        @endphp
+
                         <input type="hidden"  id="i-imovelpesquisa">
                         <input type="hidden"  id="i-cfcpesquisa">
                         <input type="hidden"  id="i-cfcdescricaopesquisa">
                         <input type="hidden"  id="i-subcontapesquisa">
                         <input type="hidden"  id="i-subcontadescricaopesquisa">
+                        <input type="hidden"  id="i-contarepassepadrao" value="{{$parametros2->FIN_CCX_ID_PADRAO_REP}}">
+                        <input type="hidden"  id="i-formarepassepadrao" value="{{$parametros2->IMB_FORPAG_IDLOCADOR}}">
 
                         <ul class="nav navbar-nav pull-right">
                             <!-- BEGIN NOTIFICATION DROPDOWN -->
@@ -428,14 +486,14 @@
                                     <i class="icon-bell" style="color:red"></i>
                                     <span class="badge badge-default" id="i-notificacoes" title="Novas Notificações"></span>
                                 </a>
-                                <ul class="dropdown-menu">
+                                <ul class="dropdown-menu notifications">
                                     <li id="i-alert-notificacoes">
                                         <h3 class="div-center font-20-red-white">Notificações
                                             </h3>
                                     </li>
                                     <li>
                                         <ul class="dropdown-menu-list scroller" style="height: 275px;" data-handle-color="#637283">
-                                        <li id="li-novosimoveis" class="btn-notif">
+                                            <li id="li-novosimoveis" class="btn-notif">
                                                 @php
                                                     $novosim = app( 'App\Http\Controllers\ctrImoveisNotificacoes')->novosImoveisQtd();
 
@@ -545,14 +603,22 @@
                                 
                             </li>
                             <li class="dropdown dropdown-extended dropdown-tasks" id="header_task_bar">
-                                <a href="javascript:cargaBoletosVecendo()" class="dropdown-toggle" >
-                                    <i class="icon-boleto fa fa-barcode" style="color:orange"></i>
+
+                                @php
+                                $req = app('App\Http\Controllers\ctrRotinas')->instanciarRequest();
+                                $req->semjson = 'S';
+                                $qtd=app('App\Http\Controllers\ctrCobrancaGerada')->boletosVencendoQtde( $req ) ;
+                                @endphp
+
+                                                              
+                                <a title="Temos {{$qtd}} vencendo hoje." href="javascript:cargaBoletosVecendo()" class="dropdown-toggle" >
+                                    <i class="icon-boleto fa fa-barcode" style="color:black"></i>
                                     <span class="badge badge-default" id="i-boletosvencendo"></span>
                                 </a>
                                 </li>
                             <li class="dropdown dropdown-extended dropdown-tasks" id="header_task_bar">
                                 <a title="Mensagens capturadas no Whatsapp" href="{{route('whatsapp.index')}}" class="dropdown-toggle" data-close-others="true">
-                                    <i class="fa fa-whatsapp" aria-hidden="true" style="color:green"></i>        
+                                    <i id="i-ws" class="fa fa-whatsapp" aria-hidden="true" style="color:green"></i>        
                                     <span class="badge badge-default" title="Mensagens WhatsApp"></span>
                                 </a>
                             </li>
@@ -595,7 +661,7 @@
                                             <i class="icon-calendar"></i> Agenda </a>
                                     </li>
                                     <li>
-                                        <a href="{{Auth::user()->IMB_ATD_WEBMAILHOST}}">
+                                        <a href="{{env('APP_EMAIL_SISTEMA')}}">
                                             <i class="icon-envelope-open"></i> Email
                                             
                                         </a>
@@ -1256,7 +1322,7 @@
              <script>
             $(document).ready(function()
             {
-
+                
                 $("#i-notificacoes").html('');
 
 
@@ -1279,7 +1345,6 @@
 
                 verificarSeHaAtendimento();
                  verificarSeHaNovosLeads();
-                 qtdeBoletosVencendo();
 
 
 
@@ -1303,6 +1368,13 @@
                     if( opcao == '3' )
                     {
                         $('#i-campo-pesquisar').attr("placeholder", "Digite o nome do proprietário ou parte dele");
+                    };
+                    if( opcao == '4' )
+                    {
+                        $('#i-campo-pesquisar').attr("placeholder", "Digite o nome do Locatário ou parte dele");
+                    }; if( opcao == '4' )
+                    {
+                        $('#i-campo-pesquisar').attr("placeholder", "Digite o nome do Fiador ou parte dele");
                     };
 
                     // $(this).val() will work here
@@ -1508,7 +1580,8 @@ function atendimentosAbertos()
             var url =  "{{route('setarvarcliente')}}";
 
             var dado =  {   clientepesquisa : texto,
-                            clientetipopesquisa:'I'
+                            clientetipopesquisa:'I',
+                            pesquisagenerica:texto,
                         };
 
             $.ajax(
@@ -1531,7 +1604,60 @@ function atendimentosAbertos()
             var url =  "{{route('setarvarcliente')}}";
 
             var dado =  {   clientepesquisa : texto,
-                            clientetipopesquisa:'P'
+                            clientetipopesquisa:'P',
+                            tipopesquisa: opcao,
+                            pesquisagenerica:texto,
+
+                        };
+            $.ajax(
+            {
+                url         : url,
+                type        : 'get',
+                dataType    : 'json',
+                data        : dado,
+                success     : function()
+                {
+                    window.location = "{{ route('cliente.index') }}";
+
+                }
+            });
+        };
+
+        if ( $('#i-select-pesquisa').val()  == 4 )
+        {
+
+            var url =  "{{route('setarvarcliente')}}";
+
+            var dado =  {   clientepesquisa : texto,
+                            clientetipopesquisa:'LT',
+                            tipopesquisa: opcao,
+                            pesquisagenerica:texto,
+
+                        };
+            $.ajax(
+            {
+                url         : url,
+                type        : 'get',
+                dataType    : 'json',
+                data        : dado,
+                success     : function()
+                {
+                    window.location = "{{ route('cliente.index') }}";
+
+                }
+            });
+        };
+
+        if ( $('#i-select-pesquisa').val()  == 5 )
+        {
+
+            var url =  "{{route('setarvarcliente')}}";
+
+            var dado =  {   clientepesquisa : texto,
+                            clientetipopesquisa:'FD',
+                            tipopesquisa: opcao,
+                            pesquisagenerica:texto,
+
                         };
             $.ajax(
             {
@@ -1656,59 +1782,41 @@ function atendimentosAbertos()
 
     }
 
-    function qtdeBoletosVencendo()
-    {
-        var url = "{{route('cobrancabancaria.boletosvencendo')}}";
-
-        $.ajax(
-            {
-                url:url,
-                dataType:'json',
-                type:'get',
-                success:function( data )
-                {
-                    if( data > 0 )
-                    {
-                        var lab = 'boleto';
-                        if (data > 1 ) lab = 'boletos';
-                        $("#i-boletosvencendo").html( data );
-                        $("#i-boletosvencendo").prop( 'title','Você tem mais '+data+' '+lab+' vencendo hoje!');
-                    }
-                }
-            }
-        );
-
-    }
-
+    
 
     function verificarSeHaAtendimento()
     {
-        var url = "{{route('atendimento.nofiticarcorretor')}}";
+        var notifica = "{{Auth::user()->IMB_ATD_NOTIFICARNOVOATM}}";
+        //alert(notifica);
+        if( notifica == 'S')
+        {
+            var url = "{{route('atendimento.nofiticarcorretor')}}";
 
-        $.ajax(
-            {
-                url:url,
-                dataType:'json',
-                type:'get',
-                success:function( data )
+            $.ajax(
                 {
-                    $("#modalnotifnovosatm").modal( 'hide');
-
-                    if( data > 0 )
+                    url:url,
+                    dataType:'json',
+                    type:'get',
+                    success:function( data )
                     {
-                        var lab = 'atendimento';
+                        $("#modalnotifnovosatm").modal( 'hide');
 
-                        if (data > 1 ) lab = 'atendimentos';
-                        $("#modalnotifnovosatm").modal( 'show');
-                        $("#i-notificacoes").html( data );
-                        $("#i-notificacoes").prop( 'title','Você tem mais '+data+' '+lab+' te aguardando');
-                        $("#i-novosatendimentos").show();
-                        $("#i-novosatendimentos").html( data );
+                        if( data > 0 )
+                        {
+                            var lab = 'atendimento';
 
+                            if (data > 1 ) lab = 'atendimentos';
+                            $("#modalnotifnovosatm").modal( 'show');
+                            $("#i-notificacoes").html( data );
+                            $("#i-notificacoes").prop( 'title','Você tem mais '+data+' '+lab+' te aguardando');
+                            $("#i-novosatendimentos").show();
+                            $("#i-novosatendimentos").html( data );
+
+                        }
                     }
                 }
-            }
-        );
+            );
+        }
 
     }
 
@@ -1736,8 +1844,55 @@ function atendimentosAbertos()
     {
         $("#modalnotifnovosatm").modal( 'show');
     }
+    
+    function setCookie(name,value,days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+    function eraseCookie(name) {   
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
 
+    function iniciarNovoAtendimento()
+    {
+        let idatendimento = getCookie('3wt2oowd3ooo2oowt4');
+        if( idatendimento != null )
+        {
+            alert('Você já está num atendimento! Para iniciar outro irá precisar fechar o pendente!');
+            return false;
+        }
 
+        window.open( "{{route('clienteatendimento.novo')}}", '_blank');
+
+    }
+    const handlePhone = (event) => 
+    {
+        let input = event.target
+        input.value = phoneMask(input.value)
+    }
+
+    const phoneMask = (value) => {
+        if (!value) return ""
+        value = value.replace(/\D/g,'')
+        value = value.replace(/(\d{2})(\d)/,"($1) $2")
+        value = value.replace(/(\d)(\d{4})$/,"$1-$2")
+        return value
+    }
 
 </script>
     </body>

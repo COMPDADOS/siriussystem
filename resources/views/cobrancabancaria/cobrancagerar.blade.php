@@ -156,6 +156,9 @@ td, th
                         <input type="checkbox" class="form-control" id="i-atrasados-gerar">Incluir Contratos em Atraso
                     </div>
                     <div class="row">
+                        <input type="checkbox" class="form-control" id="i-juridico-gerar">Incluir Jurídico
+                    </div>
+                    <div class="row">
                         <input type="checkbox" class="form-control" id="i-alterar-conta">Usar Conta Selecionada em Todos Contratos
                     </div>
                 </div>
@@ -317,7 +320,8 @@ function iniciarGeracao()
         anofinal : $("#i-ano-final").val(),
         FIN_CCX_ID:$("#FIN_CCX_ID").val(),
         IMB_CTR_ID:$("#IMB_CTR_ID").val(),
-        geraratrasado : $("#i-atrasados-gerar").prop('checked') ? 'S' : 'N'
+        geraratrasado : $("#i-atrasados-gerar").prop('checked') ? 'S' : 'N',
+        gerarjuridico : $("#i-juridico-gerar").prop('checked') ? 'S' : 'N'
     }
 
     $.ajax(

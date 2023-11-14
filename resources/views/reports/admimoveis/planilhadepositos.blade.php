@@ -171,9 +171,20 @@ border-top:3px dotted black;
             <div class="col-md-12">
                 <table class="table table-striped table-hover"  id="resultTable">
                     <thead>
-                        <th style="width: 50px"></th>
-                        <th >Pasta</th>
 
+                        <th></th>
+                        <th>Pasta</th>
+                        <th>#Imovel</th>
+                        <th>Correntista</th>
+                        <th>Total Pago</th>
+                        <th>Dt Pagto</th>
+                        <th>Dt Vencto</th>
+                        <th>Banco</th>
+                        <th>Agencia</th>
+                        <th>Nº CC</th>
+                        <th>CPF</th>
+                        <th>PIX</th>
+                        <th>Forma Pagameto</th>
                     </thead>
                 </table>
             </div>
@@ -315,11 +326,12 @@ border-top:3px dotted black;
 
     var table = $('#resultTable').DataTable(
     {
-        "pageLength": 50,
+        "pageLength": -1,
+        dom: 'Bfrtip',
         buttons: [
-        'excel',
-        'print'
-        ],
+            'excel',
+            'print'
+        ]        ,
         "language":
         {
             "sEmptyTable": "Nenhum registro encontrado",
@@ -363,10 +375,21 @@ border-top:3px dotted black;
         },
         columns:
         [
-
-            {data: 'SELECIONADO', render:selecionar},
-            {data: 'IMB_CTR_REFERENCIA', render:montarDados},
-        ],
+              { data: 'IMB_PRP_ID', render:selecionar},
+              { data: 'IMB_CTR_REFERENCIA'},
+              { data: 'IMB_IMV_ID'},
+              { data: 'IMB_CLTCCR_NOME'},
+              { data: 'TOTALRECIBO', render:formatarValor},
+              { data: 'IMB_RLD_DATAPAGAMENTO', render:formatarData}, 
+              { data: 'IMB_RLD_DATAVENCIMENTO', render:formatarData},
+              { data: 'BANCO'},
+              { data: 'GER_BNC_AGENCIA', render:agenciaComDigito},
+              { data: 'IMB_CLTCCR_NUMERO', render:contaComDigito},
+              { data: 'IMB_CLT_CPF'},
+              { data: 'IMB_IMV_PIX'},
+              
+              { data: 'FORMAPAGAMENTO'},
+          ],
 
     });
 
@@ -420,7 +443,9 @@ border-top:3px dotted black;
     function formatarValor( data )
     {
         var valor = parseFloat( data );
-        return formatarBRSemSimbolo(valor);
+        console.log( valor );
+        
+        return '<div class="div-right font-15"><b>'+formatarBRSemSimbolo(valor)+'</b></div>';
     }
 
 
@@ -444,7 +469,7 @@ border-top:3px dotted black;
                 type: 'get',
                 success: function( data )
                 {
-                    $("#i-total").html( '<b>Total Recebido no Periodo -> R$ '+formatarBRSemSimbolo(data) );
+                    $("#i-total").html( '<b>Total Repassado no Periodo -> R$ '+formatarBRSemSimbolo(data) );
                 },
                 error:function()
                 {
@@ -454,7 +479,7 @@ border-top:3px dotted black;
             }
             );
 
-    }
+}
 
     function relatorioDetalhado()
     {
@@ -683,6 +708,29 @@ border-top:3px dotted black;
         });        
 
     }
+
+    function agenciaComDigito(data, type, full, meta)
+    {
+        var dv = full.IMB_BNC_AGENCIADV;
+        if( dv === null ) dv='';
+        return full.GER_BNC_AGENCIA+'-'+dv;
+    }
+
+    function contaComDigito( data, type, full, meta)
+    {
+        var dv = full.IMB_CLTCCR_DV;
+        if( dv === null ) dv='';
+        return full.IMB_CLTCCR_NUMERO+'-'+dv;
+    }
+
+    
+    function formatarData( data )
+    {
+        return moment(data).format('DD/MM/YYYY');
+
+    }
+
+
 
 
 </script>

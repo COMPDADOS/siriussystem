@@ -12,6 +12,8 @@ use App\mdlParametros2;
 use App\mdlLanctoCaixa;
 use App\mdlCliente;
 use App\mdlCobrancaGeradaPerm;
+use App\mdlCobrancaGeradaItemPerm;
+use App\mdlTMPRecebimentoDia;
 use Illuminate\Support\Facades\Mail;
 
 use DB;
@@ -107,6 +109,7 @@ class ctrReciboLocatario extends Controller
                                     ->dataLimite( $idcontrato, $dados[0]['IMB_RLT_DATACOMPETENCIA'] );
             $recibo->FIN_LCX_DINHEIRO       = $dados[0]['FIN_LCX_DINHEIRO'];
             $recibo->FIN_LCX_CHEQUE         = $dados[0]['FIN_LCX_CHEQUE'];
+            $recibo->IMB_RLT_PIX         = $dados[0]['IMB_RLT_PIX'];
             $recibo->FIN_CFC_ID             = $idcfc;
             $recibo->IMB_CLT_ID_LOCATARIO   = $idlocatario;
             $recibo->IMB_CLT_ID_LOCADOR     = $idlocador;
@@ -130,8 +133,8 @@ class ctrReciboLocatario extends Controller
             $lf->IMB_LCF_INCMUL          = 'N';
             $lf->IMB_LCF_INCIRRF         = 'N';
             $lf->IMB_LCF_INCTAX          = 'S';
-            $lf->IMB_LCF_INCJUROS        = 'S';
-            $lf->IMB_LCF_INCCORRECAO     = 'S';
+            $lf->IMB_LCF_INCJUROS        = 'N';
+            $lf->IMB_LCF_INCCORRECAO     = 'N';
             $lf->IMB_LCF_GARANTIDO       = 'N';
             $lf->IMB_LCF_INCISS          = 'N';
             $lf->IMB_LCF_OBSERVACAO      = 'PARTE DE PAGAMENTO DO VENCIMENTO '. app('App\Http\Controllers\ctrRotinas')->formatarData( $recibo->IMB_RLT_DATACOMPETENCIA  );
@@ -215,6 +218,7 @@ class ctrReciboLocatario extends Controller
                                     ->dataLimite( $idcontrato, $d['IMB_RLT_DATACOMPETENCIA'] );
             $recibo->FIN_LCX_DINHEIRO       = $d['FIN_LCX_DINHEIRO'];
             $recibo->FIN_LCX_CHEQUE         = $d['FIN_LCX_CHEQUE'];
+            $recibo->IMB_RLT_PIX            = $d['IMB_RLT_PIX'];
             $recibo->FIN_CFC_ID             = $idcfc;
             $recibo->IMB_CLT_ID_LOCATARIO   = $idlocatario;
             $recibo->IMB_CLT_ID_LOCADOR     = $idlocador;
@@ -504,6 +508,7 @@ class ctrReciboLocatario extends Controller
                 'IMB_RLT_TOTALRECIBO',
                 'FIN_LCX_DINHEIRO',
                 'IMB_RLT_TROCO',
+                'IMB_RLT_PIX',
                 'FIN_LCX_CHEQUE',
                 'FIN_PCT_NOSSONUMERO',
                 'IMB_RECIBOLOCATARIO.IMB_IMV_ID',
@@ -560,7 +565,12 @@ class ctrReciboLocatario extends Controller
         if( $imprimir == 'S' )
         {
             $param = app( 'App\Http\Controllers\ctrRotinas')->parametros( Auth::user()->IMB_IMB_ID );
-            $pdf=PDF::loadView('reports.recibos.locatario.recibolocatarionovaversao', compact( 'rec') );
+            if( $param->IMB_PRM_MODRECLOCATARIO  == 'H' )
+                $pdf=PDF::loadView('reports.recibos.locatario.recibolocatariocomresumorepasse', compact( 'rec') );
+            else            
+                $pdf=PDF::loadView('reports.recibos.locatario.recibolocatarionovaversao', compact( 'rec') );
+            
+            
             $pdf->setPaper('A4', 'portrait');
             return $pdf->stream('recibolocatario.pdf');
             
@@ -646,107 +656,173 @@ class ctrReciboLocatario extends Controller
         $conta = $request->conta;
         $dimob =  $request->dimob;
         $destino = $request->destino;
+     
+        Log::info( "*********************************************" );
+        Log::info( "destino ".$destino );
 
         if( $datainicio=='') $datainicio = date( 'Y/m/d');
         if( $datafim=='') $datafim = date( 'Y/m/d');
 
         $par2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID);
 
-        if( $par2->IMB_PRM_PLARECTCDATARECTO == 'S')
+        
+        if( $destino <> 'PREREPASSSE')
         {
-            $rec = mdlReciboLocatario::select(
-            [
-                'IMB_RLT_NUMERO',
-                'IMB_CONTRATO.IMB_IMV_ID',
-                'IMB_CONTRATO.IMB_CTR_ID',
-                'IMB_CTR_REFERENCIA',
-                'IMB_RECIBOLOCATARIO.IMB_RLT_DATACOMPETENCIA',
-                'IMB_RECIBOLOCATARIO.IMB_RLT_DATAPAGAMENTO',
-                DB::raw('imovel( IMB_RECIBOLOCATARIO.IMB_IMV_ID) AS ENDERECOIMOVEL'),
-                DB::raw('PEGALOCATARIOCONTRATO( IMB_RECIBOLOCATARIO.IMB_CTR_ID) AS NOMELOCATARIO'),
-                DB::raw('PEGALOCADORPRINCIPALIMV( IMB_CONTRATO.IMB_IMV_ID) AS NOMELOCADOR'),
-                DB::raw('PEGACPFLOCADORPRINCIPALIMV( IMB_CONTRATO.IMB_IMV_ID) AS CPFLOCADOR'),
-                                
-                DB::raw( "( SELECT RECEBIDOTOTALRECIBO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO ) ) AS TOTALRECIBO"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'1,24' ) ) AS VALORALUGUEL"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'8,5' ) ) AS DESCONTOS"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'17') ) AS IPTU"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'23') ) AS TARIFABOLETO"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'18') ) AS IRRF"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'2,36' ) ) AS MULTAATRASO"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'3,37' ) ) AS JUROSATRASO"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'4,38' ) ) AS CORRECAOMONETARIA"),
-                DB::raw( "( select TAXACONTRATONORECEBIMENTO( IMB_RECIBOLOCATARIO.IMB_RLT_DATAPAGAMENTO, IMB_RECIBOLOCATARIO.IMB_CTR_ID, IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO )) AS TAXACONTRATO"),
-                DB::raw( "( select TAXAADMNORECEBIMENTO( IMB_RECIBOLOCATARIO.IMB_RLT_DATACOMPETENCIA, IMB_RECIBOLOCATARIO.IMB_CTR_ID )) AS TAXAADM"),
-                DB::raw( "( select RECEBIDOOUTROSEVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'1,24,23,8,5,17,18,2,36,3,37,4,38' ) ) AS OUTROS")
-            ])
-            ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID', 'IMB_RECIBOLOCATARIO.IMB_CTR_ID')
-            ->leftJoin( 'IMB_IMOVEIS','IMB_IMOVEIS.IMB_IMV_ID', 'IMB_CONTRATO.IMB_IMV_ID')
-            ->where( 'IMB_RECIBOLOCATARIO.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
-            ->where( 'IMB_RLT_DATAPAGAMENTO','>=', $datainicio)
-            ->where( 'IMB_RLT_DATAPAGAMENTO','<=', $datafim)
-            ->whereNull('IMB_RLT_DTHINATIVO');
-        }
-        else
-        $rec = mdlReciboLocatario::select(
-            [
-                'IMB_RLT_NUMERO',
-                'IMB_CONTRATO.IMB_IMV_ID',
-                'IMB_CONTRATO.IMB_CTR_ID',
-                'IMB_CTR_REFERENCIA',
-                'IMB_RECIBOLOCATARIO.IMB_RLT_DATACOMPETENCIA',
-                'IMB_RECIBOLOCATARIO.IMB_RLT_DATAPAGAMENTO',
-                DB::raw('imovel( IMB_RECIBOLOCATARIO.IMB_IMV_ID) AS ENDERECOIMOVEL'),
-                DB::raw('PEGALOCATARIOCONTRATO( IMB_RECIBOLOCATARIO.IMB_CTR_ID) AS NOMELOCATARIO'),
-                DB::raw('PEGALOCADORPRINCIPALIMV( IMB_CONTRATO.IMB_IMV_ID) AS NOMELOCADOR'),
-                DB::raw('PEGACPFLOCADORPRINCIPALIMV( IMB_CONTRATO.IMB_IMV_ID) AS CPFLOCADOR'),
-                                
-                DB::raw( "( SELECT RECEBIDOTOTALRECIBO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO ) ) AS TOTALRECIBO"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'1,24' ) ) AS VALORALUGUEL"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'8,5' ) ) AS DESCONTOS"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'17') ) AS IPTU"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'23') ) AS TARIFABOLETO"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'18') ) AS IRRF"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'2,36' ) ) AS MULTAATRASO"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'3,37' ) ) AS JUROSATRASO"),
-                DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'4,38' ) ) AS CORRECAOMONETARIA"),
-                DB::raw( "( select TAXACONTRATONORECEBIMENTO( IMB_RECIBOLOCATARIO.IMB_RLT_DATACOMPETENCIA, IMB_RECIBOLOCATARIO.IMB_CTR_ID, IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO )) AS TAXACONTRATO"),
-                DB::raw( "( select TAXAADMNORECEBIMENTO( IMB_RECIBOLOCATARIO.IMB_RLT_DATACOMPETENCIA, IMB_RECIBOLOCATARIO.IMB_CTR_ID )) AS TAXAADM"),
-                DB::raw( "( select RECEBIDOOUTROSEVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'1,24,23,8,5,17,18,2,36,3,37,4,38' ) ) AS OUTROS")
-            ])
-            ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID', 'IMB_RECIBOLOCATARIO.IMB_CTR_ID')
-            ->leftJoin( 'IMB_IMOVEIS','IMB_IMOVEIS.IMB_IMV_ID', 'IMB_CONTRATO.IMB_IMV_ID')
-            ->where( 'IMB_RECIBOLOCATARIO.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
-            ->where( 'IMB_RLT_DATAPAGAMENTO','>=', $datainicio)
-            ->where( 'IMB_RLT_DATAPAGAMENTO','<=', $datafim)
-            ->whereNull('IMB_RLT_DTHINATIVO');
+
+            if( $par2->IMB_PRM_PLARECTCDATARECTO == 'S')
+                $rec = mdlReciboLocatario::select(
+                [
+                    'IMB_RLT_NUMERO',
+                    'IMB_CONTRATO.IMB_IMV_ID',
+                    'IMB_CONTRATO.IMB_CTR_ID',
+                    'IMB_CTR_REFERENCIA',
+                    'IMB_RECIBOLOCATARIO.IMB_RLT_DATACOMPETENCIA',
+                    'IMB_RECIBOLOCATARIO.IMB_RLT_DATAPAGAMENTO',
+                    DB::raw('imovel( IMB_RECIBOLOCATARIO.IMB_IMV_ID) AS ENDERECOIMOVEL'),
+                    DB::raw('PEGALOCATARIOCONTRATO( IMB_RECIBOLOCATARIO.IMB_CTR_ID) AS NOMELOCATARIO'),
+                    DB::raw('PEGALOCADORPRINCIPALIMV( IMB_CONTRATO.IMB_IMV_ID) AS NOMELOCADOR'),
+                    DB::raw('PEGACPFLOCADORPRINCIPALIMV( IMB_CONTRATO.IMB_IMV_ID) AS CPFLOCADOR'),
+                    DB::raw( "( SELECT RECEBIDOTOTALRECIBO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO ) ) AS TOTALRECIBO"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'1,24' ) ) AS VALORALUGUEL"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'8,5' ) ) AS DESCONTOS"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'17') ) AS IPTU"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'23') ) AS TARIFABOLETO"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'18') ) AS IRRF"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'2,36' ) ) AS MULTAATRASO"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'3,37' ) ) AS JUROSATRASO"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'4,38' ) ) AS CORRECAOMONETARIA"),
+                    DB::raw( "( select TAXACONTRATONORECIBOLOCATARIO( IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO )) AS TAXACONTRATO"),
+                    DB::raw( "( select TAXAADMNORECIBOLOCATARIO( IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO )) AS TAXAADM"),
+                    DB::raw( "( select RECEBIDOOUTROSEVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'1,24,23,8,5,17,18,2,36,3,37,4,38' ) ) AS OUTROS")
+                ])
+                ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID', 'IMB_RECIBOLOCATARIO.IMB_CTR_ID')
+                ->leftJoin( 'IMB_IMOVEIS','IMB_IMOVEIS.IMB_IMV_ID', 'IMB_CONTRATO.IMB_IMV_ID')
+                ->where( 'IMB_RECIBOLOCATARIO.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
+                ->where( 'IMB_RLT_DATAPAGAMENTO','>=', $datainicio)
+                ->where( 'IMB_RLT_DATAPAGAMENTO','<=', $datafim)
+                ->whereNull('IMB_RLT_DTHINATIVO');
+            else
+                $rec = mdlReciboLocatario::select(
+                [
+                    'IMB_RLT_NUMERO',
+                    'IMB_CONTRATO.IMB_IMV_ID',
+                    'IMB_CONTRATO.IMB_CTR_ID',
+                    'IMB_CTR_REFERENCIA',
+                    'IMB_RECIBOLOCATARIO.IMB_RLT_DATACOMPETENCIA',
+                    'IMB_RECIBOLOCATARIO.IMB_RLT_DATAPAGAMENTO',
+                    DB::raw('imovel( IMB_RECIBOLOCATARIO.IMB_IMV_ID) AS ENDERECOIMOVEL'),
+                    DB::raw('PEGALOCATARIOCONTRATO( IMB_RECIBOLOCATARIO.IMB_CTR_ID) AS NOMELOCATARIO'),
+                    DB::raw('PEGALOCADORPRINCIPALIMV( IMB_CONTRATO.IMB_IMV_ID) AS NOMELOCADOR'),
+                    DB::raw('PEGACPFLOCADORPRINCIPALIMV( IMB_CONTRATO.IMB_IMV_ID) AS CPFLOCADOR'),
+                                    
+                    DB::raw( "( SELECT RECEBIDOTOTALRECIBO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO ) ) AS TOTALRECIBO"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'1,24' ) ) AS VALORALUGUEL"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'8,5' ) ) AS DESCONTOS"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'17') ) AS IPTU"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'23') ) AS TARIFABOLETO"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'18') ) AS IRRF"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'2,36' ) ) AS MULTAATRASO"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'3,37' ) ) AS JUROSATRASO"),
+                    DB::raw( "( select RECEBIDOPOREVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'4,38' ) ) AS CORRECAOMONETARIA"),
+                    DB::raw( "( select TAXACONTRATONORECIBOLOCATARIO( IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO )) AS TAXACONTRATO"),
+                    DB::raw( "( select TAXAADMNORECIBOLOCATARIO( IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO ) ) AS TAXAADM"),
+                    DB::raw( "( select RECEBIDOOUTROSEVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'1,24,23,8,5,17,18,2,36,3,37,4,38' ) ) AS OUTROS")
+                ])
+                ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID', 'IMB_RECIBOLOCATARIO.IMB_CTR_ID')
+                ->leftJoin( 'IMB_IMOVEIS','IMB_IMOVEIS.IMB_IMV_ID', 'IMB_CONTRATO.IMB_IMV_ID')
+                ->where( 'IMB_RECIBOLOCATARIO.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
+                ->where( 'IMB_RLT_DATAPAGAMENTO','>=', $datainicio)
+                ->where( 'IMB_RLT_DATAPAGAMENTO','<=', $datafim)
+                ->whereNull('IMB_RLT_DTHINATIVO');
 
 
-        if( $dimob == 'S' )
-            $rec = $rec->where('IMB_IMV_RELIRRF','=','S' );
+            if( $dimob == 'S' )
+                $rec = $rec->where('IMB_IMV_RELIRRF','=','S' );
 
-        if( $empresa)
-        $rec = $rec->where('IMB_CONTRATO.IMB_IMB_ID2','=',$empresa );
+            if( $empresa)
+            $rec = $rec->where('IMB_CONTRATO.IMB_IMB_ID2','=',$empresa );
 
-        if( $conta <> '' )
-            $rec = $rec->whereRaw( "CAST( FIN_CCR_ID AS INT ) = $conta ");
+            if( $conta <> '' )
+                $rec = $rec->whereRaw( "CAST( FIN_CCR_ID AS INT ) = $conta ");
 
+            $rec = $rec->distinct('IMB_RLT_NUMERO')
+                ->orderBy( 'IMB_RLT_DATAPAGAMENTO')
+                ->orderBy( 'IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO');
 
-        $rec = $rec->distinct('IMB_RLT_NUMERO')
-            ->orderBy( 'IMB_RLT_DATAPAGAMENTO');
-
-
-            Log::info( "***sql");
+            Log::info( '***************************************************');
             Log::info( $rec->toSql());
+            if( $destino == 'SINTETICO') 
+            {
+                $rec = $rec->get();
+                return view('reports.admimoveis.recebidosperiodosintetico',compact( 'rec', 'datainicio','datafim') ) ;
 
-        if( $destino == 'SINTETICO') 
+            }
+            return DataTables::of($rec)->make(true);
+        }
+
+        if( $destino == 'PREREPASSSE')
         {
+
+            $rec = mdlReciboLocatario::select( 'IMB_RLT_NUMERO')
+                ->distinct( 'IMB_RLT_NUMERO')
+                ->where( 'IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
+                ->where( 'IMB_RLT_DATAPAGAMENTO','>=', $datainicio)
+                ->where( 'IMB_RLT_DATAPAGAMENTO','<=', $datafim)
+                ->whereNull('IMB_RLT_DTHINATIVO')
+                ->orderBy( 'IMB_RLT_NUMERO');
+
+
+            $tmprep = mdlTMPRecebimentoDia::where( 'IMB_ATD_ID','=', Auth::user()->IMB_ATD_ID)->delete();
+
             $rec = $rec->get();
-            return view('reports.admimoveis.recebidosperiodosintetico',compact( 'rec', 'datainicio','datafim') ) ;
+            foreach( $rec as $r )
+            {
+                $numerorecibo = $r->IMB_RLT_NUMERO;
+                $objrecibo =  mdlReciboLocatario::where( 'IMB_RLT_NUMERO','=', $numerorecibo )
+                ->whereNull( 'IMB_RLT_DTHINATIVO')
+                ->get();
+
+                $totaldebitos =0;
+                $totalcreditos = 0;
+                foreach ( $objrecibo as $or )
+                {
+                    if( $or->IMB_RLT_LOCATARIOCREDEB == 'C')
+                        $totalcreditos = $totalcreditos + $or->IMB_RLT_VALOR;
+                    if( $or->IMB_RLT_LOCATARIOCREDEB == 'D')
+                        $totaldebitos = $totaldebitos + $or->IMB_RLT_VALOR;
+                }
+
+
+                $tmprep = new mdlTMPRecebimentoDia;
+                $tmprep->IMB_RLT_NUMERO             = $or->IMB_RLT_NUMERO;
+                $tmprep->IMB_CTR_ID                 = $or->IMB_CTR_ID;
+                $tmprep->IMB_IMV_ID                 = $or->IMB_IMV_ID;
+                $tmprep->TMP_RRD_ENDERECOIMOVEL     = app( 'App\Http\Controllers\ctrRotinas')->imovelEndereco( $or->IMB_IMV_ID );
+                $tmprep->TMP_RRD_NOMELOCATARIO      = app( 'App\Http\Controllers\ctrRotinas')->nomeLocatarioPrincipal( $or->IMB_CTR_ID );
+                $tmprep->IMB_RLT_DATAPAGAMENTO      = $or->IMB_RLT_DATAPAGAMENTO;
+                $tmprep->IMB_RLT_DATACOMPETENCIA    = $or->IMB_RLT_DATACOMPETENCIA;
+                $tmprep->IMB_RLT_FORMAPAGAMENTO     = app( 'App\Http\Controllers\ctrRotinas')->formaPagamento( $or->IMB_FORPAG_ID );
+                $tmprep->FIN_CCX_ID                 = $or->FIN_CCR_ID;
+                $tmprep->IMB_TBE_ID                 = $or->IMB_TBE_ID;
+                $tmprep->IMB_TBE_NOME               = app( 'App\Http\Controllers\ctrRotinas')->evento( $or->IMB_TBE_ID )->IMB_TBE_NOME;
+                $tmprep->IMB_ATD_ID                 = Auth::User()->IMB_ATD_ID;
+                $tmprep->CREDITOS                   = $totalcreditos;
+                $tmprep->DEBITOS                    = $totaldebitos;
+                $tmprep->IMB_CTR_REFERENCIA         = app( 'App\Http\Controllers\ctrRotinas')->pegarReferencia( $or->IMB_CTR_ID);
+                $tmprep->TOTALRECIBO                =  $totaldebitos - $totalcreditos;
+                $tmprep->save();
+            }
+
+            $tmprep = mdlTMPRecebimentoDia::where( 'IMB_ATD_ID','=', Auth::user()->IMB_ATD_ID)
+            ->orderBy( 'IMB_RLT_DATAPAGAMENTO' )
+            ->orderBy( 'IMB_CTR_ID' )
+            ->get();
+
+            return DataTables::of($tmprep)->make(true);
 
         }
 
-        return DataTables::of($rec)->make(true);
+        
 
     }
 
@@ -1121,16 +1197,31 @@ class ctrReciboLocatario extends Controller
 
     }
 
-    public function boletoJaRecebido( $idcontrato, $nossonumero)
+    public function boletoJaRecebido( $idcontrato, $nossonumero, $idcgr)
     {
-        //Log::info( "id contrato ".$idcontrato );
-        //Log::info( "vencimento ".$vencimento );
-        $rlt = mdlReciboLocatario::where(   'IMB_CTR_ID','=', $idcontrato )
-        ->whereRaw( "FIN_PCT_NOSSONUMERO = '$nossonumero'") 
-        ->whereNull( 'IMB_RLT_DTHINATIVO')
-        ->sum('IMB_RLT_VALOR');
+        $cgi = mdlCobrancaGeradaItemPerm::where( 'IMB_CGR_ID','=', $idcgr )
+        ->whereRaw( 'COALESCE(IMB_COBRANCAGERADAITEMPERM.IMB_LCF_ID,0) <> 0 ')
+        ->leftJoin( 'IMB_RECIBOLOCATARIO', 'IMB_RECIBOLOCATARIO.IMB_LCF_ID', 'IMB_COBRANCAGERADAITEMPERM.IMB_LCF_ID')
+        ->first();
 
-        return $rlt;
+        Log::info('************************************************');
+        Log::info( 'recibo '.$cgi->IMB_RLT_NUMERO);
+        
+        $retorno = 0;
+
+        if( $cgi <> '' )
+        {
+
+            if( $cgi->IMB_RLT_NUMERO <> '' )
+            {
+                $rlt = collect( DB::select("select RECEBIDOTOTALRECIBO($cgi->IMB_RLT_NUMERO) as rlt "))->first();
+                if( $rlt <> '')
+                $retorno = floatval($rlt->rlt) ;
+            }
+        }
+
+        Log::info( 'retorno '.$retorno );
+        return $retorno;
 
     }
 

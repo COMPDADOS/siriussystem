@@ -411,7 +411,7 @@ td.BoletoCodigoBanco {font-size: 6mm; font-family: arial, verdana; font-weight :
       </TR>
       <TR>
         <TD colspan=10 class=BoletoValorEsquerdo style='text-align: left; padding-left : 0.1cm'>
-            {{$im->IMB_IMB_NOME}}</TD>
+            {{$im->IMB_IMB_NOME}} - CNPJ: {{$im->IMB_IMB_CGC}} </TD>
         @if( $dadosboleto["cooperativa"] <> 0  )
           <TD class=BoletoValorDireito>{{$dadosboleto["agencia"]}}.
                                     {{$dadosboleto["cooperativa"]}}.

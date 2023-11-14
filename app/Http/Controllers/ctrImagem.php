@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\mdlImagem;
 use App\mdlImovel;
 use App\mdlContratoAnexos;
+use App\mdlCondominioImagem;
+use App\mdlHistoricoImovel;
 use App\classes\PQ_Image;
 use Illuminate\Filesystem;
 use Illuminate\Support\Facades\Storage;
@@ -388,7 +390,8 @@ class ctrImagem extends Controller
            return '';
 
 
-        return view('imagem.album', compact( 'imovel', 'imagens' ) );        
+        $enderecocompleto = app('App\Http\Controllers\ctrRotinas')->imovelEndereco( $imovel->IMB_IMV_ID );
+        return view('imagem.album', compact( 'imovel', 'imagens', 'enderecocompleto') );        
 
 
     }
@@ -572,65 +575,129 @@ class ctrImagem extends Controller
      
      public function dragDrop( Request $request )
      {
-        $id = $request->id;
+        $id         = $request->id;
+        $tipo       = $request->tipo;
         Log::info( 'fncao dragdrop '.$id );
-        return view( 'imagem.dragdrop', compact('id'));
+        return view( 'imagem.dragdrop', compact('id','tipo'));
      }
 
      public function storeDragDrop(Request $request)
      {
 
-
-        
-
-         $image = $request->file('file');
-        $file_name='sirius_'.rand(1000,1000000) . '.' . $image->getClientOriginalExtension();
- 
-        Log::info('563');
-        $empresa = Auth::user()->IMB_IMB_ID;
-
-        $pasta='images/'.$empresa.'/imoveis/'.$request->input('id');
-        $pastaThumb='images/'.$empresa.'/imoveis/'.'thumb/'.$request->input('id');
- 
-        Storage::disk('public')->makeDirectory( $pasta);
-        Storage::disk('public')->makeDirectory( $pastaThumb);
- 
-        $photo = Image::make( $image )
-            ->resize(1080, null, function ($constraint) { $constraint->aspectRatio(); } )
-            ->encode('jpg',80);
-        Storage::disk('public')->put( $pasta.'/'.$file_name, $photo);
- 
-        $marcadagua =env('WATERMARK'); 
-        Log::info( $marcadagua );
-        if( $marcadagua )
+        $tipo = $request->tipo;
+        if( $tipo == '' )
         {
-            $imagepathroot = Storage::disk('public')->path('');
-            $img = Image::make($imagepathroot.$pasta.'/'.$file_name);
-            $img->insert( $marcadagua, 'center');
-            $img->save($imagepathroot.$pasta.'/'.$file_name);
-        }
-        
-        $photo = Image::make( $image )
-            ->resize(100, null, function ($constraint) { $constraint->aspectRatio(); } )
-            ->encode('jpg',80);
-        Storage::disk('public')->put( $pastaThumb.'/100_75'.$file_name, $photo);
-        
-        $maxValue = DB::table( 'IMB_IMAGEM')
-                     ->where( 'IMB_IMV_ID','=',  $request->input('id'))
-                     ->max('IMB_IMG_SEQUENCIA');
- 
-        $t = new mdlImagem();
-        Log::info('597');
-        $t->IMB_IMB_ID          = Auth::user()->IMB_IMB_ID;
-        $t->IMB_IMV_ID          = $request->input('id');
-        $t->IMB_IMG_SEQUENCIA   = $maxValue+1;
-        $t->IMB_IMG_NOME        = str_pad($t->IMB_IMG_SEQUENCIA,3,"0",STR_PAD_LEFT);;
-        $t->IMB_IMG_ARQUIVO     = $file_name;
-        $t->imb_img_dthativo    = date('Y/m/d');
-        $t->IMB_ATD_ID          = Auth::user()->IMB_ATD_ID;
-        Log::info('604');
 
-        $t->save();
+            $image = $request->file('file');
+            $file_name='sirius_'.rand(1000,1000000) . '.' . $image->getClientOriginalExtension();
+    
+            Log::info('563');
+            $empresa = Auth::user()->IMB_IMB_ID;
+
+            $pasta='images/'.$empresa.'/imoveis/'.$request->input('id');
+            $pastaThumb='images/'.$empresa.'/imoveis/'.'thumb/'.$request->input('id');
+    
+            Storage::disk('public')->makeDirectory( $pasta);
+            Storage::disk('public')->makeDirectory( $pastaThumb);
+    
+            $photo = Image::make( $image )
+                ->resize(1080, null, function ($constraint) { $constraint->aspectRatio(); } )
+                ->encode('jpg',80);
+            Storage::disk('public')->put( $pasta.'/'.$file_name, $photo);
+    
+            $marcadagua =env('WATERMARK'); 
+            Log::info( $marcadagua );
+            if( $marcadagua )
+            {
+                $imagepathroot = Storage::disk('public')->path('');
+                $img = Image::make($imagepathroot.$pasta.'/'.$file_name);
+                $img->insert( $marcadagua, 'center');
+                $img->save($imagepathroot.$pasta.'/'.$file_name);
+            }
+            
+            $photo = Image::make( $image )
+                ->resize(100, null, function ($constraint) { $constraint->aspectRatio(); } )
+                ->encode('jpg',80);
+            Storage::disk('public')->put( $pastaThumb.'/100_75'.$file_name, $photo);
+            
+            $maxValue = DB::table( 'IMB_IMAGEM')
+                        ->where( 'IMB_IMV_ID','=',  $request->input('id'))
+                        ->max('IMB_IMG_SEQUENCIA');
+    
+            $t = new mdlImagem();
+            $t->IMB_IMB_ID          = Auth::user()->IMB_IMB_ID;
+            $t->IMB_IMV_ID          = $request->input('id');
+            $t->IMB_IMG_SEQUENCIA   = $maxValue+1;
+            $t->IMB_IMG_NOME        = str_pad($t->IMB_IMG_SEQUENCIA,3,"0",STR_PAD_LEFT);;
+            $t->IMB_IMG_ARQUIVO     = $file_name;
+            $t->imb_img_dthativo    = date('Y/m/d');
+            $t->IMB_ATD_ID          = Auth::user()->IMB_ATD_ID;
+
+            $t->save();
+
+            Log::info( 'HISTORICO');
+
+            $his = new mdlHistoricoImovel;
+
+            $his->IMB_IMV_ID = $request->input('id');
+            $his->IMB_IMB_ID = Auth::user()->IMB_IMB_ID;
+            $his->IMB_ATD_ID = Auth::user()->IMB_ATD_ID;
+            $his->IMB_IMH_IDALTERACAO = Auth::user()->IMB_ATD_ID;
+            $his->IMB_IMH_DTHALTERACAO = date('Y-m-d H:i:s');
+            $his->IMB_GRT_CODIGO = 'FOTOS';
+            $his->IMB_IMH_CAMPO = 'FOTOS';
+            $his->IMB_IMH_VALORANTERIOR = 'NADA';
+            $his->IMB_IMH_VALORATUAL =  'Incluiu o arquivo '.$image->getClientOriginalName();
+            $his->save();
+    
+        }
+
+        if( $tipo == 'C')
+        {
+            $image = $request->file('file');
+            $file_name='condominiosirius_'.rand(1000,1000000) . '.' . $image->getClientOriginalExtension();
+    
+            Log::info('563');
+            $empresa = Auth::user()->IMB_IMB_ID;
+
+            $pasta='images/'.$empresa.'/condominios/'.$request->input('id');
+            $pastaThumb='images/'.$empresa.'/condominios/'.'thumb/'.$request->input('id');
+    
+            Storage::disk('public')->makeDirectory( $pasta);
+            Storage::disk('public')->makeDirectory( $pastaThumb);
+    
+            $photo = Image::make( $image )
+                ->resize(1080, null, function ($constraint) { $constraint->aspectRatio(); } )
+                ->encode('jpg',80);
+            Storage::disk('public')->put( $pasta.'/'.$file_name, $photo);
+    
+            $marcadagua =env('WATERMARK'); 
+            Log::info( $marcadagua );
+            if( $marcadagua )
+            {
+                $imagepathroot = Storage::disk('public')->path('');
+                $img = Image::make($imagepathroot.$pasta.'/'.$file_name);
+                $img->insert( $marcadagua, 'center');
+                $img->save($imagepathroot.$pasta.'/'.$file_name);
+            }
+            
+            $maxValue = DB::table( 'IMB_IMAGEM')
+                        ->where( 'IMB_IMV_ID','=',  $request->input('id'))
+                        ->max('IMB_IMG_SEQUENCIA');
+    
+            $t = new mdlCondominioImagem();
+            Log::info('597');
+            $t->IMB_IMB_ID          = Auth::user()->IMB_IMB_ID;
+            $t->IMB_IMV_ID          = $request->input('id');
+            $t->IMB_IMG_SEQUENCIA   = $maxValue+1;
+            $t->IMB_IMG_NOME        = str_pad($t->IMB_IMG_SEQUENCIA,3,"0",STR_PAD_LEFT);;
+            $t->IMB_IMG_ARQUIVO     = $file_name;
+            $t->imb_img_dthativo    = date('Y/m/d');
+            $t->IMB_ATD_ID          = Auth::user()->IMB_ATD_ID;
+            Log::info('604');
+
+            $t->save();
+        }
         return response()->json(['success' => 'Arquivo Gravado'], 200);
      }
 
@@ -727,7 +794,7 @@ class ctrImagem extends Controller
        return response()->json(['success' => 'Arquivo Gravado'], 200);
     }
 
-    public function cargaDocumentosContrato( $id )
+    /*public function cargaDocumentosContrato( $id )
     {
         $imagens = mdlContratoAnexos::Select( '*')
         ->where( 'IMB_CTR_ID', $id )
@@ -737,7 +804,7 @@ class ctrImagem extends Controller
 
         return $imagens->toJson();
         //
-    }
+    }*/
 
     public function downloadDocto( $id )
     {
@@ -791,6 +858,94 @@ class ctrImagem extends Controller
 
         return response()->json( 'Não encontrado',404);
 
+    }
+
+    public function rotate( $idimg, $graus)
+    {
+
+        $tableimg = mdlImagem::find( $idimg );
+        $arquivo = $tableimg->IMB_IMG_ARQUIVO;
+
+        $imagepathroot = Storage::disk('public')->path('');        
+        Log::info( 'pathroot '.$imagepathroot);
+        $pastaarquivo ='images/'.$tableimg->IMB_IMB_ID.'/imoveis/'.$tableimg->IMB_IMV_ID.'/'.$tableimg->IMB_IMG_ARQUIVO;
+
+        Log::info( $imagepathroot);
+        Log::info( $pastaarquivo);
+        $image = Image::make($imagepathroot.$pastaarquivo);
+
+        // Rotate the image object using the `imagerotate()` function.
+        $image->rotate(90);
+    
+        // Save the rotated image object to the same file as the original uploaded image.
+        $image->save($imagepathroot.$pastaarquivo);        
+
+        Storage::disk('public')->put($imagepathroot.$pastaarquivo, $image);
+
+
+
+        return response()->json(['success' => 'Arquivo Gravado'], 200);
+    }
+
+    public function cargaImagensCondominios( $id )
+    {
+        $imagens = mdlCondominioImagem::Select( '*')
+        ->where( 'IMB_IMV_ID', $id )
+        ->where( 'IMB_IMB_ID', Auth::user()->IMB_IMB_ID )
+        ->orderBy('IMB_IMG_NOME')
+        ->get();
+
+        return $imagens->toJson();
+
+    }
+
+    public function storeDragDropDoctosAutomaticos(Request $request)
+    {
+       $image = $request->file('file');
+       $idcontrato = $request->id;
+       
+       $file_name='documento_'.rand(1000,1000000) . '.' . $image->getClientOriginalExtension();
+
+       $empresa = Auth::user()->IMB_IMB_ID;
+
+       $fileName = $request->file->getClientOriginalName();
+       $pasta="documentos/$empresa/contratos/$idcontrato/$fileName";
+
+       $path = Storage::disk('public')->put($pasta, file_get_contents($request->file));
+       $path = Storage::disk('public')->url($path);
+
+
+
+       $originalName = $request->file->getClientOriginalName();
+       $extension = $request->file->getClientOriginalExtension();
+       
+//       $file = $request->file;
+       //Storage::disk('public')->put($pasta.'.'.$file_name, $image);
+       
+       
+       $t = new mdlContratoAnexos;
+       $t->IMB_IMB_ID          = Auth::user()->IMB_IMB_ID;
+       $t->IMB_CTR_ID          = $idcontrato;
+       $t->IMB_CTA_NOMEARQUIVO  =$fileName;
+       $t->IMB_CTA_DESCRICAO  = 'Descreva aqui sobre este arquivo chamado '.$fileName;
+       $t->IMB_ATD_ID          = Auth::user()->IMB_ATD_ID;
+       $t->IMB_CTA_EXTENSAO     = $image->getClientOriginalExtension();
+       $t->IMB_CTA_DTHATIVO     = date('Y/m/d H:m:i');
+
+       $t->save();
+       return response()->json(['success' => 'Arquivo Gravado'], 200);
+    }
+
+    public function cargaDocumentosContrato( $id )
+    {
+        $imagens = mdlContratoAnexos::Select( '*')
+        ->where( 'IMB_CTR_ID', $id )
+        ->where( 'IMB_IMB_ID', Auth::user()->IMB_IMB_ID )
+        ->orderBy('IMB_CTA_NOMEARQUIVO')
+        ->get();
+
+        return $imagens->toJson();
+        //
     }
 
 

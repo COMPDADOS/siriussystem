@@ -92,6 +92,7 @@ class ctrLancamentoFuturo extends Controller
                 'IMB_LCF_CHAVE',
                 'IMB_CGR_ID',
                 'IMB_CTR_REFERENCIA',
+                'IMB_PRM_USARPARCELAS',
                 DB::raw( 'imovel( IMB_LANCAMENTOFUTURO.IMB_IMV_ID) AS ENDERECO'),
                 DB::raw( '(select FIN_CCI_BANCONUMERO FROM IMB_COBRANCAGERADAPERM
                             WHERE IMB_COBRANCAGERADAPERM.IMB_CGR_ID = IMB_LANCAMENTOFUTURO.IMB_CGR_ID) AS FIN_CCI_BANCONUMERO')
@@ -100,13 +101,14 @@ class ctrLancamentoFuturo extends Controller
         )
         ->leftJoin('IMB_TABELAEVENTOS', 'IMB_TABELAEVENTOS.IMB_TBE_ID', 'IMB_LANCAMENTOFUTURO.IMB_TBE_ID')
         ->leftJoin('IMB_CONTRATO', 'IMB_CONTRATO.IMB_CTR_ID', 'IMB_LANCAMENTOFUTURO.IMB_CTR_ID')
+        ->leftJoin( 'IMB_PARAMETROS', 'IMB_PARAMETROS.IMB_IMB_ID','IMB_LANCAMENTOFUTURO.IMB_IMB_ID')
         ->where('IMB_TABELAEVENTOS.IMB_IMB_ID', '=' , Auth::user()->IMB_IMB_ID )
         ->where('IMB_LANCAMENTOFUTURO.IMB_CTR_ID', '=' , $id )
         ->where('IMB_LANCAMENTOFUTURO.IMB_IMB_ID', '=' , Auth::user()->IMB_IMB_ID)
         ->whereNull( 'IMB_LCF_DTHINATIVADO');
 
-        if( $page <> '0' )
-            $lf->limit(100)->offset( $start_from  );
+        //if( $page <> '0' )
+          //  $lf->limit(100)->offset( $start_from  );
 
         if( $evento <> 'null' and $evento <> '0' )
             $lf->where( 'IMB_LANCAMENTOFUTURO.IMB_TBE_ID','=', $evento);
@@ -146,7 +148,11 @@ class ctrLancamentoFuturo extends Controller
             });
         }
 
-        $lf->orderBy( 'IMB_LCF_DATAVENCIMENTO','DESC')
+        if( $aberto ==  'ORDEMCRESCENTE')
+            $lf->orderBy( 'IMB_LCF_DATAVENCIMENTO','ASC')
+                ->orderBy( 'IMB_TBE_ID','ASC');
+        else
+            $lf->orderBy( 'IMB_LCF_DATAVENCIMENTO','DESC')
             ->orderBy( 'IMB_TBE_ID','ASC');
 
             
@@ -1233,6 +1239,7 @@ public function storeArray(Request $request)
     
     foreach( $lfs as $lfreq )
     {
+
         //$lfreq = json_encode( $lfreq );
         //dd( $lfreq );
         $idevento = $lfreq["IMB_TBE_ID"];

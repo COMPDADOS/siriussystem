@@ -50,6 +50,34 @@ class ctrCfc extends Controller
         
     }    
 
+    public function cargaSemJson()
+    {
+
+        $cfc = mdlCFC::select( [
+            'FIN_CFC_ID',
+	        'FIN_CFC_DESCRICAO',
+	        'FIN_CFC_DATAHORA',
+	        'FIN_CFC.FIN_GCF_ID',
+	        'FIN_CFC_TIPO',
+	        'FIN_CFC_TIPORD',
+	        'FIN_CFC.IMB_ATD_ID',
+	        'FIN_CFC_DTHINATIVO',
+	        'FIN_CFC.IMB_IMB_ID',
+	        'FIN_CFC.ID',
+            'FIN_GCF_DESCRICAO'
+
+        ])
+        ->where( 'FIN_CFC.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID )
+        ->leftJoin( 'FIN_GRUPOCFC','FIN_GRUPOCFC.FIN_GCF_ID','FIN_CFC.FIN_GCF_ID')
+        ->whereNull( 'FIN_CFC_DTHINATIVO')
+        ->orderBy( 'FIN_GCF_DESCRICAO')
+        ->orderBy( 'FIN_CFC_ID' )
+        ->get();
+
+        return $cfc;
+        
+    }    
+
     public function salvar( Request $request )
     {
         $ID = $request->ID;

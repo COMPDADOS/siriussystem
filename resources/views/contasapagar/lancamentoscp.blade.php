@@ -209,6 +209,8 @@ th{text-align:center;}
 @section('content')
 
 
+@include('layout.modalcontacaixa');
+
 <div class="page-bar">
     <ul class="page-breadcrumb">
         <li>
@@ -314,9 +316,9 @@ th{text-align:center;}
         </div>
     </div>
 </div>
-
 @include('layout.modalcpbaixa')
 @include('layout.modalcplancamento')
+
 
 @endsection
 @push('script')
@@ -443,9 +445,11 @@ th{text-align:center;}
                 "targets": 8,
                 "data": null,
                 "defaultContent": "<div style='text-align:center'>"+
-                    "<button title='Inativar' class='btn btn-danger glyphicon glyphicon-trash pull-right btn-inacp'></button>"+
-                    "<button title='Alterar informações' class='btn btn-primary glyphicon glyphicon-pencil pull-right alt-clt'></button>"+
-                    "<button title='Baixar o Documento' class='btn btn-success	glyphicon glyphicon-ok pull-right alt-pay'></button>",
+                    "<button title='Gerar Recibo' class='btn btn-dark	btn-sm fa fa-print pull-right alt-recibo'></button>"+
+                    "<button title='Inativar' class='btn btn-danger btn-sm  glyphicon glyphicon-trash pull-right btn-inacp'></button>"+
+                    "<button title='Alterar informações' class='btn btn-primary btn-sm  glyphicon glyphicon-pencil pull-right alt-clt'></button>"+
+                    "<button title='Baixar o Documento' class='btn btn-success	btn-sm glyphicon glyphicon-ok pull-right alt-pay'></button>",
+                    
 
             },
        ],
@@ -476,6 +480,12 @@ th{text-align:center;}
         baixarCP( data.FIN_APD_ID );
     });
 
+    $('#resultTableCP tbody').on( 'click', '.alt-recibo', function ()
+    {
+        var data = table.row( $(this).parents('tr') ).data();
+        gerarReciboAp( data.FIN_APD_ID );
+    });
+    
 
 
     function cargaFornecedores()
@@ -842,6 +852,16 @@ th{text-align:center;}
             }
         
         });
+
+    }
+
+    function gerarReciboAp( id )
+    {
+
+        $("#idap").val( id);
+        $("#destinacao").val( "reciboap");
+        $("#modalconta").modal('show');
+        
 
     }
 

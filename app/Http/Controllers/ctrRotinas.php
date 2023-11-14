@@ -43,7 +43,7 @@ use App\mdlBairro;
 use App\mdlRecursos;
 use App\mdlAtendenteDireitoAcesso;
 use App\mdlFormaPagamento;
-
+use App\mdlRegiaoCidade;
 
 use DB;
 use Auth;
@@ -574,7 +574,6 @@ class ctrRotinas extends Controller
          }
  
 
-
       if( $calcular == 1 )
       {
         $valorbonificacao = $ctr->IMB_CTR_VALORBONIFICACAO4;
@@ -1058,12 +1057,22 @@ class ctrRotinas extends Controller
       return $eve->FIN_CFC_ID;
    }
 
-   public function pegarBairros()
+   public function pegarBairros( $cidade )
    {
-      $bairros = DB::table('IMB_IMOVEIS')->distinct()->orderBy('CEP_BAI_NOME')
-      ->where( 'IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
-      ->get(['CEP_BAI_NOME', 'IMB_IMV_CIDADE']);
-      return view('testes.teste',compact('bairros'));
+      
+
+      $cidade = strtoupper( $cidade );
+      $bairros = mdlBairro::select( 
+         [
+            'CEP_BAI_ID',
+            DB::raw('trim(upper(CEP_BAI_NOME)) as CEP_BAI_NOME'),
+            'CEP_CID_ID',
+            DB::raw(' trim(upper(CEP_CID_NOME)) AS CEP_CID_NOME'),
+         ]
+      )
+      ->whereRaw("upper(CEP_CID_NOME) = '$cidade' " )
+         ->orderBy( 'CEP_BAI_NOME')->get();
+      return response()->json($bairros,200);
 
    }
 
@@ -1228,21 +1237,21 @@ class ctrRotinas extends Controller
       if( $tc == '' ) return response()->json(  [ 'erro' =>'Indice não localizado!'] ,404);
 
 
+      Log::info('acessei');
       if( $tc <> '' )
       {
-
 
          $diavencimento = $ctr->IMB_CTR_DIAVENCIMENTO;
          $meses = $ctr->IMB_CTR_FORMAREAJUSTE;
 
          $data =$ctr->IMB_CTR_DATAREAJUSTE;
-         $dataparcela = $this->addMeses( $ctr->IMB_CTR_DIAVENCIMENTO,  1, $data);
+         $dataparcela = $data;
+         //$dataparcela = $this->addMeses( $ctr->IMB_CTR_DIAVENCIMENTO,  1, $data);
          
          //$data = date_create_from_format("m-d-Y", $data);
          $novovalor = $ctr->IMB_CTR_VALORALUGUEL + ( $ctr->IMB_CTR_VALORALUGUEL * $tc->IMB_TBC_FATOR / 100 );
 
-
-         if( $par->IMB_PRM_ARREDONTARREAJUSTE == 'S' )
+         if( $par->IMB_PRM_ARREDONTARREAJSTE == 'S' )
             $novovalor = round( $novovalor);
 
          if( $valordigitado <> '0' )
@@ -1710,9 +1719,11 @@ class ctrRotinas extends Controller
       $chave=date('YmdHis');
       $meses = sizeof($parcelas);
 
+      $cont = 0;
       foreach( $parcelas as $parc )
       {
 
+         $cont = $cont + 1;
          $data = $this->formatarData($parc[1] );
 
          //Primeiro apagar lancamneto de aluguel dentro do mes caso esteja sem receber e pagar
@@ -1755,7 +1766,7 @@ class ctrRotinas extends Controller
             $lf->IMB_LCF_INCISS = 'N';
             $lf->IMB_LCF_OBSERVACAO = $parc[3];
             $lf->IMB_LCF_NUMEROCONTROLE = 0;
-            $lf->IMB_LCF_NUMPARREAJUSTE = 0;
+            $lf->IMB_LCF_NUMPARREAJUSTE = $cont;
             $lf->IMB_LCF_NUMPARCONTRATO = 0;
             $lf->IMB_LCF_CHAVE          = 0;
             $lf->IMB_LCF_REAJUSTAR          ='N';
@@ -2424,10 +2435,11 @@ class ctrRotinas extends Controller
                                  $lf->IMB_LCF_DATAVENCIMENTO,
                                  date('Y/m/d'),
                                  $lf->IMB_LCF_VALOR );
-                                 $jurostotal = $juros->retervalor + $juros->repassarvalor;
-            if( $lf->IMB_LCF_LOCATARIOCREDEB == 'C' and $multatotal <> 0 )
+            $jurostotal = $juros->retervalor + $juros->repassarvalor;
+            
+            if( $lf->IMB_LCF_LOCATARIOCREDEB == 'C'  )
                                  $jurostotal = $jurostotal * -1;
-                     
+
          }
 
          $evento = app('App\Http\Controllers\ctrEvento')
@@ -2805,7 +2817,7 @@ class ctrRotinas extends Controller
    public function camposMesclagem()
    {
 
-      $campos = mdlCamposMesclagem::orderBy( 'IMB_CMP_NOMEDOCAMPO')->get();
+      $campos = mdlCamposMesclagem::orderBy( 'GER_CMM_NOMECAMPO')->get();
 
       return $campos;
 
@@ -2836,6 +2848,11 @@ class ctrRotinas extends Controller
       else
       {
 
+
+         $idcfc = '';
+         $eve        = mdlTabelaEvento::where( 'IMB_TBE_ID', '=', 1 )->first();
+         if( $eve <> '' )
+            $idcfc = $eve->FIN_CFC_ID;
 
          $ctr=mdlContrato::find( $idcontrato );
 
@@ -2868,6 +2885,7 @@ class ctrRotinas extends Controller
             $lf->IMB_LCF_CHAVE          = 1;
             $lf->IMB_LCF_REAJUSTAR          = 'N';
             $lf->IMB_LCF_DATALANCAMENTO = date('Y/m/d');
+            $lf->FIN_CFC_ID = $idcfc;
             $lf->save();
             $this->gravarObs( 0, $idcontrato, 0, 0, 0, 'Lancamento automatio de aluguel no recebimento: '.$ctr->IMB_CTR_VALORALUGUEL.
             ' - Vencto: '.$this->formatarData( $vencimento) );
@@ -3083,6 +3101,7 @@ public function valorExtenso($valor = 0, $maiusculas = false) {
 
   public function formatarReal( $valor )
   {
+      Log::info( 'valor '.$valor );
       return number_format($valor,2,",",".");
   }
 
@@ -3368,10 +3387,17 @@ public function valorExtenso($valor = 0, $maiusculas = false) {
     return response()->json( 'ok',200);
   }
 
+
   public function pegarReferencia( $id )
   {
       $ctr = mdlContrato::find( $id );
       return $ctr->IMB_CTR_REFERENCIA;
+  }
+
+  public function pegarIdContrato( $referencia )
+  {
+      $ctr = mdlContrato::where( 'IMB_CTR_REFERENCIA','=', $referencia )->first();
+      return $ctr->IMB_CTR_ID;
   }
 
   public function pegarBanco( $id )
@@ -4132,72 +4158,158 @@ public function verificarReajustes( $idcontrato, $vencimento, $json)
       $porcompetencia = $request->porcompetencia;
 
       $datainicio = $request->inicio;
+      $pasta = $request->pasta;
 
       $datafim = $request->termino;
       if( $datafim == '' ) $datafim = date( 'Y/m/d');
       if( $datainicio == '' ) $datainicio = date( 'Y/m/d');
-      
 
-      if( $porcompetencia == 'S' )
-         $mov = mdlTabelaEvento::select( 
-         [
-            'IMB_TBE_ID',
-            'IMB_TBE_NOME',
-            DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+      
+      
+      if( $pasta <> '' )
+      {
+         $contrato = mdlContrato::where( 'IMB_CTR_REFERENCIA','=', $pasta )->first();
+         $idcontrato = $contrato->IMB_CTR_ID;
+         if( $porcompetencia == 'S' )
+            $mov = mdlTabelaEvento::select( 
+            [
+               'IMB_TBE_ID',
+               'IMB_TBE_NOME',
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID AND IMB_CTR_ID = $idcontrato
+                           AND IMB_RLT_DATACOMPETENCIA BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) as Recebimento_Entrada"),
+
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID AND IMB_CTR_ID = $idcontrato
+                           AND IMB_RLT_DATACOMPETENCIA BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL),0) as Recebimento_Saida"),
+
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID AND IMB_CTR_ID = $idcontrato
                            AND IMB_RLT_DATACOMPETENCIA BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) -
-                        COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                        COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and   IMB_CTR_ID = $idcontrato
                            AND IMB_RLT_DATACOMPETENCIA BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL ),0) AS Recebimento"),           
-            DB::raw( "  COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID  and IMB_CTR_ID = $idcontrato
                            AND IMB_RLD_DATAVENCIMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'C' AND IMB_RLD_DTHINATIVO IS NULL),0) -
-                        COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                        COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID  and  IMB_CTR_ID = $idcontrato
                            AND IMB_RLD_DATAVENCIMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'D' AND IMB_RLD_DTHINATIVO IS NULL ),0) AS Repassado"),
-               DB::raw( "  (COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+               DB::raw( "  (COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and  IMB_CTR_ID = $idcontrato
                            AND IMB_RLT_DATACOMPETENCIA BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL ),0) -
-                        COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                        COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and IMB_CTR_ID = $idcontrato
                            AND IMB_RLT_DATACOMPETENCIA  BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL ),0)) -
-                      (COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                      (COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and IMB_CTR_ID = $idcontrato
                            AND IMB_RLD_DATAVENCIMENTO  BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'C' AND IMB_RLD_DTHINATIVO IS NULL ),0) -
-                        COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                        COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and IMB_CTR_ID = $idcontrato
                            AND IMB_RLD_DATAVENCIMENTO  BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'D' AND IMB_RLD_DTHINATIVO IS NULL ),0)) AS Saldo")           
                         
-         ]
-         );
-      else
-      $mov = mdlTabelaEvento::select( 
-         [
-            'IMB_TBE_ID',
-            'IMB_TBE_NOME',
-            DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+            ]
+            );
+         else
+         $mov = mdlTabelaEvento::select( 
+            [
+               'IMB_TBE_ID',
+               'IMB_TBE_NOME',
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID AND IMB_CTR_ID = $idcontrato
+               AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) as Recebimento_Entrada"),
+
+                DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID AND IMB_CTR_ID = $idcontrato
+               AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL),0) as Recebimento_Saida"),
+
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID  and IMB_CTR_ID = $idcontrato
                            AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) -
-                        COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                        COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and  IMB_CTR_ID = $idcontrato
                            AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL),0) AS Recebimento"),           
-            DB::raw( "  COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and  IMB_CTR_ID = $idcontrato
                            AND IMB_RLD_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'C' AND IMB_RLD_DTHINATIVO IS NULL ),0) -
-                        COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                        COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and IMB_CTR_ID = $idcontrato
                            AND IMB_RLD_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'D' AND IMB_RLD_DTHINATIVO IS NULL ),0) AS Repassado"),
-               DB::raw( "  (COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+               DB::raw( "  (COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and  IMB_CTR_ID = $idcontrato
                            AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) -
-                        COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                        COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and IMB_CTR_ID = $idcontrato
                            AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL),0)) -
-                      (COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                      (COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and  IMB_CTR_ID = $idcontrato
                            AND IMB_RLD_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'C' AND IMB_RLD_DTHINATIVO IS NULL),0) -
-                        COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                        COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID and  IMB_CTR_ID = $idcontrato
                            AND IMB_RLD_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'D' AND IMB_RLD_DTHINATIVO IS NULL ),0)) AS Saldo")           
                         
                            
                            
          ]
          );
+      }
+      else
+      {
+         if( $porcompetencia == 'S' )
+            $mov = mdlTabelaEvento::select( 
+            [
+               'IMB_TBE_ID',
+               'IMB_TBE_NOME',
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID 
+               AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) as Recebimento_Entrada"),
+
+                DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID 
+               AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL),0) as Recebimento_Saida"),
+
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLT_DATACOMPETENCIA BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) -
+                           COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLT_DATACOMPETENCIA BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL ),0) AS Recebimento"),           
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLD_DATAVENCIMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'C' AND IMB_RLD_DTHINATIVO IS NULL),0) -
+                           COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLD_DATAVENCIMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'D' AND IMB_RLD_DTHINATIVO IS NULL ),0) AS Repassado"),
+                  DB::raw( "  (COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLT_DATACOMPETENCIA BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL ),0) -
+                           COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLT_DATACOMPETENCIA  BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL ),0)) -
+                        (COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLD_DATAVENCIMENTO  BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'C' AND IMB_RLD_DTHINATIVO IS NULL ),0) -
+                           COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLD_DATAVENCIMENTO  BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'D' AND IMB_RLD_DTHINATIVO IS NULL ),0)) AS Saldo")           
+                           
+            ]
+            );
+         else
+         $mov = mdlTabelaEvento::select( 
+            [
+               'IMB_TBE_ID',
+               'IMB_TBE_NOME',
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID 
+               AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) as Recebimento_Entrada"),
+
+                DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID 
+               AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL),0) as Recebimento_Saida"),
+
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) -
+                           COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL),0) AS Recebimento"),           
+               DB::raw( "  COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLD_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'C' AND IMB_RLD_DTHINATIVO IS NULL ),0) -
+                           COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLD_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'D' AND IMB_RLD_DTHINATIVO IS NULL ),0) AS Repassado"),
+                  DB::raw( "  (COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'D' AND IMB_RLT_DTHINATIVO IS NULL),0) -
+                           COALESCE( (SELECT SUM( IMB_RLT_VALOR ) FROM IMB_RECIBOLOCATARIO RT WHERE RT.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLT_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLT_LOCATARIOCREDEB = 'C' AND IMB_RLT_DTHINATIVO IS NULL),0)) -
+                        (COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLD_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'C' AND IMB_RLD_DTHINATIVO IS NULL),0) -
+                           COALESCE( (SELECT SUM( IMB_RLD_VALOR ) FROM IMB_RECIBOLOCADOR RD WHERE RD.IMB_TBE_ID = IMB_TABELAEVENTOS.IMB_TBE_ID
+                              AND IMB_RLD_DATAPAGAMENTO BETWEEN '$datainicio' and '$datafim' AND IMB_RLD_LOCADORCREDEB = 'D' AND IMB_RLD_DTHINATIVO IS NULL ),0)) AS Saldo")           
+                           
+                              
+                              
+            ]
+            );
+   }
 
       
-      $mov = $mov->havingRaw( ' Recebimento <> 0 or Repassado <> 0 ')
+      $mov = $mov->havingRaw( ' Recebimento_Entrada <> 0 or Recebimento_Saida <> 0 or Repassado <> 0 ')
             ->whereNotNull( 'IMB_TBE_ID')
-            ->orderBy( 'IMB_TBE_NOME');
+            ->orderBy( 'IMB_TBE_NOME', 'ASC');
 
       if( $eventos <> '' )
             $mov = $mov->whereIn( 'IMB_TBE_ID', $eventos );
 
-
+            
+            Log::info( '===>>>> movimentação por evento <<<===');
+            Log::info( $mov->toSql());
             
       return DataTables::of($mov)->make(true);
 
@@ -4210,10 +4322,12 @@ public function verificarReajustes( $idcontrato, $vencimento, $json)
       $porcompetencia = $request->porcompetencia;
       $datainicio = $request->inicio;
       $datafim = $request->termino;
+      $pasta = $request->pasta;
+      $debcre = $request->debcre;
       if( $datafim == '' ) $datafim = date( 'Y/m/d');
       if( $datainicio == '' ) $datainicio = date( 'Y/m/d');
 
-      return   view( 'reports.admimoveis.movimentacaoporeventodetalhe', compact( 'eventos', 'porcompetencia','datainicio','datafim') );
+      return   view( 'reports.admimoveis.movimentacaoporeventodetalhe', compact( 'eventos', 'porcompetencia','datainicio','datafim','pasta', 'debcre') );
       //return DataTables::of($mov)->make(true);
 
 
@@ -4225,6 +4339,7 @@ public function verificarReajustes( $idcontrato, $vencimento, $json)
       $porcompetencia = $request->porcompetencia;
       $datainicio = $request->inicio;
       $datafim = $request->termino;
+      $pasta = $request->pasta;
       if( $datafim == '' ) $datafim = date( 'Y/m/d');
       if( $datainicio == '' ) $datainicio = date( 'Y/m/d');
 
@@ -4241,11 +4356,21 @@ public function verificarReajustes( $idcontrato, $vencimento, $json)
       $porcompetencia = $request->porcompetencia;
       $datainicio = $request->inicio;
       $datafim = $request->termino;
+      $pasta = $request->pasta;
+      $relatorio = $request->relatorio;
+      $debcre = $request->debcre;
       if( $datafim == '' ) $datafim = date( 'Y/m/d');
       if( $datainicio == '' ) $datainicio = date( 'Y/m/d');
       
-
+      $idcontrato='';
+      if( $pasta <> '' )
+      {
+         
+         $contrato = mdlContrato::where( 'IMB_CTR_REFERENCIA','=', $pasta)->first();
+         $idcontrato = $contrato->IMB_CTR_ID;
+      }
       if( $porcompetencia == 'S' )
+      {
          $mov = mdlReciboLocatario::select( 
          [
             'IMB_RECIBOLOCATARIO.IMB_TBE_ID',
@@ -4265,14 +4390,21 @@ public function verificarReajustes( $idcontrato, $vencimento, $json)
          ]
          )->where( 'IMB_RLT_DATACOMPETENCIA','>=', $datainicio )
          ->where( 'IMB_RLT_DATACOMPETENCIA','<=', $datafim )
-         ->where( 'IMB_RLT_DATACOMPETENCIA','<=', $datafim )
-         ->whereNull('IMB_RLT_DTHINATIVO')
+         ->whereNull('IMB_RLT_DTHINATIVO');
+
+         if( $debcre <> '' )
+         $mov = $mov->where( 'IMB_RECIBOLOCATARIO.IMB_RLT_LOCATARIOCREDEB','=',$debcre );
+
+         if( $idcontrato <> '' )
+         $mov = $mov->where( 'IMB_RECIBOLOCATARIO.IMB_CTR_ID','=', $idcontrato );
          
-         ->leftJoin( 'IMB_TABELAEVENTOS','IMB_TABELAEVENTOS.IMB_TBE_ID','IMB_RECIBOLOCATARIO.IMB_TBE_ID')
+         $mov = $mov->leftJoin( 'IMB_TABELAEVENTOS','IMB_TABELAEVENTOS.IMB_TBE_ID','IMB_RECIBOLOCATARIO.IMB_TBE_ID')
          ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID', 'IMB_RECIBOLOCATARIO.IMB_CTR_ID')
-         ->orderBy( 'IMB_RLT_DATACOMPETENCIA');
+         ->orderBy( 'IMB_RLT_NUMERO');
+         }
       else
-      $mov = mdlReciboLocatario::select( 
+      {
+         $mov = mdlReciboLocatario::select( 
          [
             'IMB_RECIBOLOCATARIO.IMB_TBE_ID',
             'IMB_TBE_NOME',
@@ -4291,13 +4423,35 @@ public function verificarReajustes( $idcontrato, $vencimento, $json)
          ]
          )->where( 'IMB_RLT_DATAPAGAMENTO','>=', $datainicio )
          ->where( 'IMB_RLT_DATAPAGAMENTO','<=', $datafim )
-         ->whereNull('IMB_RLT_DTHINATIVO')
-         ->leftJoin( 'IMB_TABELAEVENTOS','IMB_TABELAEVENTOS.IMB_TBE_ID','IMB_RECIBOLOCATARIO.IMB_TBE_ID')
+         ->whereNull('IMB_RLT_DTHINATIVO');
+
+         if( $idcontrato <> '' )
+         $mov = $mov->where( 'IMB_RECIBOLOCATARIO.IMB_CTR_ID','=', $idcontrato );
+
+         $mov = $mov->leftJoin( 'IMB_TABELAEVENTOS','IMB_TABELAEVENTOS.IMB_TBE_ID','IMB_RECIBOLOCATARIO.IMB_TBE_ID')
          ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID', 'IMB_RECIBOLOCATARIO.IMB_CTR_ID')
-         ->orderBy( 'IMB_RLT_DATAPAGAMENTO');
+         ->orderBy( 'IMB_RLT_NUMERO');
+      }
 
       $mov = $mov->where( 'IMB_RECIBOLOCATARIO.IMB_TBE_ID','=', $eventos );
 
+      if( $debcre <> '' )
+      $mov = $mov->where( 'IMB_RECIBOLOCATARIO.IMB_RLT_LOCATARIOCREDEB','=',$debcre );
+
+
+      if( $relatorio == 'S')
+      {
+         Log::info('********** movimentacao por evento movimentacaoPorEventoDetalheCarga ******************');
+         Log::info( $mov->toSql() );
+         $mov =  $mov->get();
+         return view('reports.admimoveis.relmovrecperdetalhado',compact( 'mov', 'eventos','porcompetencia', 'porcompetencia',
+         'datainicio','datafim','pasta') );
+
+      }
+         
+
+      
+      Log::info( $mov->toSql());
       $mov = DataTables::of($mov)->make(true);
       return   $mov;
       //return DataTables::of($mov)->make(true);
@@ -4799,7 +4953,7 @@ public function verificarReajustes( $idcontrato, $vencimento, $json)
       if( $contrato )
       {
          if( $contrato->IMB_CTR_EMAIL <> '')
-            return response()->json($contrato->IMB_CTR_EMAIL,200);
+            return $contrato->IMB_CTR_EMAIL;
 
          $idlocatario = $this->codigoLocatarioPrincipal( $id );
 
@@ -4810,6 +4964,22 @@ public function verificarReajustes( $idcontrato, $vencimento, $json)
 
    }
 
-}
+   public function cargaRegiaoCidade()
+   {
+      $regiao = mdlRegiaoCidade::orderBy( 'IMB_RGC_NOME')->get();
+      return response()->json( $regiao, 200);
+   }
 
+   public function fluxoNegocioCliente( $idcliente )
+   {
+      return view('layout.modalfluxonegociocliente',compact('idcliente'));
+   }
+
+   public function instanciarRequest()
+   {
+      $request = new Request;
+      return $request;
+   }
+
+}
 

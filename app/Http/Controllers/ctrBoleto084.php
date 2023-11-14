@@ -882,7 +882,7 @@ class ctrBoleto084 extends Controller
                     if( $cgp )
                     {
                         $japago = 'N';
-                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                         if( $valorjapago <> 0 ) 
                             $japago='S';
                         else
@@ -1086,7 +1086,7 @@ class ctrBoleto084 extends Controller
                     $IMB_CTR_ID=$cgp->IMB_CTR_ID;
 
                     $japago = 'N';
-                    $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                    $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                     if( $valorjapago <> 0 ) 
                         $japago='S';
                     else

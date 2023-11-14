@@ -5,13 +5,20 @@
         <div class="portlet box blue">
           <div class="portlet-title">
             <div class="caption">
-              <i class="fa fa-gift"></i>Boletos Emitidos para o Contrato
+              <i class="fa fa-gift"></i><span id="i-boletos-title">Boletos Emitidos para o Contrato</span> 
             </div>
           </div>
 
           <div class="portlet-body form">
 
             <div class="row">
+              @php
+
+                $req = app('App\Http\Controllers\ctrRotinas')->instanciarRequest();
+                $req->semjson = 'S';
+                $bvhs=app('App\Http\Controllers\ctrCobrancaGerada')->boletosVencendoCarga( $req);
+              
+              @endphp
               <input type="hidden" id="IMB_CTR_ID-BOLETO">
               <div class="col-md-12">
                 <table  id="tblboletos-vencendo" class="table table-hover" >
@@ -27,9 +34,68 @@
                         <th  style="text-align:center"> Ações </th>
                     </tr>
                   </thead>
+                  @foreach( $bvhs as $bv)
+                    @php
+                      $classe='black-12-bold';
+                      $situacao = 'aberto';
+                      $status = 'Enviar Banco';
+                      $classestatus = '';
+                      if( $bv->IMB_CGR_ENTRADACONFIRMADA == 'S')
+                      {
+                        $status='Liberado ao Locatário';
+                        $classestatus='liberado';
+                      }
+                      if( $bv->IMB_CGR_ENTRADACONFIRMADA == 'N')
+                      {
+                        $status='Rejeitado';
+                        $classestatus='rejeitado';
+                      }
+      
+                      if( $bv->IMB_CGR_DATABAIXA != null )
+                      {
+                        $situacao='Quitado';
+                        $classe="Quitado";
+                      };
+                      $datapagamento = $bv->IMB_CGR_DATABAIXA;
+                      if( $datapagamento === null )
+                      {
+                        $datapagamento = '';
+                        $classe='atrasado';
+                      }
+                      else
+                        $datapagamento = date( 'd/m/Y', strtotime( $datapagamento));
+                      
+                        if( $bv->IMB_CGR_DTHINATIVO <> null )
+                        {
+                          $classe="Cancelado";
+                          $situacao='Cancelado';
+                        }
+                    @endphp
+                    <tr>
+                      <td class="div-center">{{$bv->IMB_CTR_REFERENCIA}}</td>
+                      <td >{{$bv->LOCATARIO}}</td>
+                      <td class="div-center">{{date( 'd/m/Y', strtotime($bv->IMB_CGR_VENCIMENTOORIGINAL))}}</td>
+                      <td class="div-center">{{date( 'd/m/Y', strtotime($bv->IMB_CGR_DATAVENCIMENTO))}}</td>
+                      <td class="div-center">{{number_format( $bv->IMB_CGR_VALOR,2,',','.')}}</td>
+                      <td class="div-center {{$classestatus}}">{{$status}}</td>
+                      <td class="div-center">
+                        <a href="javascript:imprimirBoletoVencendo( {{$bv->IMB_CGR_ID}},{{$bv->FIN_CCI_BANCONUMERO}},'N' )" title="Imprimir"><i class="fa fa-print" aria-hidden="true"></i></a>
+                        <a  class="btn btn btn-primary" href="javascript:modalEmailVencendo({{$bv->IMB_CGR_ID}},{{$bv->FIN_CCI_BANCONUMERO}},'S' )" title="Enviar por email"><i class="fa fa-envelope" aria-hidden="true"></i></a>
+                        <a  class="btn btn btn-warning" href="javascript:boletoSmsVen({{$bv->IMB_CGR_ID}},{{$bv->FIN_CCI_BANCONUMERO}},'S')" title="Enviar linha digitável por SMS"><i class="fas fa-sms"></i></a>
+                    </td>                      
+                  @endforeach
                   <tbody>
                   </tbody>
                 </table>
+              </div>
+            </div>
+            <div class="row"><hr></div>
+            <div class="col-md-12">
+              <div class="col-md-4">
+
+              </div>
+              <div class="col-md-4 div-center">
+                <button class="form-control btn btn-primary" onClick="enviarTodosWs()">Enviar por Whatsapp para todos acima</button>
               </div>
             </div>
           </div>
@@ -54,8 +120,11 @@
 
 function cargaBoletosVecendo()
 {
+  $("#i-boletos-title").html('Boletos vencendo hoje');
     url = "{{route('cobrancabancaria.boletosvencendocarga')}}";
     console.log( url );
+    $("#modalboletosvencendo").modal('show');
+    return false;
     
     $.ajax(
       {
@@ -120,7 +189,7 @@ function cargaBoletosVecendo()
               '   <td style="text-align:center"><b>'+data[nI].LOCATARIO+'</b></td>'+
                 '   <td style="text-align:center"><b>'+moment(data[nI].IMB_CGR_VENCIMENTOORIGINAL).format('DD/MM/YYYY')+'</b></td>'+
                 '   <td style="text-align:center">'+moment(data[nI].IMB_CGR_DATAVENCIMENTO).format('DD/MM/YYYY')+'</td>'+
-                '   <td style="text-align:center">'+datapagamento+'</td>'+
+                
                 '   <td style="text-align:center">R$ '+valor+'</td>'+
 
 
@@ -415,7 +484,27 @@ function boletoSmsVen( id )
 
 }
 
+function enviarTodosWs()
+{
 
+  var url = "{{route('whastapp.boletoshoje')}}";
+
+  $.ajax( 
+    {
+      url:url, 
+      dataType:'json',
+      type:'get',
+      success:function( data )
+      {
+        alert('Boletos enviados por whatsapp a todos com vencimento para hoje com sucesso!')
+
+      }
+    }
+  )
+
+}
+
+    
 </script>
 
 @endpush

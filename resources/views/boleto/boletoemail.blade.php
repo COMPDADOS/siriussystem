@@ -288,9 +288,14 @@
 
     <div class="row row-bottom-margin">
        <div class="col-xs-12 titulo-10-black-left">
+        <p>
            Locatário: <b>{{$dadosboleto["sacado"]}}</b>
+        </p>           
        </div>
     </div>
+    <p>
+        <hr>
+    </p>
     <div class="row row-bottom-margin">
        <div class="col-xs-12 titulo-10-black-left">
                    Imóvel:<b> {{$imv->IMB_IMV_ENDERECOTIPO}}

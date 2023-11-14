@@ -639,6 +639,7 @@ function mostrarImovelModal( id )
         {
             
 
+            $("#preloader").show();
             usuariocaptador = 'N'
             //verificar se o usuario do momento, também é o captador
             var url = "{{route('capimo.usuariocaptador')}}/{{Auth::user()->IMB_ATD_ID}}/"+id;
@@ -679,6 +680,7 @@ function mostrarImovelModal( id )
                 success: function( data )
                 {
 
+                    $("#preloader").hide();
                     CarregarImagens( data[0]['IMB_IMV_ID'] );
 
                     $("#i-codigo-imovel").val( data[0].IMB_IMV_ID);
@@ -1183,6 +1185,10 @@ function mostrarImovelModal( id )
                                         
                     $("#modalimovel").modal("show");
                     
+                },
+                complete:function()
+                {
+                    $("#preloader").hide();
                 },
                 error: function( error )
                 {

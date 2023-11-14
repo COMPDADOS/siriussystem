@@ -1,22 +1,580 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!DOCTYPE html>
+<html>
+	<head>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <!-- Custom Style -->
-    <link rel="stylesheet" href="{{asset('/css/styleinvoice.css')}}">
+        <style>
 
-    <title>Invoice..!</title>
-    <style>
-            hr.px2-blue 
+.div-recibo {
+      height: 45%;
+      width: 100%;
+    }
+
+.no-space
+{
+    padding: 0 0 0 0;
+}
+.semborda
+        {
+            border:none;
+        }
+
+.footer-1 {
+  position: absolute;
+  bottom: 55%;
+  left: 0;
+  right: 0;
+  font-size:8px;
+}
+.footer-2 {
+  position: absolute;
+  bottom: 0%;
+  left: 0;
+  right: 0;
+  font-size:8px;
+
+}
+
+.borda-1
+{
+    border:1;
+}
+.divTable {
+    display: table;
+    width: 100%;
+    padding: 0px;
+    border:none;
+
+}
+
+.divTableRow {
+    display: table-row;
+    padding: 0px;
+    width: 100%;
+    height: 10px;
+    border:0px;
+    
+
+}
+
+.semmargem
+{
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+.divTableRowBorda {
+    display: table-row;
+    border:1;
+    padding: 0px;
+    
+
+}
+
+.divTableHeading {
+    background-color: #eee;
+    display: table-header-group;
+}
+
+.divTableCell,
+.divTableHead {
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px;
+    border:0;
+
+}
+
+.divTableCellLogo,
+.divTableHead {
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px;
+    width : 20%;
+    border:0;
+
+}
+
+.divTableCellDadosEmpresa,
+.divTableHead {
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 3px 10px;
+    width : 70%;
+    border:0;
+
+}
+.divTableCellNomes,
+.divTableHead {
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 5px;
+    width : 50%;
+    border:0;
+
+}
+
+.font-titulo-colunas
+{
+    font-size:24px;
+    font-weight: bold;
+}
+
+.divTableCellUSUARIO
+{
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px;
+    width : 20%;
+    border:0;
+    font-size:9px;
+    text-align:left;
+
+}
+.divTableCell10porc
+{
+    border: none;
+    display: table-cell;
+    padding: 0px;
+    width : 10%;
+
+}
+.divTableCell3porc
+{
+    border: none;
+    display: table-cell;
+    padding: 0px;
+    width : 3%;
+    
+}
+.divTableCell15porc
+{
+    border: none;
+    display: table-cell;
+    padding: 0px;
+    width : 15%;
+
+}
+.divTableCell80porc
+{
+    border: none;
+    display: table-cell;
+    padding: 0px;
+    width : 80%;
+}
+.divTableCell85porc
+{
+    border: none;
+    display: table-cell;
+    padding: 0px;
+    width : 85%;
+}
+.divTableCell100porc
+{
+    border: none;
+    display: table-cell;
+    padding: 0px;
+    width : 100%;
+
+}
+
+.divTableCell90porc
+{
+    border: none;
+    display: table-cell;
+    padding: 0px;
+    width : 90%;
+
+}
+
+
+.divTableCellASSINATURADATA
+{
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px;
+    width : 40%;
+    border:0;
+    font-size:9px;
+    text-align:center;
+
+}
+
+.divTableCellASSINATURAIMOB
+{
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px;
+    width : 40%;
+    border:0;
+    font-size:9px;
+    text-align:center;
+
+}
+
+
+
+
+.divTableCellTBE_ID
+{
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px;
+    width : 6%;
+    border:.5;
+    text-align:center;
+    font-style:underline;    
+    font-size:9px;
+
+}
+
+.divTableCellTBE_NOME
+{
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px;
+    width : 20%;
+    border:none;
+    font-size:12px;
+    text-align:left;
+
+
+}
+.divTableCellTBE_NOMETIT
+{
+    border: 0;
+    display: table-cell;
+    padding: 0px;
+    width : 20%;
+    border:none;
+    font-size:14px;
+    text-align:center;
+}
+
+.font-14
+{
+    font-size:14px;
+}
+.divTableCellLCF_LOCADORCREDEB
+{
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px;
+    width : 3%;
+    border:.5;
+    font-size:9px;
+    text-align:center;
+
+
+}
+
+.divTableCellLCF_VALOR
+{
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px 5px;
+    width : 10%;
+    border:none;
+    font-size:12px;
+    text-align:right;
+
+}.divTableCellLCF_VALORTIT
+{
+    border: 0;
+    display: table-cell;
+    padding: 0px 5px;
+    width : 10%;
+    border:none;
+    font-size:14PX;
+    text-align:center;
+
+}
+.divTableCellLCF_OBSERVACAOTIT
+{
+    border: 0;
+    display: table-cell;
+    padding: 0px;
+    width : 51%;
+    border:none;
+    text-align:center;
+    font-size:14x;
+
+}.divTableCellLCF_OBSERVACAO
+{
+    border: 0;
+    display: table-cell;
+    padding: 0px;
+    width : 51%;
+    border:none;
+    text-align:center;
+    font-size:12px;
+
+}
+.divTableCellLCF_DATAVENCIMENTO
+{
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px;
+    width : 10%;
+    border:.5;
+    font-size:9px;
+    text-align:center;
+
+}
+                        
+
+
+.divTableCelldividor,
+{
+    border: 1px solid #999999;
+    background-color: black;
+    display: table-cell;
+    padding: 0px 0px;
+    width : 100%;
+    border:2;
+    font-weight: bold;
+
+}.divTableCellEndereco,
+{
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 0px 0px;
+    width : 100%;
+    border:1;
+    font-weight: bold;
+
+}
+
+.divTableHeading {
+    background-color: #eee;
+    display: table-header-group;
+    font-weight: bold;
+    border:0;
+
+}
+
+.divTableFoot {
+    background-color: #eee;
+    display: table-footer-group;
+    font-weight: bold;
+    border:0;
+
+}
+
+.divTableBody {
+    display: table-row-group;
+    border: none;
+    padding: 0;
+
+}
+
+
+
+
+.topics tr {
+    overflow: hidden;
+    height: 7px;
+    white-space: nowrap;
+}
+hr.dashed-vencimento
+        {
+            border-top: 1px dotted red;
+        }
+        hr.sold-azul
+        {
+            border-top: 8px solid rgb(156, 158, 163);
+            padding: 0px;
+        }
+
+            p { margin-bottom:-15px;margin-top:-10px; }
+            .row-bottom-margin { margin-bottom:-15px;margin-top:-10px; }
+            .p-equilibrado { margin-bottom:-10px;margin-top:-10px; }
+            td
             {
-                border: 1px dashed blue;
+                text-align:center;
+                font-size: 10px;
+                color:black;
+            }
+           th
+            {
+                text-align:center;
+                font-size: 10px;
+                color:black;
+                font-weight: bold;
+                font-style:underline;
+
+            }
+
+
+            .contrato-info
+            {
+                text-align:center;
+                font-size: 14px;
+                color:#003366;
+                font-weight: bold;
+            }
+
+            .nomes-locador-locatario
+            {
+                text-align:left;
+                font-size: 12px;
+                color:#003366;
+                
+            }
+
+            .titulo-movimento
+            {
+                font-size: 12px;
+                font-style:underline;
+
+                
+            }            
+            .contrato-info-italic
+            {
+                text-align:center;
+                font-size: 14px;
+                color:#003366;
+                font-weight: bold;
+                font-style: italic ;
+            }
+
+            .titulo-empresa-center
+            {
+                text-align:center;
+                font-size: 15px;
+                color:#003366;
+                font-weight: bold;
+
+            }
+
+            .titulo-11-black
+            {
+                text-align:center;
+                font-size: 11px;
+                color:black;
+
+            }
+            hr.px2-blue {
+                      border: 1px solid blue;
+            }
+
+            hr.px2-black{
+                      border: 1px solid black;
+            }
+
+
+            .titulo-11-black-italic
+            {
+                text-align:center;
+                font-size: 11px;
+                color:black;
+                font-style: italic ;
+
+            }
+
+            .titulo-11-black-italic-left
+            {
+                text-align:left;
+                font-size: 13px;
+                color:black;
+                font-style: italic ;
+
+            }
+
+            .titulo-12
+            {
+                text-align:center;
+                font-size: 12px;
+                color:#003366;
+                font-weight: bold;
+
+            }
+
+            .informacoes
+            {
+                text-align:left;
+                font-size: 10px;
+                color:#003366;
+
+            }
+
+
+            .cardtitulo-20-center
+            {
+                text-align:center;
+                font-size: 20px;
+                color:#003366;
+                font-weight: bold;
+            }
+
+            .titulo-10-black
+            {
+                text-align:center;
+                font-size: 10px;
+                color:black;
+            }
+
+            .sub-titulo
+            {
+                text-align:center;
+                font-size: 10px;
+                color:#003366;
+                font-weight: bold;
+            }
+
+            .sub-titulo-nome-italic-locatario
+            {
+                text-align:center;
+                font-size: 30px;
+                color:#003366;
+                font-weight: bold;
+                font-style: italic ;
+
+            }
+
+            .sub-titulo-nome-italic
+            {
+                text-align:center;
+                font-size: 22px;
+                color:#003366;
+                font-weight: bold;
+                font-style: italic ;
+
+            }
+
+            .sub-titulo-nome
+            {
+                text-align:center;
+                font-size: 14px;
+                color: black;
+                font-weight: bold;
+
+            }
+
+            .sub-titulo-nome-italic-left
+            {
+                text-align:left;
+                font-size: 22px;
+                color:#003366;
+                font-weight: bold;
+                font-style: italic ;
+
+            }
+
+            .sub-titulo-nome-left
+            {
+                text-align:left;
+                font-size: 14px;
+                color: #003366;
+                font-weight: bold;
+
+            }
+
+            .sub-titulo-imovel-left
+            {
+                text-align:left;
+                font-size: 14px;
+                color: black;
+                font-weight: bold;
+
             }
 
             .div-center
@@ -24,190 +582,266 @@
                 text-align:center;
             }
 
-            div
+            .div-left
             {
-                line-height: .55;            
-            }                        
-
-            .altura-08
-            {
-                line-height: .55;            
-            }            
-            .altura-50
-            {
-              height: 20%;
-            }          
-            
-            div
-            {
-                padding: 0px 0px 0px 0px;
+                text-align:left;
             }
 
-            .margem-zero
+            .div-right
             {
-                padding: 0px 0px 0px 0;
-            }
-            tr
-            {
-                border: 1px solid black;
-                border-collapse: collapse;  
+                text-align:right;
             }
 
-            .titulo-eventos
-            {
-                background-color: #d3d3d3;
-                color:black;
+            p {
+                margin: 0;
             }
-    </style>
-</head>
 
-<body>
-    
-        @foreach( $recibos as $recibo)
-                @php
-                    $rec = app( 'App\Http\Controllers\ctrReciboLocador')->pegarRecibo( $recibo->IMB_RLD_NUMERO, 'N' );
-                @endphp
-        <div class="my-5 page" size="A4">
-            @for ($i = 1; $i <= 2; $i++)
-                @if( $i == 2 )    
-                    <hr class="px2-blue " width="100%" >
-                @endif
+            .font-8
+            {
+                font-size:8;
+            }
 
-                <div >
-                    <section class="top-content bb d-flex justify-content-between">
-                        <div class="logo" >
-                            <img src="{{env('APP_URL')}}/storage/images/1/logos/logo.jpg" alt="" class="img-fluid">
-                        </div>
-                        <div class="top-center div-center " >
-                            <h4 class="margem-zero">{{$rec[0]->IMB_IMB_NOME}}</h4>
-                            <h6 class="margem-zero">{{$rec[0]->ENDERECO }}-{{ $rec[0]->CEP_BAI_NOME }}-{{ $rec[0]->CEP_CID_NOME}}({{$rec[0]->CEP_UF_SIGLA}})</h6>
-                            <h6 class="margem-zero">{{ $rec[0]->IMB_IMB_URL}}</h6>
-                            <h6 class="margem-zero">Fones:{{$rec[0]->TELEFONE }}- Creci: {{$rec[0]->IMB_IMB_CRECI}}</h6>
-                            <h6 class="margem-zero">Recibo de Pagamento de Aluguel de Número {{$rec[0]->IMB_RLD_NUMERO}}</h6>
-                        </div>
-                        <div class="top-left div-center" >
-                            <h6 altura-50>Vencimento</h6>
-                            <h6 altura-50><b>{{ date("d/m/Y", strtotime($rec[0]->IMB_RLD_DATAVENCIMENTO)) }}</b></h6>
-                            <h6 altura-50>Pasta</h6>
-                            <h6 altura-50><b> {{$rec[0]->IMB_CTR_REFERENCIA}}</b> </h6>
-                        </div>
-                    </section>
-                    <section class="store-user mt-5">
-                            <div class="row">
-                                <div class="col-md-7 ">
-                                    Locador
-                                    <h5 ><b>{{$rec[0]->NOMELOCADOR}}</b></h5>
-                                    <h6 >
-                                    Imóvel: <b> {{$rec[0]->ENDERECOIMOVEL}} - Bairro:
-                                        {{$rec[0]->BAIRROIMOVEL}} - Cidade: {{$rec[0]->IMB_IMV_CIDADE}}</b></h6>
+        </style>
 
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	  	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css";>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js";></script>
+    	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js";></script>
+        
+        
+		<title>Recibo Locador </title>
+		<body>
+            @php
+             $qteve=0;
+            @endphp
+
+            @foreach( $recibos as $recibo )
+                @for ($i = 1; $i <= 2; $i++)
+                <div class="div-recibo">
+                       <footer class="footer-2">
+                        {{ app('App\Http\Controllers\ctrRotinas')->pegarUsuarioLogado() }}
+                      </footer>
+                    @php
+                        $rec = app('App\Http\Controllers\ctrReciboLocador')->pegarReciboProcesso( $recibo->IMB_RLD_NUMERO );
+                    @endphp
+
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow semborba">
+                                <div class="divTableCellLogo">
+                                    <img src="{{env('APP_URL')}}/storage/images/1/logos/logo.jpg" alt="alt-logo">
                                 </div>
-                                <div class="col--md5 ">
-                                    Locatário
-                                    <h5 ><b>{{$rec[0]->NOMELOCATARIO}}</b></h5>                            
-                                </div>
-                            </div>
-
-                    </section>
-
-                    <section class=" mt-4">
-                        <table class="table ">
-                            <thead>
-                                <tr class="titulo-eventos">
-                                    <td width="6%" style="text-align:center"> <b><i>Código</i></b>  </td>
-                                    <td width="20%" style="text-align:center"> <b><i>Histórico</i></b> </td>
-                                    <td width="3%" style="text-align:center"> </td>
-                                    <td width="10%" style="text-align:center"> <b><i>Valor</i></b> </td>
-                                    <td width="51%" style="text-align:center"> <b><i>Observação</i></b> </td>
-                                    <td width="10%"style="text-align:center"> <b><i>Vencimento</i></b> </td>
-                                </tr>
-                            </thead>
-                            <tbody>
                                 @php
-                                    $itens = app( 'App\Http\Controllers\ctrReciboLocador')->itensdoRecibo( $recibo->IMB_RLD_NUMERO);
+                                    $imb = app('App\Http\Controllers\ctrImobiliaria')->pegarImobiliaria( Auth::user()->IMB_IMB_ID );
                                 @endphp
-                                @foreach( $itens as $item )
-                                <tr  class="altura-08" >
-                                    @php
-                                        $obs = $item->IMB_RLD_OBSERVACAO;
-                                        if( $obs == "null") $obs='-';
-                                    @endphp
-                                    <td style="text-align:center">{{$item->IMB_TBE_ID}}</td>
-                                    <td style="text-align:center">{{$item->IMB_TBE_NOME}}</td>
-                                    <td style="text-align:center">{{$item->IMB_RLD_LOCADORCREDEB}}</td>
-                                    <td style="text-align:right">{{ number_format($item->IMB_RLD_VALOR,2,",",".")}}</td>
-                                    <td style="text-align:center">{{$obs}}</td>
-                                    <td style="text-align:center">{{ date("d/m/Y", strtotime($item->IMB_RLD_DATAVENCIMENTO))}}</td>
-                                </tr>
-                                @endforeach                        
-                            </tbody>
-                        </table>
-                    </section>
 
-                    <section class="balance-info">
-                        <div class="row">
-                            <div class="col-md-12" >
-                                <div class="row bb pb-3">
-                                    <div class="col-3">
-                                        @php
-                                            $totalrecibo = app( 'App\Http\Controllers\ctrReciboLocador')->totaldoRecibo( $recibo->IMB_RLD_NUMERO);
-                                        @endphp
-                                        <h6>Alugado em</h6>
-                                        <h6><b>{{ date("d/m/Y", strtotime($rec[0]->IMB_CTR_DATALOCACAO))}}</b></h6>
-                                    </div>
-                                    <div class="col-3">
-                                        <h6>Reajustar em </h6>
-                                        <h6><b>{{ date("d/m/Y", strtotime($rec[0]->IMB_CTR_DATAREAJUSTE))}}</b></h6>
-                                    </div>
-                                    <div class="col-3">
-                                        <h6>$ Pago</h6>
-                                        <h6><b>R${{ number_format($totalrecibo,2,",",".")}}</b></h6>
-                                    </div>
-                                    <div class="col-3">
+                                <div class="divTableCellDadosEmpresa">
+                                    <h4 class="div-center">
+
+                                        {{$imb->IMB_IMB_NOME}}
+                                    </h4>                                    
                                     @php
-                                        $ppi =  app('App\Http\Controllers\ctrPropImo')
-                                        ->imoveisProprietarioIMV( $rec[0]->IMB_IMV_ID, $rec[0]->IMB_CLT_ID,  );
-                                        if( $ppi <> '' )
-                                        {
+                                        
+                                        $endereco = app('App\Http\Controllers\ctrRotinas')->imovelEndereco( $rec[0]->IMB_IMV_ID);
+                                        $param2 = app( 'App\Http\Controllers\ctrRotinas')->parametros2( Auth::user()->IMB_IMB_ID );
+                                        $pasta = "# Imóvel: ".$rec[0]->IMB_IMV_ID;
+                                        if( $rec[0]->IMB_CTR_REFERENCIA <> '' )
+                                            $pasta = $pasta . ' / '.$rec[0]->IMB_CTR_REFERENCIA;
                                         @endphp
-                                        <h6><b><u>Dados para Pagamento</u></b></h6>
-                                        <h6>
-                                            Banco: {{ $ppi->GER_BNC_NOME}} - Ag: {{ $ppi->GER_BNC_AGENCIA }}
-                                            - {{ $ppi->IMB_BNC_AGENCIADV }} - C/C: {{$ppi->IMB_CLTCCR_NUMERO}}-{{$ppi->IMB_CLTCCR_DV }}
-                                            - {{$ppi->IMB_CLTCCR_NOME }} - CPF: {{$ppi->IMB_CLTCCR_CPF }}
-                                        </h6>
-                                    @php
-                                    }
-                                    @endphp
-                                    </div>
+                                    </p>
+                                    <p style="margin: -2;" class="titulo-10-black" >{{ $imb->IMB_IMB_ENDERECO}} - {{ $imb->CEP_BAI_NOME}} - CEP: {{ $imb->IMB_IMB_CEP}} - {{ $imb->CEP_CID_NOME}}-{{ $imb->CEP_UF_SIGLA}}   </p>
+                                    <p style="margin: -2;" class="titulo-10-black" >{{ $imb->IMB_IMB_URL}} - {{ $imb->IMB_IMB_EMAIL}} </p>
+                                    <p style="margin: -2;" class="titulo-10-black" >Fones:{{$imb->IMB_IMB_TELEFONE1 }}- Creci: {{$imb->IMB_IMB_CRECI}}</p>
+                                    <p style="margin: -2;" class="titulo-12" >
+                                        Recibo de Pagamento de Aluguel de Número {{$rec[0]->IMB_RLD_NUMERO}}
+                                    </p>
+                                </div>
+
+                                <div class="divTableCell semborba div-center">
+                                    <p style="margin: -2;">{{$pasta}}</p>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow ">
+                                <div class=" divTableCellEndereco ">
                                 </div>
                             </div>
                         </div>
-                        <div class="row div-center">
-                            <div class="col-12">
-                                <h5>{{ $rec[0]->CEP_CID_NOME }}, {{date("d/m/Y", strtotime($rec[0]->IMB_RLD_DATAPAGAMENTO))}}</h5>
-                                <h5>__________________________________________________</h5>
+                    </div>
+                    <div class="divTable semmargem">
+                        <div class="divTableBody semmargem" >
+                            <div class="divTableRow semmargem">
+                                <div class="divTableCell85porc">
+                                    Locador: <span class="nomes-locador-locatario " >{{strtoupper($rec[0]->NOMELOCADOR)}}</span>
+                                </div>
+                                <div class="divTableCell15porc div-center"">
+                                    <span class="sub-titulo-nome ">
+                                        Vencimento</span>
+                                </div>
                             </div>
-                        </div>                    
-                    </section>
+                            <div class="divTableRow semmargem">
+                                <div class="divTableCell85porc">
+                                    Locatário: <span class="nomes-locador-locatario" >{{strtoupper($rec[0]->NOMELOCATARIO)}}</span>
+                                </div>
+                                <div class="divTableCell15porc div-center"">
+                                    <span class="sub-titulo-nome" >
+                                        {{ date("d/m/Y", strtotime($rec[0]->IMB_RLD_DATAVENCIMENTO)) }}</span>
+                                </div>
+                            </div>
+                            <div class="divTableRow semmargem">
+                                <div class="divTableCell100porc">
+                                    Imóvel: <span class="nomes-locador-locatario">{{$endereco}}</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow ">
+                                <div class=" divTableCelldividor">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divTable semborda">
+                        <div class="divTableBody  semborda">
+                            <div class="divTableRow  semborda ">
+                                <div class="divTableCellTBE_NOMETIT "><u>Histórico</u></div>
+                                <div class="divTableCellLCF_VALORTIT "><u>Valor</u></div>
+                                <div class="divTableCell3porc "></div>
+                                <div class="divTableCellLCF_OBSERVACAOTIT  "><u>Detalhes Sobre a Parcela</u></div>
+
+                            </div>
+                        </div>
+                    </div>
+                    @php
+                        $totalrecibo = 0;
+                        $tevealuguel = 'N';
+                        $totalcredito  = 0;
+                        $totaldebito = 0;
+                        $totalrecibo = app( 'App\Http\Controllers\ctrReciboLocador')->totaldoRecibo( $recibo->IMB_RLD_NUMERO);
+                    
+                    @endphp
+                    @foreach( $rec as $reg)
+
+                        @php
+                            $qteve  = $qteve + 1;
+                            if( $reg->MAISMENOS == '-' ) 
+                            {
+                                $totaldebito = $totaldebito +  $reg->IMB_RLD_VALOR;
+                            }
+                            if( $reg->MAISMENOS == '+' ) 
+                            {
+                                $totalcredito = $totalcredito +  $reg->IMB_RLD_VALOR;
+                            }
+                            if( $reg->IMB_TBE_ID == 1 )
+                            $tevealuguel = 'S';
+                            $obs = $reg->IMB_RLD_OBSERVACAO;
+                            if( $obs == "null") $obs='-';
+                        @endphp
+                        <div class="divTable">
+                            <div class="divTableBody">
+                                <div class="divTableRow ">
+                                    <div class="divTableCellTBE_NOME">{{$reg->IMB_TBE_NOME}}</div>
+                                    
+                                    <div class="divTableCellLCF_VALOR div-right"><b>{{ number_format($reg->IMB_RLD_VALOR,2,",",".")}}</div>
+                                    <div class="divTableCell3porc div-center"><b> {{$reg->MAISMENOS}}</b></div>
+                                    <div class="divTableCellLCF_OBSERVACAO ">{{$obs}}</div>
+                               
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow ">
+                                <div class=" divTableCelldividor ">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @php
+                        $valrep = app( 'App\Http\Controllers\ctrReciboLocador')->totaldoRecibo($reg->IMB_RLD_NUMERO );
+                    @endphp
+
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow ">
+                                <div class="divTableCell100porc font-14"> Total de Créditos: <b>R$ {{ number_format($totalcredito,2,",",".")}}</b> - Total de Débitos: <b>R$ {{ number_format($totaldebito ,2,",",".")}}</b> - Total Recibo: <b>R$ {{ number_format($totalrecibo,2,",",".")}}</b>  </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow ">
+                                <div class=" divTableCelldividor ">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow center">
+                                <b><u>Dados para Pagamento</u></b>                            
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow center">
+                                @php
+                                    $ppi = app('App\Http\Controllers\ctrPropImo')->imoveisProprietarioIMV( $rec[0]->IMB_IMV_ID, $rec[0]->IMB_CLT_ID )
+                                @endphp
+                                @if( $ppi <> '' and $ppi->IMB_CLTCCR_NUMERO <> '' )
+                                <b>Banco: {{ $ppi->GER_BNC_NOME}} - Ag: {{ $ppi->GER_BNC_AGENCIA }}
+                                - {{ $ppi->IMB_BNC_AGENCIADV }} - C/C: {{$ppi->IMB_CLTCCR_NUMERO}}-{{$ppi->IMB_CLTCCR_DV}}
+                                - {{$ppi->IMB_CLTCCR_NOME }} - CPF: {{$ppi->IMB_CLTCCR_CPF }}</b>
+                            @endif
+                                @if( $ppi <> '' and $ppi->IMB_IMVCLT_PIX <> '' )
+                                    <b>PIX: {{ $ppi->IMB_IMVCLT_PIX}}</b>
+                                @endif
+                        </div>
+                        </div>
+                    </div>
+
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow ">
+                                <div class="divTableCellASSINATURADATA"><h6>{{ $rec[0]->CEP_CID_NOME }}, {{date("d/m/Y", strtotime($rec[0]->IMB_RLD_DATAPAGAMENTO))}}</h6></div>
+                                <div class="divTableCellASSINATURAIMOB"><h6>__________________________________________________</h6>
+                                <h6>{{$rec[0]->NOMELOCADOR}}</h6></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            @endfor
-            <div style="page-break-after: always"></div>
-        </div>
-    </div>
-    @endforeach
+                @if( $i == 1 )
+                    <div class="divTable">
+                        <div class="divTableBody">
+                            <div class="divTableRow ">
+                            <hr class="hr.dashed-vencimento">
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
 
-    <script>
+                @endfor
+                <div style="page-break-after: always"></div>
+            @endforeach
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js";></script>
+    	  	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js";></script>
+
+
+            <script>
         window.onafterprint = window.close;
-        window.print();                
-    </script>
+        window.print();       
+            </script>
 
+		</body>
+	</head>
 
-
-
-
-
-
-
-</body></html>

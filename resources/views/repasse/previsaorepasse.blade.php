@@ -106,6 +106,15 @@
                     <select  class="select2" id="i-locadores" name="idcliente">
                 </select>
             </div>
+            <div class="col-md-1">
+                <label class="control-label">Ordem</label>
+                <select class="form-control" id="i-ordem-previsao">
+                    <option value="data" selected>Data de Pagamento</option>
+                    <option value="nome">Nome do Locador</option>
+
+                </select>
+
+            </div>
 
             <div class="form-actions noborder">
                 <button class="btn dark pull-right" onClick="iniciarPrevisao()">Imprimir</button>
@@ -284,7 +293,7 @@ function previsaoRecebidos()
         titulo1  : 'Relatório Para Previsão de Repasses',
         titulo2  : 'Periodo entre '+moment($("#i-inicio").val()).format('DD/MM/YYYY')+' a '+moment($("#i-termino").val()).format('DD/MM/YYYY'),
         titulo3  : titregra,
-
+        ordem    : $("#i-ordem-previsao").val(),
     }
 
 
@@ -329,6 +338,8 @@ function previsaoGarantidos()
         titulo1  : 'Relatório Para Previsão de Repasses',
         titulo2  : 'Periodo entre '+moment($("#i-inicio").val()).format('DD/MM/YYYY')+' a '+moment($("#i-termino").val()).format('DD/MM/YYYY'),
         titulo3  : titregra,
+        ordem    : $("#i-ordem-previsao").val(),
+
 
     }
 
@@ -370,6 +381,7 @@ function previsaoTodos()
         titulo1  : 'Relatório Para Previsão de Repasses',
         titulo2  : 'Periodo entre '+moment($("#i-inicio").val()).format('DD/MM/YYYY')+' a '+moment($("#i-termino").val()).format('DD/MM/YYYY'),
         titulo3  : titregra,
+        ordem    : $("#i-ordem-previsao").val(),
 
     }
 

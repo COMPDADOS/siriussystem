@@ -140,6 +140,33 @@ class ctrContaCaixa extends Controller
             )
             ->where( 'IMB_IMB_ID', '=', Auth::user()->IMB_IMB_ID)
             ->orderBy("FIN_CCX_DESCRICAO")->get();
+            
+        
+        return $conta;
+    }
+
+    public function cargaAtivasBancarias()
+    {
+            $conta = mdlContaCaixa::select(
+                [
+                    'FIN_CCX_ID',
+                    'FIN_CCX_TIPOCONTA',
+                    'FIN_CCX_DESCRICAO',
+                    'FIN_CCI_AGENCIANUMERO',
+                    'FIN_CCI_AGENCIADIGITO',
+                    'FIN_CCI_BANCONUMERO',
+                    'FIN_CCX_BANCO',
+                    'FIN_CCI_CONCORNUMERO',
+                    'FIN_CCI_CONCORDIGITO',
+                    'FIN_CCX_DTHINATIVO',
+                    DB::raw( "concat(FIN_CCX_DESCRICAO,' Ag.:',FIN_CCI_AGENCIANUMERO,' - C/C: ', FIN_CCI_CONCORNUMERO) as conta")
+
+                ]
+            )->where('FIN_CCX_BANCO','=','S')
+            ->where( 'IMB_IMB_ID', '=', Auth::user()->IMB_IMB_ID)
+            ->whereNull('FIN_CCX_DTHINATIVO')
+            ->orderBy("FIN_CCX_DESCRICAO")
+            ->get();
         return $conta;
     }
 

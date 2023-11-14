@@ -97,7 +97,7 @@
     <div class="portlet-body form">
        <form role="form" id="search-form">
             <div class="form-body">
-                <div class="col-md-3 fundo-grey">
+                <div class="col-md-2 fundo-grey">
                     <div class="form-group">
                         <input type="hidden" id="i-unidade" name="IMB_IMB_ID">
                         <label for="js-select-unidade" class="control-label">Unidade</label>
@@ -113,7 +113,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 fundo-grey">
+                <div class="col-md-3 fundo-grey">
                     <div class="col-md-12 div-center fundo-black font-white">
                         Repasses entre
                     </div>
@@ -130,6 +130,14 @@
                     <div class="div-center" >
                         <label id="i-total"></label>
                     </div>
+
+                </div>
+                <div class="div col-md-2">
+                    <label class="control-label">Tipo</label>
+                    <select class="form-control"  id="i-tipo">
+                        <option value="R" selected >Data do Pagamento</option>
+                        <option value="P">Data da Emissão</option>
+                    </select>
 
                 </div>
                 <div class="col-md-3">
@@ -327,6 +335,7 @@
                 d.datainicio = $('input[name=inicio]').val();
                 d.datafim = $('input[name=termino]').val();
                 d.IMB_CLT_ID = $('#i-locadores').val();
+                d.tipo = $("#i-tipo").val();
             }
         },
         columns:
@@ -539,7 +548,7 @@
 
     function recibosEmLote()
     {
-        var url = "{{route('repassadoperiodorecibos')}}?recperdatainicio="+$("#i-inicio").val()+"&recperdatafim="+$("#i-termino").val()+"&IMB_CLT_ID="+$('#i-locadores').val();
+        var url = "{{route('repassadoperiodorecibos')}}?recperdatainicio="+$("#i-inicio").val()+"&recperdatafim="+$("#i-termino").val()+"&IMB_CLT_ID="+$('#i-locadores').val()+"&tipo="+$("#i-tipo").val();
 
         window.open( url, "_blank");
         

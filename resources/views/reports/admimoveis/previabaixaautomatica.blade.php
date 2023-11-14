@@ -140,8 +140,12 @@ border-top:3px dotted black;
 
 <div class="portlet light bordered">
     <div class="portlet-title">
+        @php
+            $param = app( 'App\Http\Controllers\ctrParametrizacao')->pegarParametrosTodos( Auth::user()->IMB_IMB_ID );
+            $repassar = $param->IMB_PRM_REPASSENORECTO;
+        @endphp
         <div class="caption font-blue">
-            <span class="caption-subject bold uppercase"> Prévia para Baixa de Títulos Bancários</span>
+            <span class="caption-subject bold uppercase"> * Prévia para Baixa de Títulos Bancários *</span>
             <i class="fa fa-search font-blue"></i>
         </div>
         <div class="td-direita">
@@ -166,6 +170,10 @@ border-top:3px dotted black;
         </div>
     </div>
 </div>
+<form style="display: none" action="{{route('repasse')}}" method="POST" id="form-repassar-baixaautomatica"target="_blank">
+    @csrf
+    <input type="hidden" id="i-idcontrato-repassar" name="IMB_CTR_ID" />
+</form>
 @endsection
 
 
@@ -184,7 +192,7 @@ border-top:3px dotted black;
     {
 
         $("#sirius-menu").click();
-
+        $("#preloader").show();        
 
 
     });
@@ -307,6 +315,7 @@ border-top:3px dotted black;
 
     function selecionar( data, type, full, meta) 
     {
+        $("#preloader").hide();
         if( full.selecionado == 'N')
             return '<dir class="row"><div><a href="javascript:selecionarOnOff('+full.idtable+')" ><i class="fa fa-square-o fa-2x" aria-hidden="true"></i></a></div></div>';
         return '<dir class="row"><div><a href="javascript:selecionarOnOff('+full.idtable+')" ><i class="fa fa-check-square-o fa-2x" aria-hidden="true"></i></a></div></div>';
@@ -495,7 +504,7 @@ border-top:3px dotted black;
                             ', \''+moment(full.datapagamento).format('YYYY-MM-DD')+'\', '+
                             ' \''+moment(full.IMB_CGR_VENCIMENTOORIGINAL).format('YYYY-MM-DD')+'\', '+
                             ' \''+moment(full.datapagamento).format('YYYY-MM-DD')+'\', '+
-                            full.FIN_CCX_ID+','+full.valorpago+')" '+
+                            full.FIN_CCX_ID+','+full.valorpago+','+full.IMB_CTR_ID+')" '+
                                 '>Baixar</a>'+
                     '       </div>'
             else
@@ -532,7 +541,7 @@ border-top:3px dotted black;
 
     }
 
-    function baixarTitulo( id, datpag, datven, datcre, conta, valpago )
+    function baixarTitulo( id, datpag, datven, datcre, conta, valpago, idcontrato )
     {
        
         var url = "{{route('cobrancabancaria.baixatitulo')}}/"+id+'/'+datpag+'/'+datven+'/'+datcre+'/'+conta+'/'+valpago;
@@ -553,10 +562,19 @@ border-top:3px dotted black;
             async:false,
             complete:function(data)
             {
+
                 if (confirm("Baixado! Deseja imprimir o recibo?") == true) 
                 {
                     window.open("{{route('recibolocatario.imprimir')}}/"+data+'/S ', '_blank');
                 }
+
+                var repassar = "{{$repassar}}";
+                if( repassar == 'S' )
+                {
+                    if( confirm( "Quer aproveitar e fazer o repasse?") ==true )
+                    repassarnaBA( idcontrato );
+                }
+
                 $("#btnbx"+id).hide();
                 $("#titulo"+id).hide();
             }
@@ -569,6 +587,11 @@ border-top:3px dotted black;
 
     function baixaAutomatica()
     {
+
+        if( confirm( 'Atençao! Esta baixa será realizada e os recibos não serão impressos. Esta é uma operação de baixa automatica! '+
+                    'Caso necessite realizar as baixas e imprimir os recibos (locatário e repasse) em cada baixa, por favor clicar em "BAIXAR" em cada registro!') != true )
+        return false;
+        
         $("#btn-baixar").hide();
 
         var url = "{{route('cobrancabancaria.baixaautomatica')}}";
@@ -594,7 +617,7 @@ border-top:3px dotted black;
                     'nao foi baixado automaticamente!'
                 );
 
-                cargaTmpRetornoold();
+                window.close();//cargaTmpRetornoold();
                
             }
         });
@@ -607,6 +630,13 @@ border-top:3px dotted black;
         window.print();
 //        $(".tbcalculado").show();
     }
+
+    function repassarnaBA( id )
+        {
+
+            $("#i-idcontrato-repassar").val( id );
+            $("#form-repassar-baixaautomatica").submit();
+        }
 
 
 </script>

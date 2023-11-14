@@ -32,6 +32,16 @@ H3 {
 {
   color:blue;
 }
+.semperfil
+{
+  background-color: red;
+  color:white;
+}
+.comperfil
+{
+  background-color: orange;
+  color:black;
+}
 .footer {
   position: fixed;
   bottom: 0;
@@ -106,6 +116,8 @@ H3 {
                         <div class="col-md-4">
                           <label class="control-label">Nome do Cliente</label>
                           <input type="text" class="form-control input-8" id="IMB_CLT_NOME">
+                          <button id="btn-perfil" class="btn btn-danger form-control" onClick="abrirPerfil()";>Informar perfil para o cliente</button>
+
                         </div>
                         <div class="col-md-2">
                           <label class="control-label">Telefone (II)</label>
@@ -156,6 +168,7 @@ H3 {
                     <div class="portlet box green" id="div-pretensao">
                       <div class="portlet-title">
                         <div class="caption">
+
                           <i class="fa fa-gift"></i>Pretensão
                         </div>
                         <div class="tools">
@@ -208,6 +221,8 @@ H3 {
                                         <label class="control-label">Tipo</label>
                                         <select class='form-control' id="i-select-tipoimovel"></select>
                                       </div>
+                                      <div class="col-md-1">
+                                      </div>
 
                                     </div>
                                   </div>
@@ -223,10 +238,10 @@ H3 {
                                     <option value="Vender">Vender</option>
                                     <option value="Locar">Locar</option>
                                   </select>
-                              
+                             
                               </div>                                    
 
-                              <div class="col-md-4">
+                                <div class="col-md-4">
                                   <label class="control-label">Mídia Orígem</label>
                                   <select class="form-control font-8" id="i-select-midia">
                                   </select>
@@ -243,6 +258,23 @@ H3 {
                       </div>
                     </div>
                   </div>
+                  <div class="portlet box yellow" id="div-perfil">
+                    <div class="portlet-title">
+                      <div class="caption">
+                        <i class="fa fa-gift"></i>Perfil Informado
+                      </div>
+                      <div class="tools">
+                        <a href="javascript:;" class="collapse"> </a>
+                      </div>
+                    </div>
+                    <div class="portlet-body form">
+                      <div class="form-body">
+                        <div class="row">
+                          @include( 'layout.tableperfilcliente')                    
+                        </div>
+                      </div>
+                    </div>
+                  </div>                  
                   <div class="portlet box green">
                     <div class="portlet-title">
                       <div class="caption">
@@ -284,9 +316,7 @@ H3 {
                             <div class="form-group last">
                               <label  class="control-label col-md-2"> ** Descrição **</label>
                               <div class="col-md-10">
-                                <textarea name="content" rows="5"
-                                  data-width="600" class="form-control" id="i-observacoes">
-                                </textarea>
+                                <textarea name="content" rows="5" data-width="600" class="form-control" id="i-observacoes"></textarea>
                                 <span class="help-block"> Descreva acima mais informações sobre este atendimento </span>
                                 </div>
                               </div>
@@ -320,6 +350,7 @@ H3 {
 </div>
 
 
+@include( 'layout.modalperfil')
 @include( 'layout.modaltelefonejacadastrado')
 @include( 'layout.modalpesquisarimoveis')
 @include( 'layout.clienterapido')
@@ -336,7 +367,40 @@ H3 {
 <script>
 $( document ).ready(function()
 {
+  preencherCidades();
 
+  $("#IMB_CLT_NOME").focus(function()
+  {
+    $("#btn-perfil").show();
+    if( $("#i-telefone1").val() == '' ) 
+    {
+      $( "#IMB_CLT_NOME" ).prop( "disabled", true );
+      $("#btn-perfil").hide();
+    }
+    
+  });	  
+  $('.valor').inputmask('decimal',
+      {
+        radixPoint:",",
+        groupSeparator: ".",
+        autoGroup: true,
+        digits: 2,
+        digitsOptional: false,
+        placeholder: '0',
+        rightAlign: false,
+        onBeforeMask: function (value, opts)
+        {
+          return value;
+        }
+      });
+
+
+  $( "#i-select-cidade" ).change(function() 
+  {
+    preencherBairros( $('#i-select-cidade').val());
+  });    
+
+  
   $('#i-telefone2').click(function()
   {
     if($('#i-telefone1').val() == '' )
@@ -433,13 +497,6 @@ $( document ).ready(function()
         buttonWidth:'300px'
         });
 
-        $('#i-select-tipo').multiselect(
-    {
-        nonSelectedText: 'Selecione Tipo',
-        enableFiltering: true,
-        enableCaseInsensitiveFiltering: true,
-        buttonWidth:'200px'
-        });
 
     $('#i-select-status').multiselect(
     {
@@ -506,8 +563,11 @@ function preencherMidia()
 
       }
 
+      var selecionada = '';
+      if( data[ nI ].IMB_MDI_NOME == 'Site da Imobiliária' )
+        selecionada='selected';
       linha =
-        '<option value="'+data[nI].IMB_MDI_ID+'">&nbsp;&nbsp;&nbsp;'+
+        '<option value="'+data[nI].IMB_MDI_ID+'" '+selecionada+'>&nbsp;&nbsp;&nbsp;'+
                         data[nI].IMB_MDI_NOME+"</option>";
                         $("#i-select-midia").append( linha );
 
@@ -554,11 +614,24 @@ function procurarTelefone( telefone, campo )
 {
 //  if( $("#IMB_CLT_NOME").val() != '' )
   //   return false;
+
   var ntelefone = telefone.value;
   ntelefone = ntelefone.replace( '(','' );
   ntelefone = ntelefone.replace(')','');
   ntelefone = ntelefone.replace('-','');
   ntelefone = ntelefone.replace(' ','');
+
+  debugger;
+  $("#btn-perfil").show();
+  console.log( telefone );
+  $( "#IMB_CLT_NOME" ).prop( "disabled", false );
+  if( campo == 1 && telefone == '' )
+  {
+      $("#btn-perfil").hide();
+      alert('É necessário Informar um número de telefone');
+  }
+  
+  
 
   var url = "{{route('cliente.localizar.telefone')}}/"+ntelefone;
 
@@ -588,8 +661,12 @@ function procurarTelefone( telefone, campo )
             $("#IMB_CLT_NOME").val( data.IMB_CLT_NOME );
 
             $("#i-nomecliente").html( data.IMB_CLT_NOME+' - '+data.FONES);
+            $("#div-opcoes-atendimento").empty();
+            $("#div-opcoes-atendimento").append( '<div class="div-center"><button class="btn btn-primary" data-dismiss="modal">Fechar</div>')
+
             pegarAtendimentosCliente( data.IMB_CLT_ID );
             cargaTelefones( data.IMB_CLT_ID );
+            cargaPerfil( data.IMB_CLT_ID );            
 
         }
 
@@ -678,9 +755,13 @@ function pegarAtendimentosCliente( id )
         var url = "{{ route('tipoimovel.carga')}}";
         $.getJSON( url, function( data )
         {
-            $("#i-select-tipoimovel").empty();
+          $("#i-select-tipoimovel").empty();
+          $("#i-select-tipoimovel-perfil").empty();
+            
             var linha =  '<option value=""></option>';
             $("#i-select-tipoimovel").append( linha );
+            $("#i-select-tipoimovel-perfil").append( linha );
+                        
             for( nI=0;nI < data.length;nI++)
             {
                 linha =
@@ -688,11 +769,9 @@ function pegarAtendimentosCliente( id )
                         data[nI].IMB_TIM_DESCRICAO;
                 linha = linha + "</option>";
                 $("#i-select-tipoimovel").append( linha );
-
+                $("#i-select-tipoimovel-perfil").append( linha );
             }
-
         });
-
     }
 
     function prioridadeCarga( id )
@@ -770,7 +849,6 @@ function preencherUnidades()
        preencherUnidades();
 
        $("#i-select-bairro").multiselect('clearSelection');
-       $("#i-select-tipo").multiselect('clearSelection');
        $("#i-select-condominio").multiselect('clearSelection');
        $("#i-select-status").multiselect('clearSelection');
 
@@ -791,191 +869,49 @@ function preencherUnidades()
   function gravarAtendimento()
   {
 
+    table = document.getElementById('tableperfil');
+    n = table.rows.length; 
+    if( n == 1 )
+    {
+      $("#btn-perfil").addClass('semperfil');
+      alert('Você não informou nenhum perfil para este cliente! É muito importante você registrar um perfil para o cliente!');
+      return false;
+    }
+
     if( $("#id-especifico").prop("checked") && $("#I-IMB_IMV_REFERE").val() == '' )
     {
       alert('Você informou que o cliente já sabe qual o imóvel pretende, mas ainda não informou qual imóvel ');
       return false;
     }
 
+    debugger;
     if ( $("#i-select-midia").val() == '' )
-      alert('Informe a mídia de origem!')
-    else
+    {
+      alert('Informe a mídia de origem!');
+      return false;
+    }
     if ( $("#i-telefone1").val() == '' &&
          $("#i-telefone2").val() == '' &&
          $("#i-telefone3").val() == '' &&
          $("#i-telefone4").val() == '' )
-         alert( 'É necessário pelo menos um telefone')
-    else
-    if( $("#i-telefone1").val().length < 8 )
-      alert('Verifique o telefone I')
-    else
-    if( $("#i-telefone2").val() != '' && $("#i-telefone2").val().length < 8 )
-      alert('Verifique o telefone II')
-    else
-    if( $("#i-telefone3").val() != '' && $("#i-telefone3").val().length < 8 )
-      alert('Verifique o telefone III')
-    else
-    if( $("#i-telefone4").val() != '' && $("#i-telefone4").val().length < 8 )
-      alert('Verifique o telefone IV')
-    else
-    if ( $("#IMB_CLT_NOME").val().length < 2 )
-    {
-      alert('Nome de cliente inválido!');
-    }
-    else
-    if ( $("#i-select-prioridade").val() == '' )
-    {
-      alert('Informe a prioridade');
-    }
-
-    else
-    {
-
-      gerarToken();
-
-      cliente =
       {
-        IMB_CLT_NOME: $("#IMB_CLT_NOME").val(),
-        IMB_CLT_EMAIL: $("#i-email").val(),
-        IMB_CLT_ID: $("#IMB_CLT_ID").val(),
-
+         alert( 'É necessário pelo menos um telefone')
+        return false;
       };
 
+  
+    if ( $("#i-select-prioridade").val() == '' )
+    {
+      alert('Informe a prioridade');        
+      return false;
+    };
 
-      $.ajax(
-      {
-        url : "{{ route( 'cliente.precadastro' ) }}",
-        type : 'post',
-        datatype: 'json',
-        data: cliente,
-        async:false,
-        success:function( data )
-        {
+      cadastrarClienteAtendimento();
 
-          $("#IMB_CLT_ID").val( data);
-          console.log('Numero de Cliente Encontrado: '+data );
-
-        },
-        error:function()
-        {
-          alert('erro pra gravar o precadastro');
-        }
-      })
+      //cadastrarTelefonesAtendimento();
 
 
-
-
-      console.log('Telefone: '+$("#i-telefone1").val()  )
-      if( $("#i-telefone1").val() != '' )
-      {
-
-        gerarToken();
-          // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
-        var tel = $("#i-telefone1").val();
-        var pos = tel.indexOf("-");
-        var ddd = tel.substr(1,2);
-        if( pos ==-1 )
-          var telefone = tel.substr(5,10)
-        else
-          var telefone = tel.substr(5,pos-1-4)+tel.substr(pos+1,4);
-
-
-        var url = "{{ route('telefone.salvar')}}/"+
-            $("#IMB_CLT_ID").val()+'/'+
-            ddd+'/'+
-            telefone+'/'+
-            $("#i-telefone1-tipo").val();
-
-        console.log('url grava fone '+url );
-
-//      alert('gravando o telefone');
-        $.post( url,  function(data)
-        {
-        });
-      }
-
-      if( $("#i-telefone2").val() != '' )
-      {
-
-        gerarToken();
-          // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
-        var tel = $("#i-telefone2").val();
-        var pos = tel.indexOf("-");
-        var ddd = tel.substr(1,2);
-        if( pos == -1 )
-          var telefone = tel.substr(5,10)
-        else
-          var telefone = tel.substr(5,pos-1-4)+tel.substr(pos+1,4);
-
-        var url = "{{ route('telefone.salvar')}}/"+
-            $("#IMB_CLT_ID").val()+'/'+
-            ddd+'/'+
-            telefone+'/'+
-            $("#i-telefone2-tipo").val();
-
-        console.log('url grava fone '+url );
-
-//      alert('gravando o telefone');
-        $.post( url,  function(data)
-        {
-        });
-      }
-      if( $("#i-telefone3").val() != '' )
-      {
-
-        gerarToken();
-          // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
-        var tel = $("#i-telefone3").val();
-        var pos = tel.indexOf("-");
-        var ddd = tel.substr(1,2);
-        if( pos == -1 )
-          var telefone = tel.substr(5,10)
-        else
-          var telefone = tel.substr(5,pos-1-4)+tel.substr(pos+1,4);
-
-        var url = "{{ route('telefone.salvar')}}/"+
-            $("#IMB_CLT_ID").val()+'/'+
-            ddd+'/'+
-            telefone+'/'+
-            $("#i-telefone3-tipo").val();
-
-        console.log('url grava fone '+url );
-
-//      alert('gravando o telefone');
-        $.post( url,  function(data)
-        {
-        });
-      }
-
-      if( $("#i-telefone4").val() != '' )
-      {
-
-        gerarToken();
-
-          // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
-        var tel = $("#i-telefone4").val();
-        var pos = tel.indexOf("-");
-        var ddd = tel.substr(1,2);
-        if( pos == -1 )
-          var telefone = tel.substr(5,10)
-        else
-          var telefone = tel.substr(5,pos-1-4)+tel.substr(pos+1,4);
-
-        var url = "{{ route('telefone.salvar')}}/"+
-            $("#IMB_CLT_ID").val()+'/'+
-            ddd+'/'+
-            telefone+'/'+
-            $("#i-telefone4-tipo").val();
-
-        console.log('url grava fone '+url );
-
-//      alert('gravando o telefone');
-        $.post( url,  function(data)
-        {
-        });
-      }
-
-
+      idatendimento = 0;
       //gravar o atendimento
       var url = "{{route('atendimento.cliente.novo')}}";
 
@@ -986,7 +922,7 @@ function preencherUnidades()
         IMB_CLA_PRIORIDADE: $("#i-select-prioridade").val(),
         IMB_CLA_STATUS: 'Finalizado',
         IMB_CLA_DATAATENDIMENTO: $("#i-dataagenda").val()+' '+$("#i-horaagenda").val(),
-        IMB_CLA_COMENTARIO: "Cliente Cadastrado",
+        IMB_CLA_COMENTARIO: "Cliente Prpe-cadastrado",
         IMB_CLA_PRETENSAO : $("#i-select-pretensao").val(),
         IMB_CLA_FINALIDADE : $("#i-select-finalidade").val(),
       }
@@ -1000,9 +936,8 @@ function preencherUnidades()
           type      : 'post',
           async     : false,
           data      : dados,
-          success   : function()
+          success   : function(data)
           {
-
           },
           error: function()
           {
@@ -1033,8 +968,9 @@ function preencherUnidades()
           type      : 'post',
           async     : false,
           data      : dados,
-          success   : function()
+          success   : function(data)
           {
+            idatendimento = data;
 
           },
           error: function()
@@ -1060,14 +996,13 @@ function preencherUnidades()
         }
       )
       $("#i-btn-gravar-agenda").hide();
-      alert( 'Atendimento registrado com sucesso!');
-      window.close();
+      alert( 'Atendimento registrado com sucesso! Agora vamos a procura dos imóveis que seu cliente procura');
 
-
-
-    }
+      setCookie('3wt2oowd3ooo2oowt4',idatendimento,1 );
+      window.open( "{{route('imovel.index')}}", '_blank');
+      
+      //window.close();
   }
-
 
   function salvarCliUsuBD()
   {
@@ -1254,13 +1189,210 @@ function preencherUnidades()
           var usuariologado = "{{Auth::user()->IMB_ATD_ID}}";
           $("#i-select-corretor").val( usuariologado);
           $("#I-IMB_IMV_REFERE").val('XXXXXX');
-          alert(usuariologado);
+          //alert(usuariologado);
         }
       }
     )
 
 
   }
+  function abrirPerfil()
+  {
+    cadastrarClienteAtendimento();
+
+    if( $("#IMB_CLT_ID").val() == '' )
+    {
+      alert('É necessário informar o cliente!');
+      return false;
+    }
+    $("#IMB_CLT_ID_PERFIL").val( $("#IMB_CLT_ID").val() );
+    $("#modalperfil").modal('show');
+  }
+
+
+  function cadastrarClienteAtendimento()
+  {
+        
+    if ( $("#IMB_CLT_NOME").val().length < 2 )
+    {
+      alert('Nome de cliente inválido!');
+      return false;
+    };
+
+    debugger;
+    gerarToken();
+
+    cliente =
+    {
+      IMB_CLT_NOME: $("#IMB_CLT_NOME").val(),
+      IMB_CLT_EMAIL: $("#i-email").val(),
+      IMB_CLT_ID: $("#IMB_CLT_ID").val(),
+
+    };
+
+
+    $.ajax(
+    {
+      url : "{{ route( 'cliente.precadastro' ) }}",
+      type : 'post',
+      datatype: 'json',
+      data: cliente,
+      async:false,
+      success:function( data )
+      {
+
+        debugger;
+        $("#IMB_CLT_ID").val( data);
+        console.log('Numero de Cliente Encontrado: '+data );
+        cadastrarTelefonesAtendimento();
+      },
+      error:function()
+      {
+        alert('erro pra gravar o precadastro');
+      }
+    })
+  }
+
+
+  function cadastrarTelefonesAtendimento()
+  {
+    if( $("#i-telefone1").val().length < 8 )
+    {
+      alert('Verifique o telefone I');
+      return false;
+    };
+    if( $("#i-telefone2").val() != '' && $("#i-telefone2").val().length < 8 )
+    {
+      alert('Verifique o telefone II');
+      return false;
+    };
+
+    if( $("#i-telefone3").val() != '' && $("#i-telefone3").val().length < 8 )
+    {
+      alert('Verifique o telefone III');
+      return false;
+    };
+    
+    if( $("#i-telefone4").val() != '' && $("#i-telefone4").val().length < 8 )
+    {
+      alert('Verifique o telefone IV');
+      return false;
+    };
+
+    if( $("#i-telefone1").val() != '' )
+      {
+
+        debugger;
+        gerarToken();
+          // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
+        var tel = $("#i-telefone1").val();
+        tel = tel.replace("-", "");
+        tel = tel.replace("(", "");
+        tel = tel.replace(")", "");
+        tel = tel.replace(" ", "");
+        
+        var ddd = tel.substring(0,2);
+        var telefone = tel.substring(2,15);
+
+        var url = "{{ route('telefone.salvar')}}/"+
+            $("#IMB_CLT_ID").val()+'/'+
+            ddd+'/'+
+            telefone+'/'+
+            $("#i-telefone1-tipo").val();
+
+        console.log('url grava fone '+url );
+
+//      alert('gravando o telefone');
+        $.post( url,  function(data)
+        {
+        });
+      }
+
+      if( $("#i-telefone2").val() != '' )
+      {
+
+        gerarToken();
+          // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
+          var tel = $("#i-telefone2").val();
+        tel = tel.replace("-", "");
+        tel = tel.replace("(", "");
+        tel = tel.replace(")", "");
+        tel = tel.replace(" ", "");
+        
+        var ddd = tel.substring(0,2);
+        var telefone = tel.substring(2,15);
+
+
+        var url = "{{ route('telefone.salvar')}}/"+
+            $("#IMB_CLT_ID").val()+'/'+
+            ddd+'/'+
+            telefone+'/'+
+            $("#i-telefone2-tipo").val();
+
+        console.log('url grava fone '+url );
+
+//      alert('gravando o telefone');
+        $.post( url,  function(data)
+        {
+        });
+      }
+      if( $("#i-telefone3").val() != '' )
+      {
+
+        gerarToken();
+          // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
+          var tel = $("#i-telefone3").val();
+        tel = tel.replace("-", "");
+        tel = tel.replace("(", "");
+        tel = tel.replace(")", "");
+        tel = tel.replace(" ", "");
+        
+        var ddd = tel.substring(0,2);
+        var telefone = tel.substring(2,15);
+
+        var url = "{{ route('telefone.salvar')}}/"+
+            $("#IMB_CLT_ID").val()+'/'+
+            ddd+'/'+
+            telefone+'/'+
+            $("#i-telefone3-tipo").val();
+
+        console.log('url grava fone '+url );
+
+//      alert('gravando o telefone');
+        $.post( url,  function(data)
+        {
+        });
+      }
+
+      if( $("#i-telefone4").val() != '' )
+      {
+
+        gerarToken();
+
+          // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
+          var tel = $("#i-telefone4").val();
+        tel = tel.replace("-", "");
+        tel = tel.replace("(", "");
+        tel = tel.replace(")", "");
+        tel = tel.replace(" ", "");
+        
+        var ddd = tel.substring(0,2);
+        var telefone = tel.substring(2,15);
+
+        var url = "{{ route('telefone.salvar')}}/"+
+            $("#IMB_CLT_ID").val()+'/'+
+            ddd+'/'+
+            telefone+'/'+
+            $("#i-telefone4-tipo").val();
+
+        console.log('url grava fone '+url );
+
+//      alert('gravando o telefone');
+        $.post( url,  function(data)
+        {
+        });
+      }
+    }
 
 </script>
 

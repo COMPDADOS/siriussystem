@@ -10,7 +10,11 @@
 .gi-3x{font-size: 3em;}
 .gi-4x{font-size: 4em;}
 .gi-5x{font-size: 5em;}
-
+p.round3 {
+  border: 2px solid red;
+  border-radius: 12px;
+  padding: 5px;
+}
 .escondido
 {
     display:none;
@@ -181,6 +185,7 @@ th{text-align:center;}
 </div>
 
 
+@include('layout.modalfluxonegociocliente')
 <div class="portlet light bordered">
     <div class="portlet-title">
         <div class="caption font-blue">
@@ -259,7 +264,7 @@ th{text-align:center;}
                         <th width="50"></th>
                         <th width="50"></th>
                         <th width="10">Atualizaçao</th>
-                        <th width="100" class="text-right">Ações</th>
+                        <th width="150" class="text-right">Ações</th>
                     </thead>
                 </table>
             </div>
@@ -815,7 +820,8 @@ th{text-align:center;}
                     "defaultContent": "<div style='text-align:center'>"+
                         "<button class='btn green-meadow glyphicon glyphicon-search pull-right show-imv'></button>"+
                         "@php  $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'Clientes', '   ', 'CRM', 'Clientes','S', 'A', 'Botão')@endphp"+
-                        "<button class='btn btn-primary glyphicon glyphicon-pencil pull-right alt-clt {{$acesso}}'></button>",
+                        "<button class='btn btn-primary glyphicon glyphicon-pencil pull-right alt-clt {{$acesso}}'></button>"+
+                        "<button title='Rastrear Atendimento' class='btn btn-warning pull-right btn-rastrear {{$acesso}}'><i class='fa fa-bars' aria-hidden='true'></i></button>",
                 },
                 { width: 200, targets: 0 },
            ],
@@ -836,8 +842,18 @@ th{text-align:center;}
 
         $('#resultTable tbody').on( 'click', '.btn-fone', function ()
         {
+            var data = table.row( $(this).parents('tr') ).data();
             alterar( data.IMB_CLT_ID );
         });
+
+        $('#resultTable tbody').on( 'click', '.btn-rastrear', function ()
+        {
+
+            var data = table.row( $(this).parents('tr') ).data();
+            rastrearAtendimentoCliente( data.IMB_CLT_ID );
+        });
+
+                
 
 
         $('#resultTable tbody').on( 'click', '.show-imv', function ()
@@ -886,22 +902,17 @@ th{text-align:center;}
         function getRadar(data, type, full, meta)
         {
 
-            var cdados='<div id="radarligado'+full.IMB_CLT_ID+'"><img  src="/sys/assets/layouts/layout/img/radar_30_ligado.png" alt="radar"></div>'+
+            var cdados='<div id="radarligado'+full.IMB_CLT_ID+'"><img  title="Cliente com perfil cadastrado" src="/sys/assets/layouts/layout/img/radar_30_ligado.png" alt="radar"></div>'+
                         '<div id="radardesligado'+full.IMB_CLT_ID+'"><img  src="/sys/assets/layouts/layout/img/radar_desligado_30.png" alt="radar"></div>';
             verificarClienteTemPerfil(full.IMB_CLT_ID, function(resultado)
             {
+                $("#radarligado"+full.IMB_CLT_ID).hide();
+                $("#radardesligado"+full.IMB_CLT_ID).hide();
 
                 if( resultado == 'ok' )
                 {
                     $("#radarligado"+full.IMB_CLT_ID).show();
-                    $("#radardesligado"+full.IMB_CLT_ID).hide();
-                }
-                else
-                {
-                    $("#radarligado"+full.IMB_CLT_ID).hide();
-                    $("#radardesligado"+full.IMB_CLT_ID).show();
-
-                }
+                };
 
             });
             return cdados;
@@ -911,11 +922,13 @@ th{text-align:center;}
         function getClienteChave(data, type, full, meta)
         {
 
-            var cdados='<div id="clientechave'+full.IMB_CLT_ID+'"><img  src="/sys/assets/layouts/layout/img/chave.png" title="Cliente em posse de chaves de imóvel(eis)"</div>';
-                if( data === null )
-                    $("#clientechave"+full.IMB_CLT_ID).hide()
-                else
-                    $("#clientechave"+full.IMB_CLT_ID).show();
+
+            console.log( 'data '+data );
+            if( full.IMB_CCH_ID != null )
+                var cdados='<div id="clientechave'+full.IMB_CLT_ID+'"><img  src="/sys/assets/layouts/layout/img/chave.png" title="Cliente em posse de chaves de imóvel(eis)"</div>'
+            else
+                var cdados='<div></div>';
+        
             return cdados;
 
         }
@@ -930,30 +943,29 @@ th{text-align:center;}
             var cdados='';
             if ( full.SEGUROFIANCA != null)
             {
-                cdados = cdados + '<div class="bg-red-foreg-white">SEGURADORA</div>';
+                cdados = cdados + '<div class="bg-red-foreg-white"><p class="round3">SEGURADORA</p></div>';
 
             }
             if ( full.LOCADOR != null)
             {
-                cdados = cdados + '<div class="bg-blue-foreg-white">PROPRIETÁRIO</div>';
+                cdados = cdados + '<div class="bg-blue-foreg-white"><p class="round3">PROPRIETÁRIO</p></div>';
 
             }
 
             if ( full.INTERESSADO != null)
             {
-                cdados = cdados + '<div class="bg-peru-foreg-white">INTERESSADO</div>';
+                cdados = cdados + '<div class="bg-peru-foreg-white"><p class="round3">INTERESSADO</p></div>';
 
             }
 
             if ( full.LOCATARIO != null)
             {
-                cdados = cdados + '<div class="bg-orange-foreg-black">LOCATÁRIO</div>';
+                cdados = cdados + '<div class="bg-orange-foreg-black "><p class="round3">LOCATÁRIO</p></div>';
 
             }
             if ( full.FIADOR != null)
-
             {
-               cdados = cdados + '<div class="bg-gray-fore-black">FIADOR</div>';
+               cdados = cdados + '<div class="bg-gray-fore-black"><p class="round3">FIADOR</p></div>';
             }
 
 
@@ -961,8 +973,7 @@ th{text-align:center;}
 
             if ( cdados == '' && precadastro)
             {
-//              cdados = '<div align="center" style="color:white ;background-color:red">Pré-cadastro</div>';
-
+              cdados = '<div align="center" style="color:white ;background-color:green"><p class="round3">ATENDIMENTO</p></div>';
             }
 
             verificarClienteTemPerfil(full.IMB_CLT_ID, function(resultado)

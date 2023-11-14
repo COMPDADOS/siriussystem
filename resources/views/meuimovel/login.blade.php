@@ -94,7 +94,7 @@ z-index: 999999">
                                 <div class="input-group input-group-prepend">
                                     <span class="input-group-text border-right-0 rounded-left addon_password"><i
                                             class="fa fa-lock text-primary"></i></span>
-                                    <input type="password" class="form-control form-control-md" id="senha"   name="password" placeholder="Senha">
+                                    <input type="password" class="form-control form-control-md" id="senha"   name="password" placeholder="Sua senha são os seis primeiros digitos do CPF ou CNPJ">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -106,6 +106,7 @@ z-index: 999999">
                             </div>
 <!--                        </form>-->
                         <div class="form-group div-center">
+                            <!--
                             <div class="row">
                                     <div class="col-md-6 div-center cor-locatario font-20">
                                         <h4><u>Locatário<b>(inquilino)</b></u></h4>
@@ -123,6 +124,7 @@ z-index: 999999">
                                     
                                     </div>
                             </div>
+    -->
                         </div>
                     </div>
                 </div>

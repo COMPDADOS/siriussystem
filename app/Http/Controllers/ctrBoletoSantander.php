@@ -239,8 +239,8 @@ class ctrBoletoSantander extends Controller
 
                         if( strlen( $a ) > 4 )
                         {
-                            $pdf=PDF::loadHtml( $html,'UTF-8');
-                                $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
+//                            $pdf=PDF::loadHtml( $html,'UTF-8');
+  //                              $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
     //                        $message->to( "suporte@compdados.com.br" );
                             $message->to( $a  );
                             $message->subject('Aviso de vencimento de aluguel');

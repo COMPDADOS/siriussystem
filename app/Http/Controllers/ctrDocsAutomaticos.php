@@ -7,8 +7,11 @@ use App\mdlDocsAutomaticos;
 use App\mdlCamposMesclagem;
 use App\mdlImovel;
 use App\mdlPropImovel;
+use App\mdlEmpresa;
 use App\mdlCliente;
 use App\mdlContrato;
+use App\mdlContaCaixa;
+use App\mdlApDoc;
 use App\mdlDocumentoGerado;
 use App\mdlLocatarioContrato;
 use App\mdlFiadorContrato;
@@ -24,6 +27,7 @@ use Illuminate\Support\Facades\Storage;use File;
 use PDF;
 use Illuminate\Support\Facades\URL;
 use App\mdlIndiceReajuste;
+use App\mdlContratoSeguroIncendio;
 
 use Auth;
 use DB;
@@ -32,6 +36,7 @@ use Log;
 class ctrDocsAutomaticos extends Controller
 {
     public $idavisodesocupacao = 0;
+    public $idcontasapagar = 0;
 
     public function carga()
     {
@@ -161,9 +166,9 @@ class ctrDocsAutomaticos extends Controller
                                 trim( $cl->IMB_CLT_RESENDTIPO).' '.
                                 trim( $cl->IMB_CLT_RESEND).' '.
                                 trim( $cl->IMB_CLT_RESENDNUM).' '.
-                                trim( $cl->IMB_CLT_RESENDCOM).' '.
+                                trim( $cl->IMB_CLT_RESENDCOM).', '.
                                 trim( $cl->CEP_BAI_NOMERES).' na cidade de '.
-                                trim( $cl->CEP_CID_NOMERES).' estado de '.
+                                trim( $cl->CEP_CID_NOMERES).'/'.
                                 trim( $cl->CEP_UF_SIGLARES);
             else
             {
@@ -178,7 +183,7 @@ class ctrDocsAutomaticos extends Controller
                         trim( $cl->IMB_CLT_RESENDNUM).' '.
                         trim( $cl->IMB_CLT_RESENDCOM).' '.
                         trim( $cl->CEP_BAI_NOMERES).' na cidade de '.
-                        trim( $cl->CEP_CID_NOMERES).' estado de '.
+                        trim( $cl->CEP_CID_NOMERES).'/'.
                         trim( $cl->CEP_UF_SIGLARES);
                 if( $cl->IMB_CLT_ESTADOCIVIL == 'C')
                 {
@@ -372,7 +377,6 @@ class ctrDocsAutomaticos extends Controller
                 }
          
    
-                //Log::info( "LT-IMB_CLT_ID $lt->IMB_CLT_ID");
                 $maisum='';
                 if( $cont > 1 ) $maisum = ', e ';
 
@@ -803,7 +807,6 @@ class ctrDocsAutomaticos extends Controller
             $ctr = mdlContrato::find( $idContrato );
             if( $doc->GER_DCA_WORD == 'S' )
             {
-                Log::info('carta cobnranca word');
                 $request = new Request;
                 $request->entrada = $doc->GER_DCA_UPLOAD;
                 $request->saida = $doc->GER_DCA_DOWNLOAD;
@@ -1006,7 +1009,88 @@ class ctrDocsAutomaticos extends Controller
         $saida    = $request->saida; 
         $idcontrato = $request->idcontrato;
 
-        $templateProcessor = new TemplateProcessor(Storage::path("public/$entrada"));
+        $templateProcessor = new TemplateProcessor(Storage::path("public/automaticos/$entrada"));
+
+
+        $locatariosnomes = '';
+        $enderecocorresp= '';
+        $destinatario= '';
+        $bairrocorresp= '';
+        $cepcorresp= '';
+        $cidadecorresp= '';
+        $estadocorresp= '';
+        $cpfcliente= '';
+        $nomefiador= '';
+        $cpffiador= '';
+        $enderecofiador= '';
+        $bairrofiador= '';
+        $cidadefiador     = '';   
+        $estadofiador= '';
+        $cepfiador= '';
+        $nomelocatario= '';
+        $emaillocatario= '';
+        $emailfiador= '';
+        $bairro= '';
+        $nomelocador_1= '';
+        $nomelocador_2= '';
+        $nomelocador_3= '';
+        $nomelocador_4= '';
+        $nomelocador_5= '';
+        $nomelocador_6= '';
+        $nomelocador_7= '';
+        $nomelocador_8= '';
+        $locadordescrito_1= '';
+        $locadordescrito_2= '';
+        $locadordescrito_3= '';
+        $locadordescrito_4= '';
+        $locadordescrito_5= '';
+        $locadordescrito_6= '';
+        $locadordescrito_7= '';
+        $locadordescrito_8= '';
+
+        $nomelocatario_1= '';
+        $nomelocatario_2= '';
+        $nomelocatario_3= '';
+        $nomelocatario_4= '';
+        $nomelocatario_5= '';
+        $nomelocatario_6= '';
+        $nomelocatario_7= '';
+        $nomelocatario_8= '';
+        $locatariodescrito_1= '';
+        $locatariodescrito_2= '';
+        $locatariodescrito_3= '';
+        $locatariodescrito_4= '';
+        $locatariodescrito_5= '';
+        $locatariodescrito_6= '';
+        $locatariodescrito_7= '';
+        $locatariodescrito_8= '';
+
+        $nomefiador_1= '';
+        $nomefiador_2= '';
+        $nomefiador_3= '';
+        $nomefiador_4= '';
+        $nomefiador_5= '';
+        $nomefiador_6= '';
+        $nomefiador_7= '';
+        $nomefiador_8= '';
+        $fiadordescrito_1= '';
+        $fiadordescrito_2= '';
+        $fiadordescrito_3= '';
+        $fiadordescrito_4= '';
+        $fiadordescrito_5= '';
+        $fiadordescrito_6= '';
+        $fiadordescrito_7= '';
+        $fiadordescrito_8= '';
+
+        $fiadorconjuge_1='';
+        $fiadorconjuge_2='';
+        $fiadorconjuge_3='';
+        $fiadorconjuge_4='';
+        $fiadorconjuge_5='';
+        $fiadorconjuge_6='';
+        $fiadorconjuge_7='';
+        $fiadorconjuge_8='';
+        
 
         $ctr = mdlContrato::find( $idcontrato );
 
@@ -1014,6 +1098,96 @@ class ctrDocsAutomaticos extends Controller
         $idimovel = $imv->IMB_IMV_ID;
         $bairro = app('App\Http\Controllers\ctrRotinas')->pegarBairroImovel(  $idimovel );
 
+        $ppi = mdlPropImovel::where( 'IMB_IMV_ID','=', $idimovel )->get();
+
+        $seguro = mdlContratoSeguroIncendio::where( 'IMB_CTR_ID','=', $idcontrato )->first();
+        $valorseguro = 0;
+        $valorcoberturaseguro =0;
+        if( $seguro <> '' )
+        {
+            $valorseguro = $seguro->IMB_SCT_VALORSEGURO;
+            $valorcoberturaseguro = $seguro->IMB_SCT_VALORCOBERTURA;
+            Log::info( '$valorseguro '.$valorseguro);
+            Log::info( '$valorcoberturaseguro '.$valorcoberturaseguro);
+            
+        }
+
+        $cont = 0;
+        $nomelocador_1='';
+        $nomelocador_2='';
+        $nomelocador_3='';
+        $nomelocador_4='';
+        $nomelocador_5='';
+        $nomelocador_6='';
+        $nomelocador_7='';
+        $nomelocador_8='';
+
+        $locadordescrito_1='';
+        $locadordescrito_2='';
+        $locadordescrito_3='';
+        $locadordescrito_4='';
+        $locadordescrito_5='';
+        $locadordescrito_6='';
+        $locadordescrito_7='';
+        $locadordescrito_8='';
+
+        
+        foreach( $ppi as $pp)
+        {
+            //Log:info( "LOCADOR PP-IMB_CLT_ID $pp->IMB_CLT_ID IMOVEL $idimovel");
+            $cont = $cont + 1;
+            $maisum='';
+            if( $cont > 1 ) $maisum = ', e ';
+
+            if( $cont == 1 )
+            {
+                $nomelocador_1 = $this->pegarNomeCliente($pp->IMB_CLT_ID );
+                $locadordescrito_1 = $maisum.$this->descritivoCliente($pp->IMB_CLT_ID );
+            }
+        
+            if( $cont == 2 )
+            {
+                $nomelocador_2 = $this->pegarNomeCliente($pp->IMB_CLT_ID );
+                $locadordescrito_2 = $maisum.$this->descritivoCliente($pp->IMB_CLT_ID );
+            }
+        
+            if( $cont == 3 )
+            {
+                $nomelocador_3 = $this->pegarNomeCliente($pp->IMB_CLT_ID );
+                $locadordescrito_3= $maisum.$this->descritivoCliente($pp->IMB_CLT_ID );
+            }
+        
+            if( $cont == 4 )
+            {
+                $nomelocador_4 = $this->pegarNomeCliente($pp->IMB_CLT_ID );
+                $locadordescrito_4 = $maisum.$this->descritivoCliente($pp->IMB_CLT_ID );
+            }
+        
+            if( $cont == 5 )
+            {
+                $nomelocador_5 = $this->pegarNomeCliente($pp->IMB_CLT_ID );
+                $locadordescrito_5 = $maisum.$this->descritivoCliente($pp->IMB_CLT_ID );
+            }
+        
+            if( $cont == 6)
+            {
+                $nomelocador_6 = $this->pegarNomeCliente($pp->IMB_CLT_ID );
+                $locadordescrito_6 = $maisum.$this->descritivoCliente($pp->IMB_CLT_ID );
+            }
+        
+            if( $cont == 7 )
+            {
+                $nomelocador_7 = $this->pegarNomeCliente($pp->IMB_CLT_ID );
+                $locadordescrito_7 = $maisum.$this->descritivoCliente($pp->IMB_CLT_ID );
+            }
+        
+            if( $cont == 8 )
+            {
+                $nomelocador_8 = $this->pegarNomeCliente($pp->IMB_CLT_ID );
+                $locadordescrito_8 = $maisum.$this->descritivoCliente($pp->IMB_CLT_ID );
+            }
+        
+        };
 
         $idcliente = app('App\Http\Controllers\ctrRotinas')->codigoLocatarioPrincipal( $idcontrato );
         $cpfcliente = '';
@@ -1034,7 +1208,7 @@ class ctrDocsAutomaticos extends Controller
             $emaillocatario = $cliente->IMB_CLT_EMAIL;
         }
 
-        $fiadores = mdlFiadorContrato::where( 'IMB_CTR_ID','=', $idcontrato )->first();
+        $fiadores = mdlFiadorContrato::where( 'IMB_CTR_ID','=', $idcontrato )->get();
         $nomefiador = '';
         $cpffiador ='';
         $enderecofiador = '';
@@ -1044,20 +1218,90 @@ class ctrDocsAutomaticos extends Controller
         $cepfiador    ='';
         $emailfiador = '';
 
-        if( $fiadores )
+        $cont=0;
+        foreach( $fiadores as $fiador )
         {
-            $fiador = mdlCliente::where('IMB_CLT_ID','=', $fiadores->IMB_CLT_ID)->first();
-            if( $fiador )
+            $cont = $cont + 1;
+            $maisum='';
+            if( $cont > 1 ) $maisum = ', e ';
+            $objfiador = mdlCliente::where('IMB_CLT_ID','=', $fiador->IMB_CLT_ID)->first();
+
+            if( $cont == 1 )
             {
-                $nomefiador = $fiador->IMB_CLT_NOME;
-                $cpffiador = $fiador->IMB_CLT_CPF;
-                $enderecofiador = $fiador->IMB_CLT_RESEND.', '.$fiador->IMB_CLT_RESENDNUM.' '.$fiador->IMB_CLT_RESENDCOM;
-                $bairrofiador =  $fiador->CEP_BAI_NOMERES;
-                $cidadefiador =  $fiador->CEP_CID_NOMERES;
-                $estadofiador =  $fiador->CEP_UF_SIGLARES;
-                $cepfiador    =  $fiador->IMB_CLT_RESENDCEP;
-                $emailfiador = $fiador->IMB_CLT_EMAIL;
+                if( $objfiador<>'' )
+                {
+                    $nomefiador = $objfiador->IMB_CLT_NOME;
+                    $cpffiador = $objfiador->IMB_CLT_CPF;
+                    $enderecofiador = $objfiador->IMB_CLT_RESEND.', '.$objfiador->IMB_CLT_RESENDNUM.' '.$objfiador->IMB_CLT_RESENDCOM;
+                    $bairrofiador =  $objfiador->CEP_BAI_NOMERES;
+                    $cidadefiador =  $objfiador->CEP_CID_NOMERES;
+                    $estadofiador =  $objfiador->CEP_UF_SIGLARES;
+                    $cepfiador    =  $objfiador->IMB_CLT_RESENDCEP;
+                    $emailfiador = $objfiador->IMB_CLT_EMAIL;
+                }
             }
+            if( $cont == 1 )
+            {
+                $nomefiador_1 = $this->pegarNomeCliente($fiador->IMB_CLT_ID );
+                $fiadordescrito_1 = $maisum.$this->descritivoCliente($fiador->IMB_CLT_ID );
+                $fiadorconjuge_1 = $objfiador->IMB_CLTCJG_NOME;
+            }
+        
+            if( $cont == 2 )
+            {
+                $nomefiador_2 = $this->pegarNomeCliente($fiador->IMB_CLT_ID );
+                $fiadordescrito_2 = $maisum.$this->descritivoCliente($fiador->IMB_CLT_ID );
+                $fiadorconjuge_2 = $objfiador->IMB_CLTCJG_NOME;
+            }
+        
+            if( $cont == 3 )
+            {
+                $nomefiador_3 = $this->pegarNomeCliente($fiador->IMB_CLT_ID );
+                $fiadordescrito_3= $maisum.$this->descritivoCliente($fiador->IMB_CLT_ID );
+                $fiadorconjuge_3 = $objfiador->IMB_CLTCJG_NOME;
+
+            }
+        
+            if( $cont == 4 )
+            {
+                $nomefiador_4 = $this->pegarNomeCliente($fiador->IMB_CLT_ID );
+                $fiadordescrito_4 = $maisum.$this->descritivoCliente($fiador->IMB_CLT_ID );
+                $fiadorconjuge_4 = $objfiador->IMB_CLTCJG_NOME;
+
+            }
+        
+            if( $cont == 5 )
+            {
+                $nomefiador_5 = $this->pegarNomeCliente($fiador->IMB_CLT_ID );
+                $fiadordescrito_5 = $maisum.$this->descritivoCliente($fiador->IMB_CLT_ID );
+                $fiadorconjuge_5 = $objfiador->IMB_CLTCJG_NOME;
+
+            }
+        
+            if( $cont == 6)
+            {
+                $nomefiador_6 = $this->pegarNomeCliente($fiador->IMB_CLT_ID );
+                $fiadordescrito_6 = $maisum.$this->descritivoCliente($fiador->IMB_CLT_ID );
+                $fiadorconjuge_6 = $objfiador->IMB_CLTCJG_NOME;
+
+            }
+        
+            if( $cont == 7 )
+            {
+                $nomefiador_7 = $this->pegarNomeCliente($fiador->IMB_CLT_ID );
+                $fiadordescrito_7 = $maisum.$this->descritivoCliente($fiador->IMB_CLT_ID );
+                $fiadorconjuge_7 = $objfiador->IMB_CLTCJG_NOME;
+
+            }
+        
+            if( $cont == 8 )
+            {
+                $nomefiador_8 = $this->pegarNomeCliente($fiador->IMB_CLT_ID );
+                $fiadordescrito_8 = $maisum.$this->descritivoCliente($fiador->IMB_CLT_ID );
+                $fiadorconjuge_8 = $objfiador->IMB_CLTCJG_NOME;
+
+            }
+
         }
         
         $lctctr = mdlLocatarioContrato::where( 'IMB_CTR_ID','=', $idcontrato )->get();
@@ -1066,17 +1310,84 @@ class ctrDocsAutomaticos extends Controller
         $locatarioprincipal='';
         $locatarios='';
 
+        $nomelocatario_1='';
+        $nomelocatario_2='';
+        $nomelocatario_3='';
+        $nomelocatario_4='';
+        $nomelocatario_5='';
+        $nomelocatario_6='';
+        $nomelocatario_7='';
+        $nomelocatario_8='';
+
+        $locatariodescrito_1='';
+        $locatariodescrito_2='';
+        $locatariodescrito_3='';
+        $locatariodescrito_4='';
+        $locatariodescrito_5='';
+        $locatariodescrito_6='';
+        $locatariodescrito_7='';
+        $locatariodescrito_8='';
+
         foreach( $lctctr as $lt)
         {
             $cont = $cont + 1;
             
-
             $cliente = mdlCliente::find( $lt->IMB_CLT_ID);
 
-            $maisum = '';
+            $maisum='';
             if( $cont > 1 ) $maisum = ', e ';
+
             
             $locatariosnomes  = $locatarios.$maisum.$cliente->IMB_CLT_NOME;
+
+            if( $cont == 1 )
+            {
+                $nomelocatario_1 = $this->pegarNomeCliente($lt->IMB_CLT_ID );
+                $locatariodescrito_1 = $maisum.$this->descritivoCliente($lt->IMB_CLT_ID );
+            }
+        
+            if( $cont == 2 )
+            {
+                $nomelocatario_2 = $this->pegarNomeCliente($lt->IMB_CLT_ID );
+                $locatariodescrito_2 = $maisum.$this->descritivoCliente($lt->IMB_CLT_ID );
+            }
+        
+            if( $cont == 3 )
+            {
+                $nomelocatario_3 = $this->pegarNomeCliente($lt->IMB_CLT_ID );
+                $locatariodescrito_3= $maisum.$this->descritivoCliente($lt->IMB_CLT_ID );
+            }
+        
+            if( $cont == 4 )
+            {
+                $nomelocatario_4 = $this->pegarNomeCliente($lt->IMB_CLT_ID );
+                $locatariodescrito_4 = $maisum.$this->descritivoCliente($lt->IMB_CLT_ID );
+            }
+        
+            if( $cont == 5 )
+            {
+                $nomelocatario_5 = $this->pegarNomeCliente($lt->IMB_CLT_ID );
+                $locatariodescrito_5 = $maisum.$this->descritivoCliente($lt->IMB_CLT_ID );
+            }
+        
+            if( $cont == 6)
+            {
+                $nomelocatario_6 = $this->pegarNomeCliente($lt->IMB_CLT_ID );
+                $locatariodescrito_6 = $maisum.$this->descritivoCliente($pp->IMB_CLT_ID );
+            }
+        
+            if( $cont == 7 )
+            {
+                $nomelocatario_7 = $this->pegarNomeCliente($lt->IMB_CLT_ID );
+                $locatariodescrito_7 = $maisum.$this->descritivoCliente($lt->IMB_CLT_ID );
+            }
+        
+            if( $cont == 8 )
+            {
+                $nomelocatario_8 = $this->pegarNomeCliente($lt->IMB_CLT_ID );
+                $locatariodescrito_8 = $maisum.$this->descritivoCliente($lt->IMB_CLT_ID );
+            }
+
         }
 
         
@@ -1123,6 +1434,8 @@ class ctrDocsAutomaticos extends Controller
 
         $templateProcessor->setValues(
             [
+                '**PASTA**' => $ctr->IMB_CTR_REFERENCIA,
+                '**CODIGOIMOVEL**' => $imv->IMB_IMV_ID,
                 '**ENDERECOIMOVEL_1**' => app('App\Http\Controllers\ctrRotinas')->imovelEndereco( $imv->IMB_IMV_ID ),
                 '**ENDERECOIMOVEL_COMPLETO**' => app('App\Http\Controllers\ctrRotinas')->imovelEnderecoCompleto( $imv->IMB_IMV_ID ),
                 '**PROPRIETARIOPRINCIPAL**' =>  app('App\Http\Controllers\ctrRotinas')->proprietarioPrincipal( $imv->IMB_IMV_ID ),
@@ -1169,7 +1482,67 @@ class ctrDocsAutomaticos extends Controller
                 '**BAIRROIMOVEL**' =>$bairro,
                 '**CIDADEIMOVEL**' =>$imv->IMB_IMV_CIDADE,
                 '**UFIMOVEL**' =>$imv->IMB_IMV_ESTADO,
-                
+                '**NOMELOCADOR_1**' => $nomelocador_1,
+                '**LOCADORDESCRITIVO_1**' => $locadordescrito_1,
+                '**NOMELOCADOR_2**' => $nomelocador_2,
+                '**LOCADORDESCRITIVO_2**' => $locadordescrito_2,
+                '**NOMELOCADOR_3**' => $nomelocador_3,
+                '**LOCADORDESCRITIVO_3**' => $locadordescrito_3,
+                '**NOMELOCADOR_4**' => $nomelocador_4,
+                '**LOCADORDESCRITIVO_4**' => $locadordescrito_4,
+                '**NOMELOCADOR_5**' => $nomelocador_5,
+                '**LOCADORDESCRITIVO_5**' => $locadordescrito_5,
+                '**NOMELOCADOR_6**' => $nomelocador_6,
+                '**LOCADORDESCRITIVO_6**' => $locadordescrito_6,
+                '**NOMELOCADOR_7**' => $nomelocador_7,
+                '**LOCADORDESCRITIVO_7**' => $locadordescrito_7,
+                '**NOMELOCADOR_8**' => $nomelocador_8,
+                '**LOCADORDESCRITIVO_8**' => $locadordescrito_8,
+                '**NOMELOCATARIO_1**' => $nomelocatario_1,
+                '**NOMELOCATARIO_2**' => $nomelocatario_2,
+                '**NOMELOCATARIO_3**' => $nomelocatario_3,
+                '**NOMELOCATARIO_4**' => $nomelocatario_4,
+                '**NOMELOCATARIO_5**' => $nomelocatario_5,
+                '**NOMELOCATARIO_6**' => $nomelocatario_6,
+                '**NOMELOCATARIO_7**' => $nomelocatario_7,
+                '**NOMELOCATARIO_8**' => $nomelocatario_8,
+                '**LOCATARIODESCRITIVO_1**' => $locatariodescrito_1,
+                '**LOCATARIODESCRITIVO_2**' => $locatariodescrito_2,
+                '**LOCATARIODESCRITIVO_3**' => $locatariodescrito_3,
+                '**LOCATARIODESCRITIVO_4**' => $locatariodescrito_4,
+                '**LOCATARIODESCRITIVO_5**' => $locatariodescrito_5,
+                '**LOCATARIODESCRITIVO_6**' => $locatariodescrito_6,
+                '**LOCATARIODESCRITIVO_7**' => $locatariodescrito_7,
+                '**LOCATARIODESCRITIVO_8**' => $locatariodescrito_8,
+                '**NOMEFIADOR_1**' => $nomefiador_1,
+                '**NOMEFIADOR_2**' => $nomefiador_2,
+                '**NOMEFIADOR_3**' => $nomefiador_3,
+                '**NOMEFIADOR_4**' => $nomefiador_4,
+                '**NOMEFIADOR_5**' => $nomefiador_5,
+                '**NOMEFIADOR_6**' => $nomefiador_6,
+                '**NOMEFIADOR_7**' => $nomefiador_7,
+                '**NOMEFIADOR_8**' => $nomefiador_8,
+                '**FIADORDESCRITIVO_1**' => $fiadordescrito_1,
+                '**FIADORDESCRITIVO_2**' => $fiadordescrito_2,
+                '**FIADORDESCRITIVO_3**' => $fiadordescrito_3,
+                '**FIADORDESCRITIVO_4**' => $fiadordescrito_4,
+                '**FIADORDESCRITIVO_5**' => $fiadordescrito_5,
+                '**FIADORDESCRITIVO_6**' => $fiadordescrito_6,
+                '**FIADORDESCRITIVO_7**' => $fiadordescrito_7,
+                '**FIADORDESCRITIVO_8**' => $fiadordescrito_8,
+                '**FIADORCONJUGE_1**' => $fiadorconjuge_1,
+                '**FIADORCONJUGE_2**' => $fiadorconjuge_2,
+                '**FIADORCONJUGE_3**' => $fiadorconjuge_3,
+                '**FIADORCONJUGE_4**' => $fiadorconjuge_4,
+                '**FIADORCONJUGE_5**' => $fiadorconjuge_5,
+                '**FIADORCONJUGE_6**' => $fiadorconjuge_6,
+                '**FIADORCONJUGE_7**' => $fiadorconjuge_7,
+                '**FIADORCONJUGE_8**' => $fiadorconjuge_8,
+                "**VALORSEGURO**" =>  app('App\Http\Controllers\ctrRotinas')->formatarReal(  $valorseguro ),
+                "**VALORSEGUROEXTENSO**" =>app('App\Http\Controllers\ctrRotinas')->valorExtenso(  $valorseguro ),
+                "**VALORCOBERTURASEGURO**" =>  app('App\Http\Controllers\ctrRotinas')->formatarReal(  $valorcoberturaseguro ),
+                "**VALORCOBERTURASEGUROEXTENSO**" =>app('App\Http\Controllers\ctrRotinas')->valorExtenso(  $valorcoberturaseguro )
+
 
                 
             ]
@@ -1178,10 +1551,10 @@ class ctrDocsAutomaticos extends Controller
             Storage::disk('public')->makeDirectory( 'gerados' );
 
 
-            $filename = storage_path() . '/app/public/gerados/'.Auth::user()->IMB_ATD_ID.'_'.$saida;
+            $filename = storage_path() . '/app/public/gerados/'.'Documento_Gerado_'.$entrada;
             $templateProcessor->saveAs($filename);
             
-            $url = env( 'APP_URL').'/storage/gerados/'.Auth::user()->IMB_ATD_ID.'_'.$saida;
+            $url = env( 'APP_URL').'/storage/gerados/'.'Documento_Gerado_'.$entrada;
 
             return response()->json( $url, 200 );
 
@@ -1287,7 +1660,7 @@ class ctrDocsAutomaticos extends Controller
 
        $fileName = $request->file->getClientOriginalName();
 
-       $pasta=$fileName;
+       $pasta='/automaticos/'.$fileName;
 
        $path = Storage::disk('public')->put($pasta, file_get_contents($request->file));
        $path = Storage::disk('public')->url($path);
@@ -1299,8 +1672,84 @@ class ctrDocsAutomaticos extends Controller
 
     }
 
+    public function reciboContasPagar( $id, $idconta )
+    {
+        $this->idcontasapagar = $id;
+        $apd = mdlApDoc::find( $id );
+
+        $doc = mdlDocsAutomaticos::where( 'GER_DCA_TIPO','=','recibocontaspagar')->first();
+
+        if( $doc )
+        {
+            $texto = $this->gerarReciboAP( $doc->GER_DCA_ID, $apd->FIN_APD_ID, $idconta );
+            return view('reports.admimoveis.docrecibocaixa',compact('texto'));
+        }
+
+    }
+
     
+    public function gerarReciboAP( $iddoc, $apdId, $idconta )
+    {
+        $dca = mdlDocsAutomaticos::find( $iddoc );
+        $texto = $dca->GER_DCA_TEXTO;
+
+        $apd = mdlApDoc::find( $apdId );
+
+        $conta = mdlContaCaixa::find( $idconta );
+        Log::info( 'CONTA '.$idconta );
+
+        $forn = mdlEmpresa::find( $apd->FIN_EEP_ID);
+
+        $texto = str_replace( "**DATAATUAL**", date('d/m/Y'), $texto);        
+        
+        $texto = str_replace( "**DATARECIBO**",  
+                    app('App\Http\Controllers\ctrRotinas')
+                        ->dataExtenso( date( 'Y/m/d')), $texto);
+
+        $texto = str_replace( "**PAGADOR**", $conta->FIN_CCI_CONCORNOME, $texto);        
+        $texto = str_replace( "**VALORECIBO**", $apd->FIN_APD_VALORVENCIMENTO, $texto);        
+        $texto = str_replace( "**EXTENSOVALORRECIBO**", app('App\Http\Controllers\ctrRotinas')
+        ->valorExtenso(  $apd->FIN_APD_VALORVENCIMENTO ), $texto);
+        $texto = str_replace( "**RECEBEDOR**",  $forn->IMB_EEP_RAZAOSOCIAL, $texto);        
+        $texto = str_replace( "**CPFRECEBEDOR**",  $forn->IMB_EEP_CGC, $texto);        
+        $texto = str_replace( "**USUARIOLOGADO**",  Auth::user()->IMB_ATD_NOME, $texto);        
+        $texto = str_replace( "**REFENTERECIBO**",  $apd->FIN_APD_OBSERVACAO, $texto);         
+                
+        return $texto;
+    }
+
+    public function upload(Request $request)
+    {
+
+        $file = $request->file('file');
+        $id = $request->GER_DCA_ID_UPL;
+
+  
 
 
+        $fileName = $request->file->getClientOriginalName();
+        $path = Storage::disk('public')->put($fileName, $file);
+
+        $imagepathroot = Storage::disk('public')->path('');        
+        $pasta=$imagepathroot.$fileName;
+ 
+        $path = Storage::disk('public')->put('/automaticos/'.$fileName, file_get_contents($request->file));
+        $path = Storage::disk('public')->url($path);
+ 
+ 
+ 
+        $originalName = $request->file->getClientOriginalName();
+        $extension = $request->file->getClientOriginalExtension();
+                
+
+        $dca = mdlDocsAutomaticos::find( $id);
+        $dca->GER_DCA_UPLOAD = $fileName;
+        $dca->GER_DCA_DOWNLOAD = $fileName;
+        $dca->save();
+
+        return view( 'docsautomaticos.docsautomaticosindex');
+
+
+    }
 
 }

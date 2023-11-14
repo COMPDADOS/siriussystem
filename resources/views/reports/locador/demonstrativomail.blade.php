@@ -321,8 +321,6 @@ border-top:3px dotted #000;
                     Este é um email automático, por favor não responda neste email.
                 </p>
     		</div>
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js";></script>
-    	  	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js";></script>
 
 
             <script>

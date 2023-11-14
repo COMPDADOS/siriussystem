@@ -20,10 +20,15 @@ Route::get('/whatsapp/logout', 'ctrWhatsApp@logout')->name('whastapp.logout');
 Route::get('/whatsapp/resetar', 'ctrWhatsApp@resetar')->name('whastapp.resetar');
 Route::get('/whatsapp/enviarmsg', 'ctrWhatsApp@enviarMsg')->name('whastapp.enviarmsg');
 Route::get('/whatsapp/trocadas/carga', 'ctrWhatsApp@mensagensTrocadas')->name('whastapp.mensagenstrocadas');
+Route::get('/whatsapp/boletos/hoje', 'ctrWhatsApp@enviarBolVenHojeWhatsapp')->name('whastapp.boletoshoje');
 
 Route::get('/whatsapp/trocadas/index', function()
 {    return view( 'whatsapp.wsmensagens');
 })->name('whatsapp.index');
+
+Route::get('/testeofx', 'ctrTeste@ofx');
+Route::get('/jonfilecli', 'ctrTeste@lerJson');
+Route::get('/jonfileimv', 'ctrTeste@lerJsonImv');
 
 Route::get('/testeb2', 'ctrTeste@banco2');
 Route::get('/testecss', 'ctrTeste@testeCss');
@@ -32,7 +37,9 @@ Route::get('/testecriarrequest', 'ctrTeste@criarRequest')->name('testerequest');
 Route::get('/dropzone2', 'ctrTeste@dragDrop')->name('dd');
 Route::post( 'dropzone2/upload', 'ctrImagem@uploadDropZone')->name('dropzone.upload');
 
+Route::post('/conciliacaobancaria/lerretorno/passo2', 'ctrLanctoCaixa@conciliacaoArquivoPasso2')->name('conciliacao.passo2');
 
+Route::get( 'gerarnfexml', 'ctrIntegraNota@gerarXML')->name('gerarnfexml');
 Route::get( 'gerarnfepdf', 'ctrIntegraNota@gerarPdf')->name('gerarnfepdf');
 Route::post( 'cancelanfes', 'ctrIntegraNota@cancelaNfes')->name('cancelanfes');
 Route::post( 'gerarnfes', 'ctrIntegraNota@gerarNfs')->name('gerarnfes');
@@ -44,6 +51,8 @@ Route::get('/teste', function()
 {
     return view('clicksign.teste');
 });
+
+Route::get('/testevariavel', 'ctrTeste@variavel');
 
 
 
@@ -58,7 +67,7 @@ Route::get('/abastecerBairros', 'ctrRotinas@abastecerBairros')->name('abastecerb
 
 
 Route::get('/bancos/dist', 'ctrRedeBancaria@cargaDistinct')->name('bancos.distinct');
-Route::get('/bairros', 'ctrRotinas@pegarBairros')->name('bairros.carga');
+Route::get('/bairros/{nome?}', 'ctrRotinas@pegarBairros')->name('bairros.carga');
 
 
 Route::get('/acesso', 'ctrAcesso@indexGeral')->name('acesso.geral');
@@ -111,6 +120,8 @@ Route::get('/fornecedores/list', 'ctrEmpresa@list')->name('fornecedores.list');
 Route::get('/fornecedores', 'ctrEmpresa@index')->name('fornecedores.index');
 Route::post('/fornecedores/salvar', 'ctrEmpresa@salvar')->name('fornecedores.salvar');
 Route::get('/fornecedores/find/{id?}', 'ctrEmpresa@find')->name('fornecedores.find');
+Route::get('/fornecedores/findjson/{id?}', 'ctrEmpresa@findJson')->name('fornecedores.findjson');
+
 Route::get('/fornecedores/buscarcnpj/{cnpj?}', 'ctrEmpresa@porCnpj')->name('fornecedores.cnpj');
 
 Route::get('/contasapagar',function()
@@ -197,6 +208,7 @@ Route::post('/condominio/apagar/{id?}', 'ctrCondominio@destroy')->name('condomin
 Route::get('/condominio/buscar/{id?}', 'ctrCondominio@buscar')->name('condominio.buscar');
 Route::post('/condominio/salvar', 'ctrCondominio@salvar')->name('condominio.salvar');
 Route::get('/condominio/pesquisar/{texto?}/{empresa?}', 'ctrCondominio@pesquisar')->name('condominio.pesquisar');
+Route::post('/condominio/transferirimoveis', 'ctrCondominio@tranferirImoveisCondominios')->name('condominio.transfimoveis');
 
 Route::get('/admcon', 'ctrAdmCondominio@index')->name('admcon.index');
 Route::get('/admcon/buscar/{id?}', 'ctrAdmCondominio@buscar')->name('admcon.buscar');
@@ -206,7 +218,7 @@ Route::post('/admcon/apagar/{id?}', 'ctrAdmCondominio@destroy')->name('admcon.ap
 
 Route::get('/telefone/carga/{id?}', 'ctrTelefone@carga')->name('telefone.carga');
 Route::get('/telefone/apagar/{id?}', 'ctrTelefone@destroy')->name('telefone.apagar');
-Route::post('/telefone/salvar/{id?}/{ddd?}/{numero?}/{tipo?}', 'ctrTelefone@store')->name('telefone.salvar');
+Route::post('/telefone/salvar/{ìdtelefone?}/{idcliente?}/{ddd?}/{numero?}/{tipo?}', 'ctrTelefone@store')->name('telefone.salvar');
 Route::post('/telefone/salvarcomddi/{id?}/{ddi?}/{ddd?}/{numero?}/{tipo?}', 'ctrTelefone@gravarComDDI')->name('telefone.salvarcomddi');
 Route::post('/telefone/salvarlote', 'ctrTelefone@salvarLote')->name('telefone.salvarlote');
 Route::get('/telefone/edit/{id?}', 'ctrTelefone@edit')->name('telefone.edit');
@@ -247,6 +259,7 @@ Route::get('/cliente/telefone/{telefone?}', 'ctrCliente@localizarTelefone')->nam
 Route::get('/cliente/pegartipo/{id?}', 'ctrCliente@pegarTipoCliente')->name('cliente.pegartipo');
 Route::get('/cliente/verificarTemPerfil/{id?}', 'ctrCliente@verificarTemPerfil')->name('cliente.verificarTemPerfil');
 Route::get('/cliente/perfil/{id?}', 'ctrClientePerfil@carga')->name('cliente.perfil');
+Route::post('/cliente/perfil/apagar/{id?}', 'ctrClientePerfil@apagar')->name('cliente.perfil.apagar');
 Route::get('/cliente/corretoratente/{id?}', 'ctrClientePerfil@carga')->name('cliente.corretoratende');
 Route::post('/cliente/perfil/gravar', 'ctrClientePerfil@gravar')->name('cliente.perfil.gravar');
 Route::post('/cliente/atualizaremail', 'ctrCliente@atualizarEmailCliente')->name('cliente.atualizaremail');
@@ -497,6 +510,8 @@ Route::get('/dropzone', 'ctrImagem@dropzone')->name('dropzone.imagens');
 Route::get('/dropzone/imoveis', 'ctrDropZone@imoveis')->name('dropzone.imoveis');
 Route::post('/dropzone/fileupload', 'ctrImagem@fileUpload')->name('imoveis.fileupload');
 Route::post('/dropzone/store', 'ctrImagem@dropzoneStore')->name('dropzone.store');
+Route::get('/image/rotacionar/{idimg?}/{graus?}', 'ctrImagem@rotate')->name('image.rotate');
+
 
 
 
@@ -557,7 +572,11 @@ Route::get('/atendimento/ing/atm/dadosultatdcli/{id?}', 'ctrClienteAtendimento@d
 Route::get('/atendimento/ing/atm/dadosultatdcli/{id?}', 'ctrClienteAtendimento@dadosUltimoAtdCliente')->name('atendimento.dadosultatdcliente');
 Route::get('/atendimento/ing/atm/ultimoAtendimentoClienteCorretor/{id?}', 'ctrClienteAtendimento@ultimoAtendimentoClienteCorretor')->name('atendimento.ultimoatendimentoclientecorretor');
 Route::get('/atendimento/pegardadosatendimento/{id?}', 'ctrClienteAtendimento@pegarDadosAtendimento')->name('atendimento.pegardadosatendimento');
+Route::get('/primeiroatendimentocliente/{id?}', 'ctrClienteAtendimento@primeiroAtendimentoCliente')->name('atendimento.primeiroatendimentocliente');
+Route::post('/atendimento/fecharatendimento', 'ctrClienteAtendimento@fecharAtendimento')->name('atendimento.fechar');
 
+
+Route::get('/regiao/carga', 'ctrRotinas@cargaRegiaoCidade')->name('regiaocidade.carga');
 
 Route::get('/feriados/index', 'ctrFeriado@index')->name('feriados.feriadosindex');
 Route::get('/feriados/carga', 'ctrFeriado@carga')->name('feriados.carga');
@@ -667,6 +686,7 @@ Route::get('/propimo/imoveiscliente/{id?}', 'ctrPropImo@imoveisProprietario')->n
 Route::get('/carregaratd', 'ctrAtendente@buscaTodosJson')->name('carregaratendentes');
 
 Route::get('/imagens/{id?}', 'ctrImagem@indexJson')->name('imagens.imoveis');
+Route::get('/imagens/condominio/{id?}', 'ctrImagem@cargaImagensCondominios')->name('imagens.condominios');
 Route::get('/mostrarimagemprincipal/{id?}', 'ctrImagem@mostrarImagemprincipal')->name('mostrarimagem.principal');
 Route::get('/imagem/{id?}', 'ctrImagem@imagem')->name('imagem');
 Route::post('/imagens/principal/{idimovel?}/{idimagem?}', 'ctrImagem@principal')->name('imagem.principal');;
@@ -735,6 +755,7 @@ Route::get('/imoveis/incricoes', function()
 Route::get('/imoveis/incricoes/carga', 'ctrImovel@imoveisIncricoes')->name('imoveis.incricoes.carga');
 Route::get('/imoveis/pessoas/{id?}/{tipo?}', 'ctrImovel@imoveisPessoas')->name('imoveis.pessoas');
 Route::get('/imoveis/geral', 'ctrImovel@imoveisGeral')->name('imoveis.geral');
+Route::get('/proprietario/imoveis/{id?}', 'ctrPropImo@imoveisdoProprietario')->name('proprietario.imoveis');
 
 
 Route::get('/contratos/vencimentocontratos/carga', 'ctrContrato@vencimentoContrato')->name('contrato.relvencontrato');
@@ -752,9 +773,14 @@ Route::post('/locatariocontrato/destroy/{id?}', 'ctrLocatarioContrato@destroy')-
 Route::get('/locatarios/carga', 'ctrCliente@locatarios')->name('locatarios.carga');
 Route::get('/locatario/principal/{id?}', 'ctrCliente@locatarioPrincipal')->name('locatario.principal');
 Route::get('/locatarios/cargaativos', 'ctrLocatarioContrato@cargaAtivos')->name('locatariocontrato.cargaativos');
+Route::get('/locatarios/contratosdolocatario/{id?}', 'ctrLocatarioContrato@contratosdoLocatario')->name('locatariocontrato.contratosdolocatario');
+
 
 
 Route::get('/locadores/carga', 'ctrCliente@locadores')->name('locadores.carga');
+Route::get('/locadores/contrato/{pasta?}', 'ctrPropImo@locadoresContrato')->name('locadores.contrato');
+
+Route::get('/fiador/contratosdofiador/{id?}', 'ctrFiadorContrato@contratosdoFiador')->name('fiadorcontrato.contratosdofiador');
 
 Route::post('/fiadorcontrato/store', 'ctrFiadorContrato@store')->name('fiadorcontrato.store');
 Route::get('/fiadorcontrato/carga/{id?}', 'ctrFiadorContrato@carga')->name('fiadorcontrato.carga');
@@ -786,6 +812,12 @@ Route::get('/planilharecebimentos', function()
     return view('reports.admimoveis.planilharecebimentos');
 
 })->name('planilharecebimento.index');
+
+Route::get('/repassarrecebidos',  function()
+{
+    return view( 'reports.admimoveis.repassarrecebidos');
+})->name('repassarrecebidos');
+
 Route::get('/planilharepasses', function()
 {
     return view('reports.admimoveis.planilharepasses');
@@ -811,11 +843,16 @@ Route::get('/planilhadepositosindex', function()
 
 })->name('planilhadepositos.index');
 
+
+Route::get('/fluxocliente/{id?}', 'ctrRotinas@fluxoNegocioCliente')->name('fluxonegociocliente');
+Route::post('/recibolocador/alterardatapag', 'ctrReciboLocador@alterarDataPagto')->name('recibolocador.alterardatapag');
+
 Route::get('/recibolocadorcontrole', 'ctrReciboLocadorControle@gerar')->name('recibolocadorcontrole.gerar');
 Route::post('/recibolocador/gravar', 'ctrReciboLocador@store')->name('recibolocadorcontrole.gravar');
 Route::get('/recibolocador/historico/{id?}', 'ctrReciboLocador@carregarViewHistLd')->name('recibolocador.historico');
 Route::get('/recibolocador/carregarHistorico/{id?}/{tiporetorno?}', 'ctrReciboLocador@carregarHistorico')->name('recibolocador.carregarHistorico.puro');
 Route::get('/recibolocador/imprimir/{id?}/{imprimir?}', 'ctrReciboLocador@pegarRecibo')->name('recibolocador.imprimir');
+Route::get('/recibolocador/imprimir/processo/{id?}', 'ctrReciboLocador@pegarRecibosPorProcesso')->name('recibolocador.imprimir.processo');
 Route::post('/recibolocador/estornar', 'ctrReciboLocador@estornar')->name('recibolocador.estornar');
 Route::get('/recibolocador/demonstrativos', 'ctrReciboLocador@demonstrativos')->name('recibolocador.demonstrativos');
 Route::get('/recibolocador/demonstrativosindex', 'ctrReciboLocador@demonstrativosIndex')->name('recibolocador.demonstrativosindex');
@@ -897,8 +934,18 @@ Route::post('/representantes/{id?}', 'ctrClienteRepresentante@store')->name('rep
 Route::get('/representantes/apagar/{id?}', 'ctrClienteRepresentante@destroy')->name('representante.apagar');
 
 
+Route::get('/boletoperiodojson','ctrCobrancaGerada@cargaBoletosPeriodoJson')->name('boleto.periodo.email.json');
+Route::get('/painelboletosenviadoscarga','ctrCobrancaGerada@painelBoletosEnviadosCarga')->name('boleto.painelenviadoscarga');
+Route::get('/painelboletosenviadosindex', function()
+{
+    return view( 'cobrancabancaria.painelboletosenviados') ;
+})->name('boleto.painelenviadosindex');
+
+
 
 Route::get('/boleto/gerar/itau/{id?}/{email?}/{endendemail?}','ctrBoletoItau@index')->name('boleto.itau');
+
+
 
 Route::get('/boleto/gerar/generico/{id?}','ctrCobranca@gerarGenerico')->name('boleto.generico');
 Route::get('/boleto/gerar/santander/{id?}/{email?}/{endendemail?}','ctrBoleto033@index')->name('boleto.santander');
@@ -1227,7 +1274,12 @@ Route::post('/caixa/lancto/desconciliar', 'ctrLanctoCaixa@desconcilarLancamento'
 Route::get('/catran/carga/{id?}', 'ctrCaTran@carga')->name('caixa.catranlanc');
 Route::post('/catran/store', 'ctrCaTran@store')->name('caixa.catran.store');
 
-Route::get('/camposmesclagem', 'ctrRotinas@camposMesclagem')->name('camposmesclagem');
+Route::get('/camposmesclagempesquisar', function()
+{
+    return view('docsautomaticos.camposdemesclagem');
+})->name('camposmesclagempesquisar');
+
+Route::get('/camposmesclagem', 'ctrRotinas@camposMesclagem')->name('camposmesclagemvisualizar');
 
 Route::get('/sms/enviar', 'ctrRotinas@sms')->name('sms.enviar');
 
@@ -1260,7 +1312,9 @@ Route::get('/gerardocautomatico/{iddoc?}/{idcliente?}/{idcontrato?}/{idimovel?}/
 Route::get('/documentomesclado/{iddoc?}', 'ctrDocsAutomaticos@documentoMesclado')->name('docsautomaticos.documentomesclado');
 Route::get('/documentomesclado/buscar/{iddoc?}', 'ctrDocsAutomaticos@buscarDocumentoMesclado')->name('docsautomaticos.documentomescladobuscar');
 Route::get('/documentosgerados', 'ctrDocsAutomaticos@documentosGerados')->name('docsautomaticos.documentosgerados');
-Route::get('/docautomaticoupload', 'ctrDocsAutomaticos@upload')->name('docsautomaticos.upload');
+Route::post('/docautomaticoupload', 'ctrDocsAutomaticos@upload')->name('docsautomaticos.upload');
+Route::get('/docautomatico/reciboap/{id?}/{idconta?}', 'ctrDocsAutomaticos@reciboContasPagar')->name('docsautomaticos.reciboap');
+
 
 
 
@@ -1337,7 +1391,8 @@ Route::get('/estatistica/crm', function(){ return view( 'estatisticas.estatcrm')
     Route::get('/cartacobranca/fiador/carta/{idcontrato?}/{idcliente?}','ctrDocsAutomaticos@cartaCobrancaFiador')->name('cartacobrancafiador');
     Route::get('/email/fiador/{idcontrato?}/{idcliente?}','ctrDocsAutomaticos@emailCobrancaFiador')->name('emailcobrancafiador');
         
-    Route::get('/cartacobranca/locatario/{idcontrato?}/{idcliente?}','ctrDocsAutomaticos@emailCobrancaLocatario')->name('emailcobrancalocatario');
+ 
+    Route::get('/emailcobrancafiador/{idcontrato?}/{idcliente?}','ctrDocsAutomaticos@emailCobrancaLocatario')->name('emailcobrancalocatario');
     Route::get('/cartacobranca/locatario/carta/{idcontrato?}/{idcliente?}','ctrDocsAutomaticos@cartaCobrancaLocatario')->name('cartacobrancalocatario');
     Route::get('/avisoreajuste/locatario/{idcontrato?}/{idcliente?}','ctrDocsAutomaticos@emailAvisoReajusteLocatario')->name('avisoreajustelocatario');
     Route::get('/avisoreajuste/locatario/periodo','ctrDocsAutomaticos@emailAvisoReajusteLocatarioPeriodo')->name('avisoreajustelocatarioperiodo');

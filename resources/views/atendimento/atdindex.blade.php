@@ -26,6 +26,11 @@ td
     font-weight: bold;
 
 }
+
+th
+{
+    text-align:center;
+}
 </style>
 @endsection
 
@@ -71,13 +76,13 @@ td
                     <div class="col-md-2">
                         <div class="form-group">
                         <label class="control-label" for="nome">Data Início:</label>
-                            <input type="text" class="form-control dpicker" name="datainicio" placeholder="data inicial" id="i-inicio">
+                            <input type="date" class="form-control " name="datainicio" placeholder="data inicial" id="i-inicio">
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
                             <label class="control-label" for="nome">Data Fim Retorno:</label>
-                            <input type="text" class="form-control dpicker"  
+                            <input type="date" class="form-control "  
                                 name="datafim" placeholder="data Final" id="i-termino">
                         </div>
                     </div>
@@ -118,6 +123,8 @@ td
                         <th ></th>
                         <th ></th>
                         <th ></th>
+                        <th >Status</th>
+                        <th >Ultima Atualização</th>
                         <th >#ID</th>
                         <th >Data de Início</th>
                         <th >Data Atendimento</th>
@@ -131,6 +138,14 @@ td
         </div>
     </div>
 </div>
+
+@include('layout.modalfecharatendimento')
+<form style="display: none" action="{{route('cliente.edit')}}" method="POST" id="form-alt-cliente-clt"  target="_blank">
+@csrf
+    <input type="hidden" id="id-cliente-clt" name="id" />
+    <input type="hidden" id="readonly" name="readonly" value="readonly"/>
+</form>
+
 
 @include('layout.modalatendimento')
 
@@ -212,6 +227,7 @@ $(document).ready(function() {
     prioridadeCarga();
     preencherCorretor();
 
+    limparCampos();
     $( "#i-select-reagendar" ).change(function() 
     {
         if( $( "#i-select-reagendar" ).val() == 'S' )
@@ -221,6 +237,13 @@ $(document).ready(function() {
         
     });    
 
+    $('#resultTable tbody').on( 'click', '.btn-finalizar', function () {
+            var data = table.row( $(this).parents('tr') ).data();
+            //$("#id").val( data.VIS_ATM_ID );
+            //$("#form-alt").submit();
+            finalizarAtendimento( data.IMB_CLA_ID, "'"+data.IMB_CLA_STATUS+"'");
+        });
+            
     $('#resultTable tbody').on( 'click', '.btn-editar', function () 
     {
         var data = table.row( $(this).parents('tr') ).data();
@@ -285,6 +308,10 @@ $(document).ready(function() {
                 d.ocultarclientecadastrado=$('input[name=ocultarclientecadastrado]').val();
                 d.filtroatendimento=$('input[name=filtroatendimento]').val();
                 d.atendimentostatus=$('input[name=atendimentostatus]').val();
+            },
+            error:function()
+            {
+                alert('error');
             }
         },
         columns: 
@@ -317,11 +344,13 @@ $(document).ready(function() {
                 "defaultContent": "<div style='text-align:center'>"+
                 "<button class='btn glyphicon glyphicon-retweet btn btn-sm btn-danger pull-right btn-transferir' title='Transferir'></button></div>"
             },
+            { data:'IMB_CLA_STATUS'},
+            { data: 'IMB_CLA_DATATUALIZACAO', render:formatardataatualizacao},
             {data: 'IMB_CLA_ID'         , name: 'IMB_CLA_ID'},
             {data : 'IMB_CLA_DATACADASTRO', render : formatardatacadastro},
             {data: 'IMB_CLA_DATAATENDIMENTO', render : formatardataatendimento},
             {data: 'IMB_ATD_NOME'         , name: 'IMB_ATD_NOME'},
-            {data: 'IMB_CLT_NOME'         , name: 'IMB_CLT_NOME'},
+            {data: 'IMB_CLT_NOME'         , render:nomeCliente},
             {data: 'IMB_CLT_NOME'           , render: pegarFones},
             {data: 'VIS_PRI_NOME'         , name: 'VIS_PRI_NOME'},
                 
@@ -398,8 +427,9 @@ $(document).ready(function() {
             var data = table.row( $(this).parents('tr') ).data();
             $("#id").val( data.VIS_ATM_ID );
             $("#form-alt").submit();
- //           window.location = "{{ route('atendimento.atendimento') }}/" + data.VIS_ATM_ID;            
         });
+
+                
 /*
 
         $('#resultTable tbody').on( 'click', '.alt-imv', function () {
@@ -427,6 +457,16 @@ function prioridadeCarga()
 
   });
 }
+
+
+function formatardataatualizacao(data, type, full, meta) 
+        {
+            var dataat = full.IMB_CLA_DATAATUALIZACAO;
+            dataat = moment(dataat).format('DD/MM/YYYY');
+            if( dataat == 'Invalid date') dataat = '-';
+            return dataat;
+
+        }
 
 function formatardataatendimento(data, type, full, meta) 
         {
@@ -514,14 +554,23 @@ function formatardataatendimento(data, type, full, meta)
             $("#i-filtroatendimento").val('');
             $("#i-atendimentostatus").val('');
             $("#i-prioridade").val('');
-            $("#i-inicio").val('');
-            $("#i-termino").val('');
+            $("#i-inicio").val( moment().format( 'YYYY-MM-DD'));
+            $("#i-termino").val(moment().format( 'YYYY-MM-DD'));
             $("#i-select-corretor").val('');
             
             
         }
 
+        function nomeCliente( data, type, full, meta )
+        {
+            return '<a href="javascript:verCliente('+full.IMB_CLT_ID+')">'+full.IMB_CLT_NOME+'</a>';
+        }
 
+        function verCliente( id )
+        {
+            $("#id-cliente-clt").val( id );
+            $("#form-alt-cliente-clt").submit();
+        }
 
 
     </script>

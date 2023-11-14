@@ -94,7 +94,7 @@ class mdwSincronizaCampos
             DB::statement("$tb");
 
 
-        $tb = "CREATE TABLE if not exists  IMB_ATENDENTEPERFILLEAD(".
+            $tb = "CREATE TABLE if not exists  IMB_ATENDENTEPERFILLEAD(".
                 "IMB_ATL_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,".
                 "IMB_ATD_ID INT NOT NULL,".
                 "IMB_NEG_ID VARCHAR(100),".
@@ -108,6 +108,26 @@ class mdwSincronizaCampos
                 "IMB_ATL_DTJINATIVO DATETIME )";
             DB::statement("$tb");
 
+
+            $tb = "CREATE TABLE if not exists IMB_CONDOMINIOIMAGEM (".
+                "IMB_IMB_ID INT(11) NOT NULL,".
+                "IMB_IMV_ID INT(11) NOT NULL,".
+                "IMB_IMG_ID INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,".
+                "IMB_IMG_PRINCIPAL CHAR(1) NULL DEFAULT NULL, ".
+                "IMB_IMG_NOME VARCHAR(200) NULL DEFAULT NULL ,".
+                "IMB_IMV_DESCRICAO VARCHAR(500) NULL DEFAULT NULL  ,".
+                "IMB_IMG_CAPA CHAR(1) NULL DEFAULT NULL  ,".
+                "IMB_IMG_LANCAMENTO CHAR(1) NULL DEFAULT NULL  ,".
+                "IMB_IMV_FINALIDADE CHAR(1) NULL DEFAULT NULL  ,".
+                "IMB_IMG_NAOIRPROSITE CHAR(1) NULL DEFAULT NULL  ,".
+                "IMB_IMG_SEQUENCIA BIGINT(20) NULL DEFAULT NULL, ".
+                "IMB_IMG_ARQUIVO VARCHAR(500) NULL DEFAULT NULL  ,".
+                "IMB_IMG_IMAGEM VARCHAR(500) NULL DEFAULT NULL  ,".
+                "imb_img_dthativo DATE NULL DEFAULT NULL, ".
+                "imb_atd_id INT(11) NULL DEFAULT NULL, ".
+                "IMB_IMG_IMAGEMDESCOMP VARCHAR(100) NULL )";
+            DB::statement("$tb");
+            
 
 
         $tb = "CREATE TABLE if not exists IMB_EQUIPE (".
@@ -347,6 +367,18 @@ $tb = "CREATE TABLE if not exists CAMPOSDOSISTEMA(".
         " ADD IF NOT EXISTS IMB_CLA_CIENTE CHAR(01)";
         DB::statement("$tb");
 
+
+        $tb = "CREATE TABLE if not exists IMB_ATENDIMENTOFILA(".
+           "IMB_ATF_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ".
+           "IMB_ATD_ID INT NOT NULL, ".
+           "IMB_ATF_SEQUENCIA INT NOT NULL, ".
+           "IMB_ATF_NOTIFICADO CHAR(01), ".
+           "IMB_ATF_FINALIZADO CHAR(01), ".
+           "IMB_ATF_EMATENDIMENTO CHAR(01) )";
+        DB::statement("$tb");
+
+
+        
 //        $tb = "DROP TRIGGER IF EXISTS TG_RLD_INS ";
   //      DB::statement("$tb");
         
@@ -381,10 +413,29 @@ $tb = "CREATE TABLE if not exists CAMPOSDOSISTEMA(".
         "IMB_CTR_REFERENCIA VARCHAR(10) NULL DEFAULT NULL  ,".
         "PRIMARY KEY (IMB_CGR_ID) USING BTREE)" ;
         DB::statement("$tb");
-        
 
+        $tb = "CREATE TABLE IF NOT EXISTS IMB_REGIAODACIDADE(".
+            "IMB_RGC_ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,".
+            "IMB_IMB_ID INT NOT NULL,".
+            "IMB_RGC_NOME VARCHAR(40) NOT NULL    )";        
+        DB::statement("$tb");
+
+        $tb = "CREATE TABLE IF NOT EXISTS TMP_PREVISAOTAXAADM (".
+            "ID INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,".
+            "IMB_IMB_ID INT(11) NOT NULL,".
+            "IMB_CTR_ID INT(11) NOT NULL,".
+            "IMB_CTR_REFERENCIA VARCHAR(10) NULL,".
+            "IMB_IMV_ID INT NOT NULL, ".
+            "ENDERECO VARCHAR(100),".
+            "LOCADOR VARCHAR(40) ,".
+            "DATAVENCIMENTO DATE ,".
+            "VALORTAXA DECIMAL(12,2) ,".
+            "VALORTAXACONTRATO DECIMAL(12,2),".
+            "IMB_ATD_ID INT(11) NOT NULL)";
+        DB::statement("$tb");
+        
         $tb = "CREATE TABLE IF NOT EXISTS TMP_PREVISAORECEBIMENTODETAIL (".
-            "IMB_CGI_ID INT(11) NOT NULL AUTO_INCREMENT,".
+            "IMB_CGI_ID INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,".
             "IMB_CGR_ID INT(11) NULL DEFAULT NULL,".
             "IMB_LCF_ID INT(11) NULL DEFAULT NULL,".
             "IMB_TBE_ID INT(11) NULL DEFAULT NULL,".
@@ -396,10 +447,25 @@ $tb = "CREATE TABLE if not exists CAMPOSDOSISTEMA(".
             "IMB_ATD_ID INT(11) NULL DEFAULT NULL,".
             "IMB_LCF_DATAVENCIMENTO DATE NULL DEFAULT NULL,".
             "IMB_CLT_ID INT(11) NULL DEFAULT NULL,".
-            "IMB_IMB_ID INT(11) NULL DEFAULT NULL,".
-            "PRIMARY KEY (IMB_CGI_ID) USING BTREE)";        
+            "IMB_IMB_ID INT(11) NULL DEFAULT NULL)";        
         DB::statement("$tb");
 
+        $tb = "CREATE TABLE IF NOT EXISTS TMP_RELRECEBIMENTODIA ( ".
+            "TMP_RRD_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ".
+            "IMB_RLT_NUMERO INT NOT NULL, ".
+            "IMB_CTR_ID INT NOT NULL, ".
+            "IMB_IMV_ID INT NOT NULL, ".
+            "TMP_RRD_ENDERECOIMOVEL VARCHAR(100), ".
+            "TMP_RRD_NOMELOCATARIO VARCHAR(100), ".
+            "IMB_RLT_DATAPAGAMENTO DATE, ".
+            "IMB_RLT_DATACOMPETENCIA DATE, ".
+            "IMB_RLT_FORMAPAGAMENTO VARCHAR(20), ".
+            "FIN_CCX_ID INT, ".
+            "IMB_TBE_ID INT, ".
+            "IMB_TBE_NOME VARCHAR(40), ".
+            "IMB_LCF_OBSERVACAO VARCHAR(200), ".
+            "IMB_ATD_ID INT)";
+        DB::statement("$tb");
 
         $tb = "CREATE OR REPLACE VIEW VLANCAMENTOCAIXA( ".
         "    FIN_CAT_OPERACAO,  ".
@@ -438,41 +504,25 @@ $tb = "CREATE TABLE if not exists CAMPOSDOSISTEMA(".
         "    AND FIN_CATRAN.FIN_CFC_ID = FIN_CFC.FIN_CFC_ID;         ";
         DB::statement("$tb");
 
-$this->verificarExistencia( "IMB_CLIENTE","USER2",'INT' );
-$this->verificarExistencia( "IMB_CLIENTE","USER3",'INT' );
-$this->verificarExistencia( "IMB_COBRANCAGERADAITEM","IMB_IMB_ID",'INT' );
-$this->verificarExistencia( "FIN_CATRAN","IMB_IMB_ID",'INT' );
-$this->verificarExistencia( "FIN_LANCTOCAIXA","FIN_LCX_DTHEXCLUSAO",'TIMESTAMP NULL DEFAULT NULL' );
-$this->verificarExistencia( "FIN_LANCTOCAIXA","FIN_LCX_DTHCONCILIACAO",'TIMESTAMP NULL DEFAULT NULL' );
-$this->verificarExistencia( "FIN_LANCTOCAIXA","IMB_ATD_IDCONCILIACAO",'INT' );
-$this->verificarExistencia( "IMB_LANCAMENTOFUTURO","IMB_CGR_ID",'INT' );
-$this->verificarExistencia( "IMB_LANCAMENTOFUTURO","IMB_LCF_COBRARTAXADMMES",'VARCHAR(01)' );
-$this->verificarExistencia( "IMB_LANCAMENTOFUTURO","IMB_LCF_FIXO",'CHAR(01)' );
-$this->verificarExistencia( "IMB_LANCAMENTOFUTURO","IMB_LCF_IDFIXO",'INT' );
-$this->verificarExistencia( "IMB_ATENDENTE","IMB_ATD_COMISSAOCAPVENDA",'NUMERIC(12,2)' );
-$this->verificarExistencia( "IMB_ATENDENTE","IMB_ATD_COMISSAOCORVENDA",'NUMERIC(12,2)' );
-$this->verificarExistencia( "IMB_ATENDENTE","IMB_ATD_COMISSAOCAPLOC",'NUMERIC(12,2)' );
-$this->verificarExistencia( "IMB_ATENDENTE","IMB_ATD_COMISSAOCORLOC",'NUMERIC(12,2)' );
-$this->verificarExistencia( "IMB_ATENDENTE","IMB_ATD_COMISSAOPAGDIAFIXO",'INT' );
-$this->verificarExistencia( "IMB_ATENDENTE","IMB_ATD_COMISSAOPAGDIASEMANA",'INT' );
-$this->verificarExistencia( "IMB_CORCTR","IMB_CORCTR_ID",'INT AUTO_INCREMENT PRIMARY KEY' );
-$this->verificarExistencia( "IMB_CORCTR","IMB_CORCTR_VALORLOCACAO","numeric(12,2)" );
-$this->verificarExistencia( "IMB_CAPCTR","IMB_CAPCTR_ID",'INT AUTO_INCREMENT PRIMARY KEY' );
-$this->verificarExistencia( "IMB_CORCTR","IMB_CAPCTR_VALORLOCACAO","numeric(12,2)" );
-$this->verificarExistencia( "TMP_DADOSBOLETO","convenio","VARCHAR(10)" );
-$this->verificarExistencia( "TMP_DADOSBOLETO","FIN_CCI_BANCONUMERO","INT" );
-$this->verificarExistencia( "TMP_DADOSBOLETO","valor_boleto_impresso","VARCHAR(20)" );
-$this->verificarExistencia( "IMB_CONTRATOHISTREA","IMB_CHR_DESCONTO","NUMERIC(12,2)" );
-$this->verificarExistencia( "IMB_CLIENTE","IMB_CLT_WHATSID","VARCHAR(200)" );
-$this->verificarExistencia( "IMB_TELEFONES","IMB_CLT_WHATSID","VARCHAR(200)" );
-$this->verificarExistencia( "IMB_TELEFONES","IMB_TLF_DDI","VARCHAR(03) DEFAULT '55'" );
-$this->verificarExistencia( "WSMENSAGENS","IMB_CLT_ID","INT" );
-$this->verificarExistencia( "WSMENSAGENS","IMB_ATD_ID","INT" );
+        $tb ="CREATE TABLE IF NOT EXISTS FIN_TABELACONCILIACAOARQUIVO  (".
+            "FIN_CNC_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,".
+            "FIN_CCX_ID INT NOT NULL,".
+            "FIN_CNC_OPERACAO VARCHAR(10),".
+            "FIN_CNC_VALOR NUMERIC(12,2),".
+            "FIN_CNC_DATA DATE,".
+            "FIN_CNC_DESCRICAO VARCHAR(500),".
+            "FIN_CFC_UNIQUEID VARCHAR(100),".
+            "FIN_LCX_ID INT)";
+        DB::statement("$tb");
+               
+$this->verificarExistencia( "TMP_RELRECEBIMENTODIA","IMB_CTR_REFERENCIA","VARCHAR(10)" );
 
 
+$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_DEMONSTRATIVOPDF", 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_PLARECTCDATARECTO", 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_WSAPELIDO", 'VARCHAR(20)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_WSWEBHOOK", 'VARCHAR(1000)');
+$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TCPAR1COBRARTA", 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TCPAR1INCTA" , 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TCPAR2COBRARTA", 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TCPAR2INCTA" , 'CHAR(01)');
@@ -480,18 +530,22 @@ $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TCPAR3COBRARTA", 'CHAR(01
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TCPAR3INCTA" , 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TCPAR4COBRARTA", 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TCPAR4INCTA" , 'CHAR(01)');
+$this->verificarExistencia( "IMB_PARAMETROS2","IMB_TBE_IDSEGINC" , "INT");
 $this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_INCTAXAADM1" , 'CHAR(01)');
 $this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_INCTAXAADM2" , 'CHAR(01)');
 $this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_INCTAXAADM3" , 'CHAR(01)');
 $this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_INCTAXAADM4" , 'CHAR(01)');
 $this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_INCTAXAADM5" , 'CHAR(01)');
 $this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_INCTAXAADM6" , 'CHAR(01)');
+$this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_JURIDICOANOTACOES" , 'TEXT');
 $this->verificarExistencia( "TMP_RESUMOACORDO","IMB_ATD_ID" , 'INT');
 $this->verificarExistencia( "TMP_RESUMOACORDO","IMB_IMB_ID" , 'INT');
 $this->verificarExistencia( "TMP_RESUMOACORDO","PROPORCAO" , 'NUMERIC(12,5)');
-
-
-
+$this->verificarExistencia( "IMB_ATENDENTE","IMB_ATD_NOTIFICARNOVOATM" , 'CHAR(01)');
+$this->verificarExistencia( "IMB_CONDOMINIO","IMB_CND_ZELADORTEL3OBS" , 'varchar(500)');
+$this->verificarExistencia( "FIN_LANCTOCAIXA","FIN_LCX_UNIQUEIDBANK" , 'varchar( 100)');
+$this->verificarExistencia( "IMB_CONTRATOSEGUROINCENDIO","IMB_SCT_VALORCOBERTURA",'numeric(12,2)' );
+$this->verificarExistencia( "IMB_CONTRATOSEGUROINCENDIO","IMB_SCT_VALORSEGURO",'numeric(12,2)' );
 $this->verificarExistencia( "IMB_PARAMETROS","IMB_PRM_ARREDONTARREAJSTE",'CHAR(01)' );
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_DIADMAIS",'INT' );
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TOLERANCIABOLETO",'CHAR(01)' );
@@ -514,20 +568,6 @@ $this->verificarExistencia( "IMB_CONTROLECHAVE","IMB_CCH_RESERVAR",'char(01)' );
 $this->verificarExistencia( "IMB_CONTROLECHAVE","IMB_CCH_RESERVARDATALIMITE",'date' );
 $this->verificarExistencia( "IMB_IMOVEIS","IMB_CCH_RESERVAR",'char(01)' );
 $this->verificarExistencia( "IMB_IMOVEIS","IMB_CCH_RESERVARDATALIMITE",'date' );
-$this->verificarExistencia( "IMB_IMOVEIS","IMB_CCH_ID",'int' );
-$this->verificarExistencia( "IMB_COBRANCAGERADAPERM","FIN_CCI_COOPNUMERO",'VARCHAR(04)' );
-$this->verificarExistencia( "IMB_COBRANCAGERADAPERM","FIN_CCI_COOPDV",'VARCHAR(02)' );
-$this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_REAJUSTARPARCELAVENCTO",'DATE' );
-$this->verificarExistencia( "IMB_CONTRATOALTOVENC","IMB_CAV_LIBERADO",'CHAR(01)' );
-$this->verificarExistencia( "IMB_RECIBOLOCATARIO","IMB_RLT_DTHINATIVO",'DATE' );
-$this->verificarExistencia( "IMB_RECIBOLOCATARIO","IMB_ATD_IDINATIVO",'INT' );
-$this->verificarExistencia( "FIN_LANCTOCAIXA","FIN_LCX_DTHINATIVO",'DATE' );
-$this->verificarExistencia( "FIN_LANCTOCAIXA","IMB_ATD_IDINATIVO",'INT' );
-$this->verificarExistencia( "IMB_RECIBOLOCADOR","IMB_RLD_DTHINATIVO",'DATETIME' );
-$this->verificarExistencia( "IMB_RECIBOLOCADOR","IMB_ATD_IDINATIVO",'INT' );
-$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_RPSNUMERO",'INT' );
-$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_RPSSEQUENCIA",'INT' );
-$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_REAJUSTEFIMPARCELAS",'CHAR(01)' );
 
 $this->verificarExistencia( "IMB_PARAMETROS2","FIN_CCR_ID_COBRANCA",'VARCHAR(05)' );
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_FORPAG_ID_LOCATARIO",'INT');
@@ -535,11 +575,6 @@ $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_NOTASERIE",'VARCHAR(3)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_CODIGOIMOVELRECIBOS",'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_TOKENNFS",'VARCHAR(500)');
 
-
-$this->verificarExistencia( "IMB_RECIBOLOCADOR","IMB_PRM_RPSSEQUENCIA",'INT' );
-$this->verificarExistencia( "IMB_NFES","IMB_PRM_RPSNUMERO",'INT' );
-$this->verificarExistencia( "IMB_NFES","IMB_NFE_VALORISS",'NUMERIC(12,2)' );
-$this->verificarExistencia( "IMB_NFES","IMB_NFE_CHAVE",'VARCHAR(500)' );
 
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_TBE_IDRENOVACAO",'INT' );
 $this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_NUNCARETEIRRF",'CHAR(01)' );
@@ -600,7 +635,11 @@ $this->verificarExistencia( "GER_DOCUMENTOAUTOMATICOS","GER_DCA_DOWNLOAD",'VARCH
 $this->verificarExistencia( "GER_DOCUMENTOAUTOMATICOS","GER_DCA_WORD",'CHAR(01)' );
 $this->verificarExistencia( "TMP_REPASSE","RECEBIDO",'CHAR(01)' );
 $this->verificarExistencia( "TMP_DADOSBOLETO","IMB_CGR_VENCIMENTOORIGINAL",'varchar(10)' );
-
+$this->verificarExistencia( "TMP_RELRECEBIMENTODIA","CREDITOS",'NUMERIC(12,2)' );
+$this->verificarExistencia( "TMP_RELRECEBIMENTODIA","DEBITOS",'NUMERIC(12,2)' );
+$this->verificarExistencia( "TMP_RELRECEBIMENTODIA","TOTALRECIBO",'NUMERIC(12,2)' );
+$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_DATAREPASSEDODIA",'CHAR(01)' );
+$this->verificarExistencia( "IMB_RECIBOLOCATARIO","IMB_RLT_PIX",'NUMERIC(12,2)' );
 
 $this->videosTreinamento( 'acesso_ao_sistema.mp4', 'Acessando o Sirius System', 'sirius system acesso acessando entrando sistema plataforma'  );
         $this->videosTreinamento( 'Prontos_introducao.mp4', 'Introdução ao Ambiente de Aprendizado Virtual', 'Treinamentos cursos treinamento curso'  );

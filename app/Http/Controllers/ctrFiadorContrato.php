@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\mdlFiadorContrato;
 use Auth;
+use DB;
 
 class ctrFiadorContrato extends Controller
 {
@@ -103,4 +104,31 @@ class ctrFiadorContrato extends Controller
         return response()->json( 'OK', 200);
         //
     }
+
+    public function contratosdoFiador( $id )
+    {
+        $contratos = mdlFiadorContrato::select( [
+            'IMB_FIADORCONTRATO.IMB_CTR_ID',
+            'IMB_FIADORCONTRATO.IMB_CLT_ID',
+            'IMB_CLT_NOME',
+            'IMB_FIADORCONTRATO.IMB_CTR_ID',
+            'IMB_CTR_REFERENCIA',
+            'IMB_CTR_DATALOCACAO',
+            'IMB_CTR_INICIO',
+            'IMB_CTR_VALORALUGUEL',
+            'IMB_CTR_DATARESCISAO',
+            'IMB_CTR_SITUACAO',
+            DB::raw( '( select imovel( IMB_CONTRATO.IMB_IMV_ID ) ) as ENDERECO')
+
+        ])
+        ->where( 'IMB_FIADORCONTRATO.IMB_CLT_ID','=', $id )
+        ->leftJoin( 'IMB_CONTRATO', 'IMB_CONTRATO.IMB_CTR_ID', 'IMB_FIADORCONTRATO.IMB_CTR_ID' )
+        ->leftJoin( 'IMB_CLIENTE','IMB_CLIENTE.IMB_CLT_ID','IMB_FIADORCONTRATO.IMB_CLT_ID')
+        ->orderBy( 'IMB_CTR_INICIO')
+        ->get();
+
+        if (count($contratos) < 1) return response()->json('NA',404);
+        return response()->json( $contratos, 200 );
+
+    }    
 }

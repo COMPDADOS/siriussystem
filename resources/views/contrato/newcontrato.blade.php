@@ -166,6 +166,8 @@
             <option value="V">Cartão de Crédito</option>
             <option value="P">Titulo Capitalização</option>
             <option value="O">Outra Forma</option>
+            <option value="I">CredPago</option>
+            <option value="Q">Quinto Cred</option>
             <option value="D">Dispensado</option>
           </select>
         </div>
@@ -1727,9 +1729,10 @@
       var date = new Date( dFormatado );
       var mes = date.getMonth();
 
-      var duracao = parseInt($("#IMB_CTR_FORMAREAJUSTE").val());
+      var duracao = parseInt($("#IMB_CTR_FORMAREAJUSTE").val())+1;
 	    //crio uma nova váriavel com a nova data, Date(ano, mes(soma da variavel enviada para o metodo + o mes atual, dia que eu coloquei padrão para 1
       var n_date = date.setMonth( mes + duracao);
+    //  n_date = moment(n_date).add(1, 'days').toDate();
       n_date = moment( n_date ).format( 'DD/MM/YYYY');
 
       if ( n_date=='Invalid date') n_date='';
@@ -1775,6 +1778,14 @@
     {
 
 
+      debugger;
+      var valorprimven = realToDolar( $("#IMB_CTR_VALORPRIMVEN").val() );
+      if ( valorprimven == 0 )
+      {
+        if( confirm( 'O valor do primeiro vencimento está zerado! Confirma o novo contrato mesmo assim?') != true )
+          return false;
+      }
+      
       var dFormatado = moment($("#IMB_CTR_PRIMEIROVENCIMENTO").val()).format("M-D-YYYY");
 
       dFormatado = new Date( dFormatado );
@@ -2486,7 +2497,7 @@
     function confirmarContrato(e)
     {
 
-      debugger;
+     
       $("#modalresumo").hide();
       alert('Este processo poderá demorar alguns segundos....');
         e.disabled = true;
@@ -2634,7 +2645,7 @@
               gravarLocatarios( data  );
               debugger;
               gravarFiadores( data  );
-              gravarCorCtr( data  );
+              //gravarCorCtr( data  );
               //salvarCapCtrBD( data  );
 
               alert( 'Contrato Gerado!!!!');
@@ -2697,8 +2708,10 @@
 
         }
 
-
-        console.log('criando vetor');
+       /* cinciss = 'N';
+        if( table.rows[r].cells[1].innerHTML == 7 || table.rows[r].cells[1].innerHTML == 25)
+          cinciss = 'S';
+*/        console.log('criando vetor');
         console.log('reaustsar: '+table.rows[r].cells[10].innerHTML);
         lf =
         {
@@ -2724,7 +2737,7 @@
           IMB_LCF_INCMUL            : '',
           IMB_LCF_INCJUROS          : '',
           IMB_LCF_INCCORRECAO       : '',
-          IMB_LCF_INCISS            : '',
+          IMB_LCF_INCISS            : 'S',
           IMB_LCF_FIXO              : 'N',
           IMB_LCF_GARANTIDO         : 'X',
           IMB_LCF_COBRARTAXADMMES    : table.rows[r].cells[8].innerHTML,

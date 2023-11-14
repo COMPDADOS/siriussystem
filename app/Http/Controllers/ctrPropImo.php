@@ -160,6 +160,15 @@ class ctrPropImo extends Controller
                 'IMB_CLIENTE.IMB_CLT_NOME',
                 'IMB_CLIENTE.IMB_CLT_EMAIL',
                 'IMB_CLIENTE.CEP_CID_NOMERES',
+                'IMB_PROPRIETARIOIMOVEL.GER_BNC_NUMERO',
+                'IMB_PROPRIETARIOIMOVEL.GER_BNC_AGENCIA',
+                'IMB_PROPRIETARIOIMOVEL.IMB_CLTCCR_NUMERO',
+                'IMB_PROPRIETARIOIMOVEL.IMB_CLTCCR_DV',
+                'IMB_PROPRIETARIOIMOVEL.IMB_CLTCCR_NOME',
+                'IMB_PROPRIETARIOIMOVEL.IMB_CLTCCR_CPF',
+                'IMB_PROPRIETARIOIMOVEL.IMB_IMVCLT_PIX',
+                'IMB_PROPRIETARIOIMOVEL.IMB_BNC_AGENCIADV',
+                DB::raw( '( SELECT IMB_FORPAG_NOME FROM IMB_FORMAPAGAMENTO WHERE IMB_FORMAPAGAMENTO.IMB_FORPAG_ID = IMB_PROPRIETARIOIMOVEL.IMB_FORPAG_ID) AS FORMAPAGAMENTO'),
                 DB::raw( 'PEGAFONES( IMB_CLIENTE.IMB_CLT_ID ) as FONES '),
                 DB::raw('( CASE  WHEN IMB_IMVCLT_PRINCIPAL = "S" THEN "Principal" else " " end ) as principal ')
             ])
@@ -245,7 +254,8 @@ class ctrPropImo extends Controller
                         'IMB_CLTCCR_NUMERO',
                         'IMB_CLTCCR_DV',
                         'IMB_CLTCCR_NOME',
-                        'IMB_CLTCCR_CPF'
+                        'IMB_CLTCCR_CPF',
+                        'IMB_IMVCLT_PIX'
             ]
         )
         ->where( 'IMB_PROPRIETARIOIMOVEL.IMB_IMV_ID','=', $id )
@@ -288,6 +298,62 @@ class ctrPropImo extends Controller
         return $prop;
 
         //
+    }
+
+    public function locadoresContrato( $pasta )
+    {
+        $prop = mdlPropImovel::select(
+            [
+            	'IMB_PROPRIETARIOIMOVEL.IMB_CLT_ID',
+                'IMB_IMVCLT_PRINCIPAL',
+                'IMB_IMVCLT_PERCENTUAL4',
+                'IMB_PPI_ID',
+            	'IMB_PROPRIETARIOIMOVEL.IMB_IMV_ID',
+                'IMB_CLIENTE.IMB_CLT_NOME',
+                'IMB_CLIENTE.IMB_CLT_EMAIL',
+                'IMB_CLIENTE.CEP_CID_NOMERES',
+                DB::raw( '( SELECT IMB_FORPAG_NOME FROM IMB_FORMAPAGAMENTO WHERE IMB_FORMAPAGAMENTO.IMB_FORPAG_ID = IMB_PROPRIETARIOIMOVEL.IMB_FORPAG_ID) AS FORMAPAGAMENTO'),
+                DB::raw( 'PEGAFONES( IMB_CLIENTE.IMB_CLT_ID ) as FONES '),
+                DB::raw('( CASE  WHEN IMB_IMVCLT_PRINCIPAL = "S" THEN "Principal" else " " end ) as principal ')
+            ])
+            ->leftjoin( 'IMB_CLIENTE', 'IMB_CLIENTE.IMB_CLT_ID', 'IMB_PROPRIETARIOIMOVEL.IMB_CLT_ID')
+            ->leftJoin( 'IMB_CONTRATO', 'IMB_CONTRATO.IMB_IMV_ID', 'IMB_PROPRIETARIOIMOVEL.IMB_IMV_ID')
+            ->where( 'IMB_CONTRATO.IMB_CTR_REFERENCIA', $pasta)
+            ->get();
+
+        return response()->json( $prop, 200);
+
+        //
+    }
+
+    public function imoveisdoProprietario( $idcliente )
+    {
+        $imoveis = mdlPropImovel::select( [
+            'IMB_PROPRIETARIOIMOVEL.IMB_IMV_ID',
+            'IMB_PROPRIETARIOIMOVEL.IMB_CLT_ID',
+            'IMB_IMV_DATACADASTRO',
+            'IMB_CLT_NOME',
+            DB::raw( '( SELECT imovel( IMB_PROPRIETARIOIMOVEL.IMB_IMV_ID ) ) AS ENDERECO'),
+            'IMB_IMVCLT_PERCENTUAL4',
+            DB::raw( 'case when exists( select IMB_CTR_ID FROM IMB_CONTRATO 
+            WHERE IMB_CONTRATO.IMB_IMV_ID = IMB_PROPRIETARIOIMOVEL.IMB_IMV_ID AND IMB_CTR_SITUACAO="ATIVO" LIMIT 1) THEN "ALUGADO"
+            ELSE "-" end as SITUACAO'),
+            'VIS_STA_NOME',
+            'VIS_STA_SITUACAO',
+            'CEP_BAIRRO.CEP_BAI_NOME',
+            DB::raw( '( select IMB_CND_NOME FROM IMB_CONDOMINIO WHERE IMB_CONDOMINIO.IMB_CND_ID = IMB_IMOVEIS.IMB_CND_ID) AS CONDOMINIO')
+        ])
+        ->leftJoin( 'IMB_CLIENTE','IMB_CLIENTE.IMB_CLT_ID', 'IMB_PROPRIETARIOIMOVEL.IMB_CLT_ID' )
+        ->leftJoin( 'IMB_IMOVEIS','IMB_IMOVEIS.IMB_IMV_ID', 'IMB_PROPRIETARIOIMOVEL.IMB_IMV_ID' )
+        ->leftJoin( 'CEP_BAIRRO', 'CEP_BAIRRO.CEP_BAI_ID', 'IMB_IMOVEIS.CEP_BAI_ID')
+        ->leftJoin( 'VIS_STATUSIMOVEL','VIS_STATUSIMOVEL.VIS_STA_ID', 'IMB_IMOVEIS.VIS_STA_ID' )
+        ->where( 'IMB_PROPRIETARIOIMOVEL.IMB_CLT_ID', '=', $idcliente )->get();
+
+        if (count($imoveis) < 1) return response()->json('NA',404);
+        return response()->json( $imoveis, 200 );
+
+
+
     }
     
 

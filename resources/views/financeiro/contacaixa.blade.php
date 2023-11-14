@@ -537,11 +537,13 @@
                 datainativo = '-';
 
 
+                tipoconta = data[nI].FIN_CCX_TIPOCONTA;
+                if( tipoconta === null ) tipoconta = '-';
 
                 linha =
                         '<tr>'+
                         '<td style="text-align:center valign="center">'+data[nI].FIN_CCX_ID+'</td>' +
-                        '<td style="text-align:center valign="center">'+data[nI].FIN_CCX_TIPOCONTA+'</td>' +
+                        '<td style="text-align:center valign="center">'+tipoconta+'</td>' +
                         '<td style="text-align:center valign="center">'+data[nI].FIN_CCX_DESCRICAO+'</td>' +
                         '<td style="text-align:center valign="center">'+data[nI].FIN_CCX_BANCO+'</td>' +
                         '<td style="text-align:center valign="center">'+datainativo+'</td>' +

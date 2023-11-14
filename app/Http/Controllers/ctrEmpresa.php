@@ -40,10 +40,30 @@ class ctrEmpresa extends Controller
 
     }
 
+    public function carga( $json)
+    {
+        $fornecedores = mdlEmpresa::where( 'IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID)
+        ->orderBy( 'IMB_EEP_RAZAOSOCIAL')
+        ->get();
+ 
+
+        if( $json == 'S' )
+            return response()->json( $fornecedores,200);
+    
+        return $fornecedores;
+
+
+
+    }
     public function find( $id )
     {
         $gc = mdlEmpresa::find( $id );
         return $gc;
+    }
+    public function findJson( $id )
+    {
+        $gc = mdlEmpresa::find( $id );
+        return response()->json($gc,200);
     }
 
     public function salvar( Request $request )

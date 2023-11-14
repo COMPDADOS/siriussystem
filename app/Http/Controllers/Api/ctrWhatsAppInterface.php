@@ -37,26 +37,26 @@ class ctrWhatsAppInterface extends Controller
     $pushName = $body->pushName;
     $instanceKey = $request->instanceKey;
 
-    Log::info( 'instancekey '.$instanceKey);
     $pos = strpos( $remoteJid,'@');
     $identificacaocliente = substr($remoteJid,0, $pos );
-
 
     $cli=0;
     $clt = mdlTelefone::whereRaw( "concat( '55', IMB_TLF_DDD, IMB_TLF_NUMERO) = '$identificacaocliente'" )->first();
 
     $msgs = mdlWSMessages::where( 'BODY_KEY_REMOTEJID','=', $remoteJid)->orderBy( 'BODY_MESSAGETIMESTAMP','DESC')->first();
 
+    $nomecliente='';
     if( $clt <> '' )
     {
       $cli = $clt->IMB_TLF_ID_CLIENTE;
       $cliente = mdlCliente::find( $cli );
-      $nomecliente = $cliente->IMB_CLT_NOME;
+      if( $cliente <> '' )
+          $nomecliente = $cliente->IMB_CLT_NOME;
     }
 
-    Log::info('cliente '.$cli );
-    
-    $body = $request['body'];
+
+      $body = $request['body'];
+  
     $msg = new mdlWSMessages;
       $msg->MTYPE                 =  $request->type;
       $msg->BODY_KEY_REMOTEJID    =  $remoteJid;
@@ -66,10 +66,21 @@ class ctrWhatsAppInterface extends Controller
       $msg->BODY_PUSHNAME         =  $request['body']['pushName'];
       $msg->BODY_BROADCAST        =  $request['body']['broadcast'];
       $msg->BODY_INSTANCE_KEY        =  $request['instanceKey'];
-      if(array_key_exists("Lot_iextendedTextMessaged", $array) )   
-        $msg->MODY_MESSAGE_CONVERSATION = $request['body']['message']['extendedTextMessage']['text'];
-//      else
-        //$msg->MODY_MESSAGE_CONVERSATION = $request['body']['message']['conversation'];
+      
+      try
+      {
+        if( isset( $json->body->message->conversation) )
+          $msg->MODY_MESSAGE_CONVERSATION =  $json->body->message->conversation;
+        if( isset( $json->body->message->extendedTextMessage->text) )
+          $msg->MODY_MESSAGE_CONVERSATION =  $json->body->message->extendedTextMessage->text;
+      }
+      catch (\Illuminate\Database\QueryException $e) 
+      {
+        $msg->MODY_MESSAGE_CONVERSATION = '**emotions**';
+      }                    
+
+
+      
       $msg->IMB_CLT_ID = $cli;
       $msg->save();
 /*

@@ -68,7 +68,8 @@
         </div>
         <div class="panel-body">
           <form id="dropzoneForm" class="dropzone" action="{{ route('imagensimoveisdragdrop') }}">
-              <input type="hidden" name="id" id="i-imv-dragdrop" value="{{$id}}">
+                <input type="hidden" name="id" id="i-imv-dragdrop" value="{{$id}}">
+                <input type="hidden" name="tipo" id="i-tipo" value="{{$tipo}}">
             @csrf
           </form>
           <div align="center">
@@ -98,7 +99,8 @@ Dropzone.options.dropzoneForm = {
     autoProcessQueue : false,
     acceptedFiles : ".png,.jpg,.gif,.bmp,.jpeg",
     parallelUploads: 20,
-    init:function(){
+    init:function()
+    {
       var submitButton = document.querySelector("#submit-all");
       myDropzone = this;
 
@@ -127,9 +129,19 @@ function CarregarImagens()
         debugger;
         nId = $("#i-imv-dragdrop").val();
 
-        $("#galeria-update-btn").hide();        
+        $("#galeria-update-btn").hide();   
         var url = "{{ route( 'imagens.imoveis')}}/"+nId;
+        tipo = 'imoveis';
+        if( $("#i-tipo").val() == 'C' )
+        {
+            tipo='condominios';
+            var url = "{{ route( 'imagens.condominios')}}/"+nId;
+        }
 
+        console.log( url );
+            
+
+        
         var empresa = "{{Auth::user()->IMB_IMB_ID}}";
 //        console.log('imagens '+url );
         $.getJSON( url, function( data)
@@ -152,7 +164,7 @@ function CarregarImagens()
                         '       <div class="card-body"> '+
                         '          <h5 class="card-title div-center">'+data[nI].IMB_IMG_NOME+'</h5>' +
                         '       </div> '+
-                        '       <img class="img-album" src={{url('')}}/storage/images/'+empresa+'/imoveis/'+data[nI].IMB_IMV_ID+'/'+data[nI].IMB_IMG_ARQUIVO+'>'+
+                        '       <img class="img-album" src={{url('')}}/storage/images/'+empresa+'/'+tipo+'/'+data[nI].IMB_IMV_ID+'/'+data[nI].IMB_IMG_ARQUIVO+'>'+
                         '       <a title="Alterar ou complementar informações para esta imagem" href=javascript:editarImagem('+data[nI].IMB_IMG_ID+') class="btn btn-sm btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i></a>'+
                         '       <a title="Excluir a imagem" href=javascript:apagarImagem('+data[nI].IMB_IMG_ID+') class="btn btn-sm btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>'+
                         principal+
@@ -324,6 +336,8 @@ function CarregarImagens()
 
         window.close();
     }
+
+    CarregarImagens();
 
 </script>
 

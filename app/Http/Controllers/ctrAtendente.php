@@ -151,8 +151,9 @@ class ctrAtendente extends Controller
         $atd->IMB_ATD_COMISSAOCORVENDA = $request->IMB_ATD_COMISSAOCORVENDA;
         $atd->IMB_ATD_COMISSAOPAGDIAFIXO = $request->IMB_ATD_COMISSAOPAGDIAFIXO;
         $atd->IMB_ATD_COMISSAOPAGDIASEMANA = $request->IMB_ATD_COMISSAOPAGDIASEMANA;
+        $atd->IMB_ATD_NOTIFICARNOVOATM = $request->IMB_ATD_NOTIFICARNOVOATM;
        
-
+        
         if ( $request->input('IMB_ATD_DATAADMISSAO')  <>'' )
            $atd->IMB_ATD_DATAADMISSAO = $request->input('IMB_ATD_DATAADMISSAO');
 

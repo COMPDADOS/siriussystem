@@ -116,7 +116,10 @@
                         </div>
                     </div>                
                 </div>              
-                <div class="col-md-6">
+                <div class="col-md-2">
+                    <input class="form-control" type="text" id="i-pasta" placeholder="Pasta">
+                </div>
+                <div class="col-md-4">
                     @php
                         $eventos = app( 'App\Http\Controllers\ctrTabelaEventos')->carga();
                     @endphp
@@ -141,7 +144,8 @@
                     <thead>
                         <th style="width: 6%">#ID</th>
                         <th class="div-center" style="width: 59%">Evento</th>
-                        <th class="direita" style="width: 15%">$ em Recebidos</th>
+                        <th class="direita" style="width: 15%">$ em Recebidos(Entrada)</th>
+                        <th class="direita" style="width: 15%">$ em Recebidos(Saída)</th>
                         <th class="direita" style="width: 15%">$ em Repassados</th>
                         <th class="direita" style="width: 15%">Saldo</th>
                     </thead>
@@ -186,9 +190,10 @@ $(document).ready(function()
 
     var table = $('#resultTable').DataTable(
     {   
-        "pageLength": 20,
-        "lengthChange": true,
-
+        "paging": true,
+        "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+        "pagingType": "full_numbers",
+        "pageLength": -1,
         "language": 
         {
             "sEmptyTable": "Nenhum registro encontrado",
@@ -222,6 +227,7 @@ $(document).ready(function()
                 d.termino = $('input[name=termino]').val();
                 d.eventos = $("#IMB_TBE_ID").val();
                 d.porcompetencia = $("#chkcompetencia").prop( "checked" )   ? 'S' : 'N';
+                d.pasta = $("#i-pasta").val();
             }
 
         },
@@ -229,7 +235,8 @@ $(document).ready(function()
         [
             {data: 'IMB_TBE_ID' },
             {data: 'IMB_TBE_NOME'},
-            {data: 'Recebimento', render:formatarValorRecebimento},
+            {data: 'Recebimento_Entrada', render:formatarValorRecebimentoEntrada},
+            {data: 'Recebimento_Saida', render:formatarValorRecebimentoSaida},
             {data: 'Repassado', render:formatarValorRepassado},
             {data: 'Saldo', render:formatarValor}
         ],
@@ -290,13 +297,24 @@ $(document).ready(function()
 
     }
 
-    function formatarValorRecebimento(data, type, full, meta)
+    function formatarValorRecebimentoEntrada(data, type, full, meta)
     {
 //        debugger;
         var evento = full.IMB_TBE_ID;
         if( data ==  '' || data === null ) return '-';
         var valor = parseFloat(data);
-        return '<div class="direita"><a href="javascript:explodirLancto('+evento+', \'RT\')">'+formatarBRSemSimbolo( valor )+'</a></div>';
+        return '<div class="direita"><a href="javascript:explodirLancto('+evento+', \'RT\', \'D\')">'+formatarBRSemSimbolo( valor )+'</a></div>';
+            
+
+    }
+
+    function formatarValorRecebimentoSaida(data, type, full, meta)
+    {
+//        debugger;
+        var evento = full.IMB_TBE_ID;
+        if( data ==  '' || data === null ) return '-';
+        var valor = parseFloat(data);
+        return '<div class="direita"><a href="javascript:explodirLancto('+evento+', \'RT\', \'C\')">'+formatarBRSemSimbolo( valor )+'</a></div>';
             
 
     }
@@ -307,7 +325,7 @@ $(document).ready(function()
         var evento = full.IMB_TBE_ID;
         if( data ==  '' || data === null ) return '-';
         var valor = parseFloat(data);
-        return '<div class="direita"><a href="javascript:explodirLancto('+evento+', \'RD\')">'+formatarBRSemSimbolo( valor )+'</a></div>';
+        return '<div class="direita"><a href="javascript:explodirLancto('+evento+', \'RD\', \'T\')">'+formatarBRSemSimbolo( valor )+'</a></div>';
             
 
     }
@@ -321,9 +339,8 @@ $(document).ready(function()
         return '<div class="direita">'+formatarBRSemSimbolo( valor )+'</div>';
     }
 
-    function explodirLancto( evento, tipo )
+    function explodirLancto( evento, tipo, debcre )
     {
-
         var inicio = $("#i-inicio").val();
         var fim = $("#i-termino").val();
         var porcompetencia = $("#chkcompetencia").prop( "checked" )   ? 'S' : 'N';
@@ -331,11 +348,11 @@ $(document).ready(function()
 
         if( tipo == 'RT' )
             var url = "{{route('movimentacaoporeventodetalherecebido.view')}}?inicio="+
-                        inicio+"&fim="+fim+"&porcompetencia="+porcompetencia+"&eventos="+eventos;
+                        inicio+"&termino="+fim+"&porcompetencia="+porcompetencia+"&eventos="+eventos+'&pasta='+$("#i-pasta").val()+'&debcre='+debcre;
 
         if( tipo == 'RD' )
             var url = "{{route('movimentacaoporeventodetalherepassado.view')}}?inicio="+
-                        inicio+"&fim="+fim+"&porcompetencia="+porcompetencia+"&eventos="+eventos;
+                        inicio+"&termino="+fim+"&porcompetencia="+porcompetencia+"&eventos="+eventos+'&pasta='+$("#i-pasta").val();
         
         window.open( url, '_blank' );
 

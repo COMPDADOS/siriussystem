@@ -46,6 +46,9 @@
             <option value="emailreajustelocatar">Usar como Email Aviso Reajuste Locatário</option>
             <option value="emaillocatarioimportante">Usar como Email Aviso Importante ao Locatário</option>
             <option value="avisodesocupacao">Usar como Aviso de Desocupação</option>
+            <option value="recibocontaspagar">Usar Recibo Contas a Pagar</option>
+            <option value="recibopagcaixa">Usar Recibo de Pagamento no Caixa</option>
+            <option value="reciboreccaixa">Usar Recibo de Recebimento no Caixa</option>
             
         </select>
         <hr>
@@ -63,12 +66,17 @@
         </div>
         <div class="col-md-12 escondido" id="div-word">
             <h5>Nome do Arquivo Modelo</h5>
-            <input type="text" class="form-control" id="i-upload">
-            <h5>Nome do Arquivo Gerado</h5>
-            <input type="text" class="form-control" id="i-download">
-            <h5 class="div-center">Click no botão abaixo para upload do arquivo</h5>
-            <button class="form-control btn btn-primary">Upload</button>
-
+            <input type="text" class="form-control" id="i-upload" readonly>
+            <form action="{{ route('docsautomaticos.upload') }}" method="post" enctype="multipart/form-data" id="form-upload-docautomatico">
+                @csrf
+                <label for="file">Selecione o documento</label>
+                <input type="file" id="file" name="file">
+                <input type="hidden" name="nomedocumento-upl" id="nomedocumento-upl">
+                <input type="hidden" name="GER_DCA_ID_UPL" id="GER_DCA_ID_UPL" value="{{$dca->GER_DCA_ID}}">
+                <h5 class="div-center">Click no botão abaixo para upload do arquivo</h5>
+                <button class="btn btn-primary" type="submit">Fazer o Upload</button>
+              </form>
+            
         </div>
     </div>
     <div class="col-md-9">
@@ -123,7 +131,12 @@ function incluirCampo()
         alert( 'Selecione o campo desejgado');
         return false;
     }
+
+
+    
     var valor = $("#selcampos").val();
+    //if( $("#i-padrao-word").prop('checked') == true )
+        //valor = "${"+valor+"}";
     CKEDITOR.instances['GER_DCA_TEXTO'].insertText( valor );
     $("#GER_DCA_TEXTO").show();    
 };
@@ -131,6 +144,12 @@ function incluirCampo()
 
 function salvar()
 {
+    if ( $("#GER_DCA_NOME").val() == 'Novo documento')
+    {
+        alert('Informe como podemos chamar este documento!');
+        event.preventDefault();        
+        return false;
+    }
     var url = "{{route('docsautomaticos.salvar')}}";
 
     var dados =
@@ -159,9 +178,10 @@ function salvar()
             dataType:'json',
             type:'post',
             data:dados,
-            success:function()
+            success:function( data )
             {
                 alert( 'gravado!');
+                window.location = "{{route('docsautomaticos.index')}}";
             }
         });
     
@@ -225,6 +245,13 @@ function cargaCampos()
     });
                 
 }
+
+$("#form-upload-docautomatico").submit( function()
+{
+    
+    salvar();
+    $("#GER_DCA_ID_UPL").val( $("#GER_DCA_ID").val() );
+})
 
 
 

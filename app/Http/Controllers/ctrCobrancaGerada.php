@@ -22,6 +22,7 @@ use App\mdlTabelaMulta;
 use App\mdlTmpPrevisaoRecebimentoDetail;
 use App\mdlTmpPrevisaoRecebimento;
 use App\mdlLocatarioContrato;
+use App\mdlObs;
 
 use Illuminate\Support\Carbon;
 
@@ -57,6 +58,7 @@ class ctrCobrancaGerada extends Controller
 
         $contacobranca = $request->FIN_CCX_ID;
         $atrasado = $request->geraratrasado;
+        $juridico = $request->gerarjuridico;
         $date = Carbon::today();
 
 
@@ -66,8 +68,12 @@ class ctrCobrancaGerada extends Controller
         ->where( 'IMB_FORPAG_ID_LOCATARIO','=','1')
         ->where( 'FIN_CCR_ID_COBRANCA','=',$contacobranca) ;
 
+        if( $juridico == 'N')
+            $contratos = $contratos->whereRaw( "coalesce(IMB_CTR_ADVOGADO,'N') <> 'S'");
+
         if( $atrasado == 'N')
            $contratos= $contratos->whereDate('IMB_CTR_VENCIMENTOLOCATARIO', '>=', $date);
+
 
         if( $request->IMB_CTR_ID <> 0 )
         {
@@ -110,8 +116,6 @@ class ctrCobrancaGerada extends Controller
 
 
 
-            if( $contrato->IMB_CTR_ADVOGADO <> 'A')
-            {
                 //Log::info('entrou 2');
                 $this->gerar( $idcontrato,
                                     $contrato->IMB_CTR_DIAVENCIMENTO,
@@ -123,7 +127,6 @@ class ctrCobrancaGerada extends Controller
                                    $anofinal,
                                    $contacobranca
                                 );
-            }                                
 
         }
 
@@ -703,7 +706,7 @@ class ctrCobrancaGerada extends Controller
     {
         $request = new \Illuminate\Http\Request();
 
-        $request->replace(['ordem' => 'IMB_CTR_REFERENCIA']);
+        $request->replace(['ordem' => 'IMB_CTR_REFERENCIA',]);
 
 
         $cob = $this->carga( $request );
@@ -818,8 +821,12 @@ class ctrCobrancaGerada extends Controller
 
             if( $conta->FIN_CCI_BANCONUMERO == 341 )
             {
-                $url = app('App\Http\Controllers\ctrBoletoItau')
-                    ->gerarRemessa();
+                if( $conta->FIN_CCX_ARQCOBRANCANOVOPADRAO =='S' )
+                    $url = app('App\Http\Controllers\ctrBoletoItau')
+                        ->gerarRemessaNovoPadrao();
+                else
+                    $url = app('App\Http\Controllers\ctrBoletoItau')
+                        ->gerarRemessa();
 
             }
 
@@ -879,10 +886,12 @@ class ctrCobrancaGerada extends Controller
         $gerar='N';
         $cp = mdlCobrancaGeradaPerm::where( 'IMB_CGR_VENCIMENTOORIGINAL','=', $data )
         ->where( 'IMB_CTR_ID','=', $idcontrato )
-        ->where( 'IMB_CGR_DTHINATIVO','=',null )
+        ->whereNull( "IMB_CGR_DTHINATIVO")  //is null or COALESCE(IMB_CGR_ENTRADACONFIRMADA,'') ='N'")
         ->first();
 
         if( $cp <> null ) return $tem='S';
+
+
         return $tem;
 
 
@@ -1225,7 +1234,19 @@ class ctrCobrancaGerada extends Controller
                 $dados = app('App\Http\Controllers\ctrBoleto237')
                 ->lerRetorno400( $request->conta, $request->arquivo, $request->ocor, $request->nomeoriginal );
             }
-            if( $dadosconta->FIN_CCI_BANCONUMERO == 84 )
+            if( $dadosconta->FIN_CCI_BANCONUMERO == 341 )
+            {
+                $dados = app('App\Http\Controllers\ctrBoletoItau')
+                ->lerRetorno400( $request->conta, $request->arquivo, $request->ocor, $request->nomeoriginal );
+            }
+            
+            if( $dadosconta->FIN_CCI_BANCONUMERO == 77 )
+            {
+                Log::info( 'vou acessar o 77');
+                $dados = app('App\Http\Controllers\ctrBoleto077')
+                ->lerRetorno400( $request->conta, $request->arquivo, $request->ocor, $request->nomeoriginal );
+
+            }   if( $dadosconta->FIN_CCI_BANCONUMERO == 84 )
             {
                 $dados = app('App\Http\Controllers\ctrBoleto084')
                 ->lerRetorno400( $request->conta, $request->arquivo, $request->ocor, $request->nomeoriginal );
@@ -1257,7 +1278,7 @@ class ctrCobrancaGerada extends Controller
 
             $retornos = $retornos->get();
 
-            return view( 'cobrancabancaria.resultadoleitura');
+        return view( 'cobrancabancaria.resultadoleitura');
             //return response()->json($retornos,200);
 
         }
@@ -1433,17 +1454,7 @@ class ctrCobrancaGerada extends Controller
         }
 
         $diferenca =  round( floatval($totalitensboleto),2) - round(floatval($totalCalculado),2);
-        Log::info( "Diferenca $diferenca");
-        if( $diferenca <> 0 )
-        {
-            //Log::info( "     totalitensboleto: $totalitensboleto <> totalCalculado> $totalCalculado");
-            
-//            $inv = mdlRetornoBancario::where( 'id','=',$id );
-            //$inv->observacoes = 'Valor pago difere do valor do boleto gerado';
-            //$inv->save();
-        }
-        else
-        {
+        
             $proximorecibo = $this->proximoRecibo();
             //Fazer as baixas dos ítens
             $itemaluguel = 0;
@@ -1549,88 +1560,6 @@ class ctrCobrancaGerada extends Controller
                     $lf->IMB_LCF_ORIGEM          = 'BOLETO';
                     $lf->save();
                 };
-
-                /*
-                if( $cgr->IMB_CGR_VALORPONTUALIDADE <> 0 )
-                {
-                    $eve        = mdlEvento::find( $idtbe );
-
-                    if( $idcfc == '' )
-                        $idcfc = $eve->FIN_CFC_ID;
-    
-                    $recibo = new mdlReciboLocatario;
-                    $recibo->IMB_RLT_NUMERO         = $proximorecibo;
-                    $recibo->IMB_RLT_DATAPAGAMENTO  = $datapagamento;
-                    $recibo->IMB_IMB_ID             = Auth::user()->IMB_IMB_ID;
-                    $recibo->IMB_RLT_DATACOMPETENCIA= $datavencimento;
-                    $recibo->IMB_RLT_LOCATARIOCREDEB= 'C';
-                    $recibo->IMB_RLT_LOCADORCREDEB  = 'D';
-                    $recibo->IMB_RLT_VALOR          = $cgr->IMB_CGR_VALORPONTUALIDADE;
-                    $recibo->IMB_RLT_OBSERVACAO     = 'Bonificação para pagamento até vencimento';
-                    $recibo->IMB_RLT_TIPORECEBIMENTO= 'B';
-                    $recibo->IMB_LCF_ID             = 0;
-                    $recibo->IMB_RLT_DATACAIXA      = $datacredito;
-                    $recibo->IMB_RLT_FORMARECEBIMENTO  = 'BANCO';
-                    $recibo->IMB_RLT_DATACONTABIL   = $datacredito;
-                    $recibo->IMB_CTR_ID             = $idcontrato;
-                    $recibo->IMB_IMV_ID             = $idimv;
-                    $recibo->IMB_TBE_ID             = 5;
-                    $recibo->FIN_CFC_ID             = $idcfc;
-                    $recibo->FIN_CCR_ID             = $FIN_CCR_ID;
-                    $recibo->IMB_ATD_ID             = Auth::user()->IMB_ATD_ID;
-                    $recibo->IMB_RLT_DTHEMISSAO     = date('Y/m/d');
-                    $recibo->IMB_IMB_ID2            = $idimb2;
-                    $recibo->IMB_FORPAG_ID          = 1;
-                    $recibo->IMB_RLT_TOTALRECIBO    = $valorpago;
-                    $recibo->IMB_RLT_DATALIMITE     = $datavencimento;
-                    $recibo->FIN_LCX_DINHEIRO       = $valorpago;
-                    $recibo->FIN_LCX_CHEQUE         = 0;
-                    $recibo->FIN_CFC_ID             = $idcfc;
-                    $recibo->IMB_CLT_ID_LOCATARIO   = $idlocatario;
-                    $recibo->IMB_CLT_ID_LOCADOR     = $idlocador;
-                    $recibo->save();
-                    
-                    //VERIFICAR SE A BONIFICACAO JÁ NÃO EXISTIA;
-                    $bnf = mdlLancamentoFuturo::where('IMB_IMB_ID','=', Auth::user()->IMB_ATD_ID)
-                    ->where( 'IMB_LCF_DATAVENCIMENTO','=', $datavencimento )
-                    ->where( 'IMB_TBE_ID','=', 5 )
-                    ->whereNull( 'IMB_LCF_DTHINATIVADO')
-                    ->first();
-
-                    if( $blf == '' )
-                    {
-                        $lf = new mdlLancamentoFuturo();
-                        $lf->IMB_IMB_ID              = Auth::user()->IMB_IMB_ID;
-                        $lf->IMB_CTR_ID              = $idcontrato;
-                        $lf->IMB_LCF_VALOR           = $cgr->IMB_CGR_VALORPONTUALIDADE;
-                        $lf->IMB_LCF_LOCADORCREDEB   = 'D';
-                        $lf->IMB_LCF_LOCATARIOCREDEB = 'C';
-                        $lf->IMB_LCF_DATAVENCIMENTO  = $datavencimento;
-                        $lf->IMB_IMV_ID              = $idimv;
-                        $lf->IMB_CLT_IDLOCADOR       = 0;
-                        $lf->IMB_TBE_ID              = 5;
-                        $lf->IMB_ATD_ID              = Auth::user()->IMB_IMB_ID;
-                        $lf->IMB_LCF_INCMUL          = 'S';
-                        $lf->IMB_LCF_INCIRRF         = 'S';
-                        $lf->IMB_LCF_INCTAX          = 'S';
-                        $lf->IMB_LCF_INCJUROS        = 'S';
-                        $lf->IMB_LCF_INCCORRECAO     = 'S';
-                        $lf->IMB_LCF_GARANTIDO       = 'N';
-                        $lf->IMB_LCF_INCISS          = 'N';
-                        $lf->IMB_LCF_OBSERVACAO      = 'Bonificação para pagamento até vencimento';
-                        $lf->IMB_LCF_NUMEROCONTROLE  = '0';
-                        $lf->IMB_LCF_NUMPARREAJUSTE  = '0';
-                        $lf->IMB_LCF_NUMPARCONTRATO  = '0';
-                        $lf->IMB_LCF_CHAVE           = '0';
-                        $lf->IMB_LCF_TIPO            = 'A';
-                        $lf->IMB_LCF_DATARECEBIMENTO = $datapagamento;
-                        $lf->IMB_RLT_NUMERO          = $proximorecibo;
-                        $lf->IMB_LCF_DATALANCAMENTO  = date('Y/m/d');
-                        $lf->save();
-                    }
-    
-                }
-*/
             }
 
             if( $cgr )
@@ -1651,7 +1580,7 @@ class ctrCobrancaGerada extends Controller
             }
 
             return $recibo->IMB_RLT_NUMERO;
-        }
+        
 
     }
 
@@ -2368,6 +2297,7 @@ class ctrCobrancaGerada extends Controller
     {
         $datainicio = $request->datainicio;
         $datafim    = $request->datafim;
+        $semjson    = $request->semjson;
         if( $datainicio == '' ) $datainicio = date('Y/m/d');
         if( $datafim == '' ) $datafim = date('Y/m/d');
 
@@ -2377,14 +2307,17 @@ class ctrCobrancaGerada extends Controller
                 DB::raw( '( select PEGALOCATARIOCONTRATO( IMB_COBRANCAGERADAPERM.IMB_CTR_ID) ) AS LOCATARIO')
                 
             ])
-        ->where('IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
+        ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_COBRANCAGERADAPERM.IMB_CTR_ID')
+        ->where('IMB_CONTRATO.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
         ->where( 'IMB_CGR_DATAVENCIMENTO','>=', $datainicio )
         ->where( 'IMB_CGR_DATAVENCIMENTO','<=', $datafim )
+        ->where( 'IMB_CTR_SITUACAO','=', 'ATIVO')
         ->whereNull( 'IMB_CGR_DATABAIXA')
         ->whereNull( 'IMB_CGR_DTHINATIVO')
         ->orderBy( 'IMB_CGR_DATAVENCIMENTO')
         ->get();
 
+        if( $semjson == 'S' ) return $boletos;
         return response()->json($boletos,200);
 
 
@@ -2396,6 +2329,7 @@ class ctrCobrancaGerada extends Controller
     {
         $datainicio = $request->datainicio;
         $datafim    = $request->datafim;
+        $semjson = $request->semjson;
         if( $datainicio == '' ) $datainicio = date('Y/m/d');
         if( $datafim == '' ) $datafim = date('Y/m/d');
 
@@ -2407,6 +2341,7 @@ class ctrCobrancaGerada extends Controller
         ->orderBy( 'IMB_CGR_DATAVENCIMENTO')
         ->count();
 
+        if( $semjson == 'S' ) return $boletos;
         return response()->json($boletos,200);
 
 
@@ -2826,6 +2761,62 @@ class ctrCobrancaGerada extends Controller
 
         return response()->json( $telefones, 200);
     }
+
+
+    public function cargaBoletosPeriodoJson( Request $request )
+    {
+
+        $logged='S';
+        if( ! Auth::check())
+        {
+            Auth::loginUsingId( 1,false);
+            $logged = 'N';
+        }
+        $datainicio = $request->datainicio;
+        $datafim = $request->datafim;
+
+        $cobrancas = mdlCobrancaGeradaPerm::select( '*',
+        db::Raw( '( select PEGAEMAILLOCATARIOCONTRATO( IMB_COBRANCAGERADAPERM.IMB_CTR_ID) ) EMAIL'))
+                ->where( 'IMB_CTR_SITUACAO','=','ATIVO')
+                ->whereNull( 'IMB_CGR_DATABAIXA')
+                ->whereNull( 'IMB_CGR_DTHINATIVO')
+                ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_COBRANCAGERADAPERM.IMB_CTR_ID' )
+                ->where( 'IMB_CGR_ENTRADACONFIRMADA','=','S' )
+                ->where( 'IMB_CGR_DATAVENCIMENTO','>=', $datainicio )
+                ->where( 'IMB_CGR_DATAVENCIMENTO','<=', $datafim );
+
+        $cobrancas = $cobrancas->get();
+
+        return response()->json($cobrancas,200 );
+
+    }
+
+    public function painelBoletosEnviadosCarga( Request $request )
+    {
+
+        $datainicio = $request->datainicio;
+        $datafim = $request->datafim;
+
+        $boletos = mdlObs::
+        select( 
+            '*', 
+            db::raw( '( SELECT IMB_CTR_REFERENCIA FROM IMB_CONTRATO WHERE IMB_CONTRATO.IMB_CTR_ID = IMB_OBSERVACAOGERAL.IMB_CTR_ID) AS IMB_CTR_REFERENCIA' ),
+            db::raw( '( select PEGALOCATARIOCONTRATO( IMB_OBSERVACAOGERAL.IMB_CTR_ID) ) AS IMB_CLT_NOME')
+        )
+        ->whereRaw( " cast(IMB_OBS_DTHATIVO as date ) between '$datainicio' and '$datafim' and  IMB_OBS_OBSERVACAO like 'Boleto enviado para%'")
+        ->orderBy( 'IMB_OBS_ID','desc' );
+
+
+
+        return DataTables::of($boletos)->make(true);        
+
+
+
+    }
+
+
+
+
 
 }
 

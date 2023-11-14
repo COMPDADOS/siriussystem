@@ -10,9 +10,10 @@ class ctrClientePerfil extends Controller
 {
     public function carga( $id )
     {
-        $perfil = mdlClientePerfil::select('*')
-        ->where( "IMB_CLT_ID",'=',$id)
+        $perfil = mdlClientePerfil::
+        where( "IMB_CLT_ID",'=',$id)
         ->leftJoin( 'IMB_TIPOIMOVEL','IMB_TIPOIMOVEL.IMB_TIM_ID', 'IMB_CLIENTEPERFIL.IMB_TIM_ID')
+        ->leftJoin( 'IMB_REGIAODACIDADE','IMB_REGIAODACIDADE.IMB_RGC_ID','IMB_CLIENTEPERFIL.IMB_RGC_ID')
         ->orderBy( 'IMB_CLP_DATACADASTRO','ASC')
         ->get();
 
@@ -22,8 +23,6 @@ class ctrClientePerfil extends Controller
 
     public function gravar( Request $request )
     {
-
-            $regiao = explode(",",$request->REGIAO);
 
 
             $IMB_CLP_VALVENINI = $request->IMB_CLP_VALVENINI;
@@ -80,8 +79,6 @@ class ctrClientePerfil extends Controller
         $perfil->IMB_CLP_VALLOCFIM = $IMB_CLP_VALLOCFIM;
         $perfil->IMB_TIM_ID = $IMB_TIM_ID;
         $perfil->IMB_IMV_FINALIDADE = $request->IMB_IMV_FINALIDADE;
-        $perfil->IMB_CLP_CIDADE = $regiao[0];
-        $perfil->IMB_CLP_BAIRRO = $regiao[1];
         $perfil->IMB_IMV_DORQUA = $IMB_IMV_DORQUA;
         $perfil->IMB_IMV_GARAGEM = $IMB_IMV_GARAGEM;
         $perfil->IMB_IMV_SUIQUA = $IMB_IMV_SUIQUA;
@@ -91,9 +88,22 @@ class ctrClientePerfil extends Controller
         $perfil->IMB_IMV_EMCONDOMINIO = substr($request->IMB_IMV_EMCONDOMINIO,0,1);
         $perfil->IMB_IMB_ID = Auth::user()->IMB_IMB_ID;
         $perfil->IMB_ATD_ID = Auth::user()->IMB_ATD_ID;
+        $perfil->IMB_RGC_ID = $request->IMB_RGC_ID;
         $perfil->save();
         
         return response()->json( 'ok',200);
+    }
+
+    public function apagar( $id )
+    {
+        $per = mdlClientePerfil::find( $id );
+        if( $per)
+        {
+            $per->delete();
+            return response()->json( 'ok',200);
+        }
+        return response()->json('não encontrado',404);
+
     }
 
 }

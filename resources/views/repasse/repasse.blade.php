@@ -130,6 +130,7 @@
                   @php
                     $contrato = app('App\Http\Controllers\ctrContrato')->findFull( $id );
                     $ppis = app('App\Http\Controllers\ctrPropImo')->cargaSemJson( $contrato->IMB_IMV_ID);
+                    $param2 = app( 'App\Http\Controllers\ctrRotinas')->parametros2( Auth::user()->IMB_IMB_ID);
                   @endphp
                   @foreach( $ppis as $registro )
                     {{$registro->IMB_CLT_NOME}}({{$registro->IMB_IMVCLT_PERCENTUAL4}}%),
@@ -362,8 +363,16 @@
         $("#i-data-limite").val( dDataLimite)
         $("#i-data-limite-fixo").val( dDataLimitefixo)
 
+        var datapagtododia = "{{$param2->IMB_PRM_DATAREPASSEDODIA}}";
+
+        if( datapagtododia == 'S' )
+          $("#i-data-rec").val(  moment().format( 'YYYY-MM-DD') )
+        else
+        $("#i-data-rec").val(  moment(dDataLimite).format( 'YYYY-MM-DD') );
+
+
         $("#i-data-base").val( moment().format( 'YYYY-MM-DD'));
-        $("#i-data-rec").val( moment().format( 'YYYY-MM-DD'));
+//        $("#i-data-rec").val( moment().format( 'YYYY-MM-DD'));
         $("#i-tolerancia").val( data[0].IMB_CTR_TOLERANCIA );
         $("#IMB_IMV_ID").val( data[0].IMB_IMV_ID );
 
@@ -428,6 +437,9 @@
                           data[nI].FIN_CCX_DESCRICAO+"</option>";
         $("#FIN_CCX_ID_LOCADOR").append( linha );
       }
+      $("#FIN_CCX_ID_LOCADOR").val(  $("#i-contarepassepadrao").val() );
+      
+
     });
 
   }
@@ -448,6 +460,7 @@
                         data[nI].IMB_FORPAG_NOME+"</option>";
         $("#IMB_FORPAG-IDLOCADOR-repasse").append( linha );
       }
+      $("#IMB_FORPAG-IDLOCADOR-repasse").val($("#i-formarepassepadrao").val() );
     });
 
   }
@@ -494,7 +507,8 @@
     var nTroco = parseFloat(realToDolar($("#i-troco-locador").val()));
     if ( isNaN( nTroco))
       nTroco = 0;
-
+  
+    
     var nRecibo = gerandoReciboLocador(
       "i-tlblf-resumo",
       moment( $("#i-data-base").val()).format( 'YYYY-MM-DD'),
@@ -513,12 +527,14 @@
 
     );
 
+    if( confirm( "Processo concluído com Sucesso! Deseja emitir o recibo?") )
+			{  
+
+			  window.open( "{{route('recibolocador.imprimir')}}/"+nRecibo+'/S', '_blank');
+			}
+
     $("#btn-confirmar").hide();
 
-    if( confirm( "Processo concluído. Deseja emitir o recibo?") )
-    {  
-      window.open( "{{route('recibolocador.imprimir')}}/"+nRecibo+'/S', '_blank');
-    }
 
     $("#modalresumoparcela").modal('hide');
     $("#div-calcular").hide();
@@ -620,6 +636,16 @@
   //    $("#i-total-apurado").val( formatarBRSemSimbolo(totalreceber) );
       $("#i-total-dinheiro-locador").val( formatarBRSemSimbolo(totalreceber) );
       $("#i-div-dados-repassar").show();
+
+      var tot = parseFloat(realToDolar( totalreceber ))
+      if( tot < 0 ) 
+      {
+        $("#i-total-dinheiro-locador").val( '0,00' );
+        $("#i-troco-locador").val( formatarBRSemSimbolo(totalreceber) );
+        $("#div-debito-futuro-locador").show();
+        $("#i-debito-futuro").prop('checked',true );
+        
+      }
   }
 
   function apagarLancamento( id )
@@ -770,9 +796,9 @@
 
   function alterarLancamento( id, tbe )
   {
-    if( tbe != 6 )
+    if( tbe == 1 )
     {
-      alert('Alteração só permitida para taxa administrativa');
+      alert('Aluguel não pode ser altera');
       return false;
     }
     $("#i-tmp-rec-id").val( id );

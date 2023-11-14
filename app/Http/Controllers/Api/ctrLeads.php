@@ -8,14 +8,14 @@ use App\mdlLeads;
 use App\mdlImovel;
 use Auth;
 use DB;
+use Log;
 
 class ctrLeads extends Controller
 {
-    public function webhook( Request $request)
+    public function capturarVivaReal( Request $request)
     {
        
-        dd( $request->all() );
-
+            Log::info('Capturando leads');
             $userdata = $request->input();
 //            $dados = json_decode( $userdata );
 
@@ -38,6 +38,7 @@ class ctrLeads extends Controller
             $lead->IMB_LED_TELEFONE =  $userdata['phone'];
             $lead->IMB_LED_MENSAGEM =  $userdata['message'];
             $lead->save();
+            Log::info('Salvou lead');
             Auth::logout();
             return response()->json('ok',200);
 

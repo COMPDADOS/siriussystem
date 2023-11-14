@@ -116,7 +116,7 @@ th, td{
 }
 .rejeitado
 {
-    color:green;
+    color:red;
     text-decoration-line: italic;
 }
 .div-center
@@ -358,7 +358,8 @@ h4-center-17 {
         onClick="limparCampos()">Limpar Filtro</button>
 
         @php  
-            $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'Contratos', 'Contratos', 'ADM', 'Contratos','S', 'I', 'Botão')
+            $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'Contratos', 'Contratos', 'ADM', 'Contratos','S', 'I', 'Botão');
+            $param2 = app( 'App\Http\Controllers\ctrRotinas')->parametros2( Auth::user()->IMB_IMB_ID);
         @endphp
         <div class="{{$acesso}}">
             <form action="{{route( 'imovel.index' )}}" method="get">
@@ -374,6 +375,8 @@ h4-center-17 {
         <form role="form" id="search-form">
         <!--<form role="form" action="{{ route('contrato.list')}}" method="get">-->
             <input type="hidden" id="IMB_IMB_IDMASTER" name="empresamaster" value="{{ Auth::User()->IMB_IMB_ID }}">
+            <input type="hidden" id="i-idtbesemseg" value="{{$param2->IMB_TBE_IDSEGINC}}">
+            <input type="hidden" id="i-textsemseguro">
             <div class="form-body cor-fundo-pesquisa">
                 <input type="hidden" id="i-unidade" name="agencia">
 
@@ -385,17 +388,23 @@ h4-center-17 {
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-2 row-top-margin">
+                    <div class="col-md-1 row-top-margin">
                         <div class="form-group">
                             <label for="referencia" >Pasta</label>
                             <input type="text" class="form-control" name="referencia"
                             id="i-referencia">
                         </div>
                     </div>
-                    <div class="col-md-2 row-top-margin">
+                    <div class="col-md-1 row-top-margin">
                         <div class="form-group">
                             <label for="id_completus">Código Imóvel</label>
                             <input type="text" class="form-control" name="id_completus" id="i-idcompletus">
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            <label for="id_completus">Dia Vencto.</label>
+                            <input type="number" class="form-control"  id="i-diavencimento" max="31" min="1" value="">
                         </div>
                     </div>
 
@@ -406,6 +415,14 @@ h4-center-17 {
                             placeholder="Sugestão: coloque parte do endereço" id="i-endereco">
                         </div>
                     </div>
+                    <div class="col-md-1 div-center row-top-margin">
+                        <div class="form-group div-center" >
+                            <label >S/ Seguro Incêndio
+                            <input title="Sem seguro lançado para o próximo vencimento" class="form-control" type="checkbox" id="i-semseguro">
+                                </label>
+                        </div>
+                    </div>
+
 
                 </div>
 
@@ -585,6 +602,22 @@ $(document).ready(function()
         $("#i-unidade").val( nUnidade);
     });
 
+    $("#i-semseguro").change( function()
+    {
+        if( $("#i-semseguro").prop('checked') == true )
+        {
+            if( $("#i-idtbesemseg").val() == '' )
+            {
+                alert('Você precisa definir qual o código do evento do seguro incêndio em parametrização!');
+                $("#i-semseguro").prop( 'checked', false);
+                return false;
+            }
+            $("#i-textsemseguro").val( 'S' )
+        }
+        else
+            $("#i-textsemseguro").val( 'N' );
+
+    })
     $( "#i-select-tipo" ).change(function() {
         var nTipo = $('#i-select-tipo').val();
         $("#i-tipo").val( nTipo);
@@ -649,6 +682,9 @@ $(document).ready(function()
                 d.advogadoexceto = $('input[name=IMB_CTR_ADVOGADOEXCETO]').val();
                 d.fiador = $('input[name=fiador]').val();
                 d.empresamaster = $('input[name=empresamaster]').val();
+                d.diavencimento = $("#i-diavencimento").val();
+                d.semseguro = $("#i-textsemseguro").val();
+                
             }
         },
         columns: [
@@ -666,6 +702,7 @@ $(document).ready(function()
     });
     $('#search-form').on('submit', function(e) {
 
+            $("#i-semseguro").val(  $("#i-semseguro").prop( "checked" )   ? 'S' : 'N');            
             $("#IMB_CTR_ADVOGADO").val(  $("#IMB_CTR_ADVOGADO").prop( "checked" )   ? 'S' : 'N');
             $("#IMB_CTR_ADVOGADOEXCETO").val(  $("#IMB_CTR_ADVOGADOEXCETO").prop( "checked" )   ? 'S' : 'N');
             table.draw();
@@ -960,6 +997,47 @@ $(document).ready(function()
 
                 '</div>';
 
+                iptu1 = full.IMB_IMV_IPTU1
+                if( iptu1  === null )  iptu1='';
+                iptu2 = full.IMB_IMV_IPTU2
+                if( iptu2  === null )  iptu2='';
+                iptu3 = full.IMB_IMV_IPTU3
+                if( iptu3  === null )  iptu3='';
+                iptu4 = full.IMB_IMV_IPTU4
+                if( iptu4  === null )  iptu4='';
+                iptu5 = full.IMB_IMV_IPTU5
+                if( iptu5  === null )  iptu5='';
+                iptu6 = full.IMB_IMV_IPTU6
+                if( iptu6  === null )  iptu1='';
+
+
+                iptu1ref = full.IMB_IMV_IPTU1REFERENTE
+                if( iptu1ref  === null )  iptu1ref='';
+                
+                iptu2ref = full.IMB_IMV_IPTU2REFERENTE
+                if( iptu2ref  === null )  iptu2ref='';
+                
+                iptu3ref = full.IMB_IMV_IPTU3REFERENTE
+                if( iptu3ref  === null )  iptu3ref='';
+                
+                iptu4ref = full.IMB_IMV_IPTU4REFERENTE
+                if( iptu4ref  === null )  iptu4ref='';
+                
+                iptu5ref = full.IMB_IMV_IPTU5REFERENTE
+                if( iptu5ref  === null )  iptu5ref='';
+                
+                iptu6ref = full.IMB_IMV_IPTU6REFERENTE
+                if( iptu6ref  === null )  iptu6ref='';
+                
+
+                inscdae = full.IMB_IMV_DAEINSCRICAO;                
+                if( inscdae === null ) inscdae = '-';
+                senhadae = full.IMB_IMV_DAESENHA;                
+                if( senhadae === null ) senhadae = '-';
+                inscenerg = full.IMB_IMV_CPFLINSCRICAO;                
+                if( inscenerg === null ) inscenerg = '-';
+                senhaenerg = full.IMB_IMV_CPFLSENHA;                
+                if( senhaenerg === null ) senhaenerg = '-';
 
                 var formarec = full.CONTARECEB;
                 if( formarec == null ) 
@@ -967,6 +1045,14 @@ $(document).ready(function()
                 else
                     formarec = '('+formarec+')';
                 
+                var valorcaucao = '';
+                if( full.VALORCAUCAO != null)
+                    valorcaucao = ' (Caucão de R$ '+dolarToReal(full.VALORCAUCAO )+')';
+
+                var seguroincendio = '';
+                if( full.SEGUROINCENDIO != null )
+                    seguroincendio = ' **Vencimento Seguro Incêndio em: '+moment( full.SEGUROINCENDIO).format('DD/MM/YYYY')+'**';
+
                 var formafianca = full.IMB_CTR_EXIGENCIA;
                 if( formafianca == 'F' ) formafianca =  'Fiador';
                 if( formafianca == 'C' ) formafianca =  'Caução';
@@ -985,7 +1071,7 @@ $(document).ready(function()
                 '   </div> '+
                 '   <div class=" p-5  col-md-6 cardtitulo row-top-margin bg-info text-white">'+
              
-                '           <label >Forma de Fiança: '+formafianca+'   </label>'+
+                '           <label >Forma de Fiança: '+formafianca+valorcaucao+seguroincendio+'   </label>'+
       
                 '   </div> '+
 
@@ -1160,19 +1246,31 @@ $(document).ready(function()
                         '</div>'+
                     '</div>'+
                 '</div>'+
+                '<div class="row p-5 bg-info text-white" >'+
+                '   <div class="col-md-2" >IPTU 1: '+iptu1+'<p>'+iptu1ref+'</p></div>'+
+                '   <div class="col-md-2" >IPTU 2: '+iptu2+'<p>'+iptu2ref+'</p></div>'+
+                '   <div class="col-md-2" >IPTU 3: '+iptu3+'<p>'+iptu3ref+'</p></div>'+
+                '   <div class="col-md-2" >IPTU 4: '+iptu4+'<p>'+iptu4ref+'</p></div>'+
+                '   <div class="col-md-2" >Inscr. Água: '+inscdae+'<p>Senha: '+senhadae+'</p></div>'+
+                '   <div class="col-md-2" >Inscr.Energia: '+inscenerg+'<p>Senha: '+senhaenerg+'</p></div>'+
+                '</div>';
+
                 '<div class="row p-5 bg-info text-white" ><p></p></div>';
 
                 if( obsimv != '' )
-                texto = texto + '<div class="row p-5 bg-info text-white div-center" >'+obsimv+'</div>';
+                texto = texto + '<div class="row p-5 bg-info text-white div-center" ><b>'+obsimv+'</b></div>';
 
                 if( obsld != '' )
-                texto = texto + '<div class="row p-5 bg-info text-white div-center" >'+obsld+'</div>';
+                texto = texto + '<div class="row p-5 bg-info text-white div-center" ><b>'+obsld+'</b></div>';
 
                 if( obslt != '' )
-                texto = texto + '<div class="row p-5 bg-info text-white div-center" >'+obslt+'</div>';
+                texto = texto + '<div class="row p-5 bg-info text-white div-center" ><b>'+obslt+'</b></div>';
                 
                 texto = texto +'<div class="row p-5 bg-info text-white" ><p></p></div>';
 
+                classeencerrado = '';
+                if( full.IMB_CTR_SITUACAO == 'ENCERRADO')
+                   classeencerrado='escondido';
 
                 texto = texto +
                 '<div class="row p-5 bg-info text-white" >'+
@@ -1184,10 +1282,10 @@ $(document).ready(function()
                 '<a class="{{$acesso}}" href="javascript:lancamentos('+full.IMB_CTR_ID+')" title="Lançamentos de valores"><i class="fas fa-calculator fa-2x"></i></a>'+
                 '&nbsp;&nbsp;&nbsp;'+
                 "@php  $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'RecebimentoAluguel', 'Contratos - Receber Aluguel', 'ADM', 'Contratos','S', 'X', 'Botão')@endphp"+
-                '<a class="{{$acesso}}" href="javascript:receber('+full.IMB_CTR_ID+')" title="Receber Aluguel"><i class="fas fa-donate fa-2x" style="color:green"></i></a>'+
+                '<a class="{{$acesso}} '+classeencerrado+'" href="javascript:receber('+full.IMB_CTR_ID+')" title="Receber Aluguel"><i class="fas fa-donate fa-2x" style="color:green"></i></a>'+
                 '&nbsp;&nbsp;&nbsp;'+
                 "@php  $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'RepassarAluguel', 'Contratos - Repassar Aluguel', 'ADM', 'Contratos','S', 'X', 'Botão')@endphp"+
-                '<a  class="{{$acesso}}" href="javascript:repassar('+full.IMB_CTR_ID+')" title="Repassar Aluguel"><i class="fas fa-donate fa-2x" style="color:red"></i></a>'+
+                '<a  class="{{$acesso}} '+classeencerrado+'" href="javascript:repassar('+full.IMB_CTR_ID+')" title="Repassar Aluguel"><i class="fas fa-donate fa-2x" style="color:red"></i></a>'+
                 '&nbsp;&nbsp;&nbsp;'+
                 "@php  $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'HistoricoLt', 'Contratos - Histórico de Recebimento', 'ADM', 'Contratos','S', 'X', 'Botão')@endphp"+
                 '<a class="{{$acesso}}"href="javascript:hitoricoReceb('+full.IMB_CTR_ID+')"    title="Históricos de Recebimento"><i class="fas fa-eye fa-2x" style="color:green"></i></a>'+
@@ -1464,7 +1562,13 @@ $(document).ready(function()
                     //        '   <td style="text-align:center"> '+
                 //            '     <a  class="btn btn-sm btn-primary" data-toggle="tooltip" title="Dados Bancário / Informações para Pagamento" href=javascript:dadosBancarios('+data[nI].IMB_PPI_ID+','+imovel+')>Dados Bancários</a>'+
               //              '   </td>'+
-                            '   <td style="text-align:center"><a href="javascript:ClienteCargaEnvolvido('+data[nI].IMB_CLT_ID+')">'+data[nI].IMB_CLT_NOME+'</a></td>'+
+                            '   <td style="text-align:center"><a title="Forma Pagto: '+
+                                            data[nI].FORMAPAGAMENTO+
+                                            ' Banco: '+data[nI].GER_BNC_NUMERO+
+                                            ' Agencia: '+data[nI].GER_BNC_AGENCIA+'-'+data[nI].IMB_BNC_AGENCIADV+'  '+
+                                            ' Conta: '+data[nI].IMB_CLTCCR_NUMERO+'-'+data[nI].IMB_CLTCCR_DV+'  '+
+                                            ' Correntista: '+data[nI].IMB_CLTCCR_NOME+' CPF: '+data[nI].IMB_CLTCCR_CPF+'  '+
+                                            ' Pix: '+data[nI].IMB_IMVCLT_PIX+'" href="javascript:ClienteCargaEnvolvido('+data[nI].IMB_CLT_ID+')">'+data[nI].IMB_CLT_NOME+'('+data[nI].FORMAPAGAMENTO+')</a></td>'+
                             '   <td style="text-align:center">'+data[nI].IMB_IMVCLT_PERCENTUAL4+'%</td>'+
                             '   <td style="text-align:center">'+data[nI].principal+'</td>'+
                             '</tr>';

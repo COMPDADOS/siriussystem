@@ -236,7 +236,15 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>Condomínio</label>
-                                                <select class="select2" id="IMB_CND_ID" >
+                                                @php
+                                                    $cnds = app('App\Http\Controllers\ctrCondominio')->cargaSemJson( Auth::user()->IMB_IMB_ID );
+                                                @endphp
+                                                <select class="select2"  id="IMB_CND_ID" placeholder="Selecione o Condominio">
+
+                                                    <option value=""></option>
+                                                    @foreach( $cnds as $cnd )
+                                                    <option value="{{$cnd->IMB_CND_ID}}">{{$cnd->IMB_CND_NOME}}</option>
+                                                    @endforeach
                                                 </select>
                                                 <span><button class="btn green" onClick="buscarCondominio()">preencher endereço</button></span>
                                             </div>
@@ -294,15 +302,42 @@
                                                 <label>Cidade</label>
                                                 <input type="text" id="IMB_IMV_CIDADE"
                                                 maxlength="40"
-                                                class="form-control input-sm" value="BAURU" >
+                                                class="form-control input-sm"  >
                                             </div>
                                         </div>
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>UF</label>
-                                                <input type="text"
-                                                id="IMB_IMV_ESTADO" class="form-control input-sm"
-                                                value="SP">
+                                                <select class="form-control" id="IMB_IMV_ESTADO" >
+                                                    <option value="AC">Acre</option>
+                                                    <option value="AL">Alagoas</option>
+                                                  <option value="AP">Amapá</option>
+                                                  <option value="AM">Amazonas</option>
+                                                  <option value="BA">Bahia</option>
+                                                  <option value="CE">Ceará</option>
+                                                  <option value="DF">Distrito Federal</option>
+                                                  <option value="ES">Espírito Santo</option>
+                                                  <option value="GO">Goiás</option>
+                                                  <option value="MA">Maranhão</option>
+                                                  <option value="MT">Mato Grosso</option>
+                                                  <option value="MS">Mato Grosso do Sul</option>
+                                                  <option value="MG">Minas Gerais</option>
+                                                  <option value="PA">Pará</option>
+                                                  <option value="PB">Paraíba</option>
+                                                  <option value="PR">Paraná</option>
+                                                  <option value="PE">Pernambuco</option>
+                                                  <option value="PI">Piauí</option>
+                                                  <option value="RJ">Rio de Janeiro</option>
+                                                  <option value="RN">Rio Grande do Norte</option>
+                                                  <option value="RS">Rio Grande do Sul</option>
+                                                  <option value="RO">Rondônia</option>
+                                                  <option value="RR">Roraima</option>
+                                                  <option value="SC">Santa Catarina</option>
+                                                  <option value="SP">São Paulo</option>
+                                                  <option value="SE">Sergipe</option>
+                                                  <option value="TO">Tocantins</option>
+                                                  <option value="EX">Estrangeiro</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-2">
@@ -1179,10 +1214,11 @@
                                 <table  id="tbcapimo" class="table table-striped table-bordered table-hover" >
                                     <thead class="thead-dark">
                                         <th style="text-align:center"> ID </th>
-                                        <th width="70%" style="text-align:center"> Captador </th>
+                                        <th width="50%" style="text-align:center"> Captador </th>
                                         <th width="10%" style="text-align:center"> Percentual </th>
+                                        <th width="20%" style="text-align:center"> Tipo </th>
                                         <th width="20%" style="text-align:center"> Ações </th>
-                                        </tr>
+                                       </tr>
                                     </thead>
                                     <tbody>
                                     </tbody>
@@ -1424,7 +1460,7 @@
 
 <!--modal CAPIMO -->
 <div class="modal" tabindex="-1" role="dialog" id="modalcapimo">
-    <div class="modal-dialog " role="document">
+        <div class="modal-dialog"  style="width:70%;">
         <div class="modal-content">
             <div class="modal-body">
                 <div class="portlet box blue">
@@ -1446,7 +1482,7 @@
                         <div class="portlet-body form">
                             <div class="form-body" >
                                 <div class="row">
-                                    <div class="col-md-8">
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Captador</label>
                                             <select class="form-control" id="i-select-captador" name="IMB_ATD_ID">
@@ -1457,6 +1493,16 @@
                                         <div class="form-group">
                                             <label>Percentual</label>
                                             <input class="form-control valor" id="IMB_CAPIMO_PERCENTUAL">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label class="control-label">Tipo</label>
+                                            <select  class="form-control" id="IMB_CAPIMO_TIPO">
+                                                <option value="Venda">Venda</option>
+                                                <option value="Locação">Locação</option>
+                                                <option value="Ven./Loc.">Ven./Loc.</option>
+                                            </select>
                                         </div>
                                     </div>
 
@@ -2642,6 +2688,7 @@ function modalCaptadores()
             '   <td class="div-center">'+$("#i-select-captador").val()+'</td>'+
             '   <td class="div-center">'+$("#i-select-captador option:selected" ).text()+'</td>'+
             '   <td class="div-center">'+$("#IMB_CAPIMO_PERCENTUAL").val()+'</td>'+
+            '   <td class="div-center">'+$("#IMB_CAPIMO_TIPO").val()+'</td>'+
             '   <td style="text-align:center"> '+
             '       <a  class="btn btn-sm btn-danger" href=javascript:apagarCapImo('+cliente+')>Apagar</a>'+
             '   </td>'+
@@ -2672,6 +2719,7 @@ function modalCaptadores()
                 IMB_CAPIMO_ID : '',
                 IMB_IMB_ID : $("#IMB_IMB_ID2").val(),
                 IMB_IMV_ID : id,
+                IMB_CAPIMO_TIPO : table.rows[r].cells[3].innerHTML,
             };
 
 
@@ -2878,7 +2926,7 @@ function modalCaptadores()
     
     preencherUnidades();
     preencherTipoImovel();
-    preencherCondominio();
+//    preencherCondominio();
     preencherCBCorretores(999999);
     $("#tbcorimo>tbody").empty();
 
@@ -3053,7 +3101,15 @@ function modalCaptadores()
                     $("#CEP_BAI_NOME").val( data.CEP_BAI_NOME);
                     $("#CEP_CID_NOME").val( data.CEP_CID_NOME);
                     $("#CEP_UF_SIGLA").val( data.CEP_UF_SIGLA);
-                    $("#imb_imv_valorcondominio").val( data.IMB_CND_VALCON);
+                    $("#imb_imv_valorcondominio").val( data.IMB_CND_VALCON );
+                    $("#IMB_CND_VALORIPTU").val( data.IMB_CND_VALCON );
+                    $("#IMB_IMV_DORQUA").val( data.IMB_CND_DORQUA );
+                    $("#IMB_IMV_GARCOB").val( data.IMB_CND_GARCOB );
+                    $("#IMB_IMV_GARDES").val( data.IMB_CND_GARDES );
+                    $("#IMB_IMV_ARETOT").val( data.IMB_CND_AREUTI );
+                    $("#IMB_IMV_ARECON").val( data.IMB_CND_AREPRI );
+                    
+                    
                 }
             }
         )
@@ -3064,6 +3120,8 @@ function modalCaptadores()
 
 //Nova variável "cep" somente com dígitos.
 var cep = valor.replace(/\D/g, '');
+var cep = cep.replace('-', '');
+$("#IMB_IMV_ENDERECOCEP").val(cep );
 
 //Verifica se campo cep possui valor informado.
 if (cep != "") {

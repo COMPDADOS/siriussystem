@@ -292,11 +292,14 @@ class ctrBoleto748 extends Controller
                 {
                     $a=str_replace( ';','',$a);
 
-                    Log::info( 'email: '.$a );
   
 //                    $a="juliana.lolo2062@gmail.com";
                     if( $a <>'' and filter_var($a, FILTER_VALIDATE_EMAIL))
                     {
+
+                        $a = trim( $a );
+                        $a = str_replace( ' ','', $a );
+                        Log::info( 'Enviando para : '.$a.' - Imóvel: '.app('App\Http\Controllers\ctrRotinas')->imovelEnderecoCompleto($imovel_log) );
 
                         $html = view('boleto.748.boleto748', compact( 'dadosboleto', 'im','ctr', 'imv','barcode', 'cpi' ) );
                         $banconumber='748';
@@ -305,15 +308,12 @@ class ctrBoleto748 extends Controller
                         {
                             $copiaend = env('APP_MAILBOLETOCOPIA');
 
-                            $a = trim( $a );
-                            Log::info( 'a: '.$a );
-                            Log::info( 'Copia : '.$copiaend  );
   
                             $pdf=PDF::loadHtml( $html,'UTF-8');
                                     //$message->attachData($pdf->output(), $nossonumero_email.'.pdf');
                             $message->to( $a  );
                             $message->cc( $copiaend );
-                            $message->bcc("suporte@compdados.com.br");
+                            //$message->bcc("suporte@compdados.com.br");
                             
                             $message->subject('Aviso de vencimento de aluguel');
                             app('App\Http\Controllers\ctrRotinas')
@@ -1471,7 +1471,7 @@ class ctrBoleto748 extends Controller
         $soma = 0;
         $fator = 2;
 
-        Log::info( $num );
+//        Log::info( $num );
 
         /* Separacao dos numeros */
         for ($i = strlen($num); $i > 0; $i--)
@@ -1574,7 +1574,7 @@ class ctrBoleto748 extends Controller
                     if( $cgp )
                     {
                         $japago = 'N';
-                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                         if( $valorjapago <> 0 ) 
                             $japago='S';
                         else

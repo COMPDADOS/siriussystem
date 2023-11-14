@@ -640,7 +640,7 @@ class ctrbeSoft extends Controller
 
         $token = $this->login();
         $body = json_encode( $request->all() );
-//        dd( $body );
+    
         $curl = curl_init();
         $header = array();
         $header[] = 'Content-Type: application/json';
@@ -663,7 +663,7 @@ class ctrbeSoft extends Controller
         if( $codret <> '200') 
             return response()->json('Erro', 500 );
 
-        return response()->json( $respx->arquivo, 200 );
+        return response()->json( $respx->docxlink, 200 );
 
     }
 

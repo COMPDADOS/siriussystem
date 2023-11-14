@@ -1,8 +1,7 @@
 @extends('layout.app')
-@section('scriptop')
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+@section('scripttop')
+<link href="{{asset('/global/plugins/select2/css/select2.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{asset('/global/plugins/select2/css/select2-bootstrap.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('scripttop')
 <style>
@@ -312,17 +311,19 @@ th{text-align:center;}
                         </div>
                     </div>
                     <div class="col-md-2">  
-                     <div class="col-md-12 div-center">
+                        <div class="col-md-12 div-center">
                             <label class="control-label">Somente Conciliados
                                 <input class="form-control" type="checkbox" name="i-conciliados" id="i-conciliados" >
                             </label>                        
                         </div>
                     </div>
 
-                    <div class="col-md-3 div-center">
-                        <div class="form-actions noborder">
-                            <button class="btn blue pull-right" id='btn-search-form'>Processar</button>
-                        </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-1 div-center">
+                        <button class="btn blue  form-control" id='btn-search-form'>Processar</button>
+                    </div>                    
+                    <div class="col-md-1 div-center">
+                        <button class="btn btn-dark form-control" onClick="relatorio()">Imprimir</button>
                     </div>                    
                 </div>
             </div>
@@ -396,6 +397,8 @@ th{text-align:center;}
 @push('script')
 
 <script src="{{asset('/js/funcoes.js')}}" type="text/javascript"></script>
+<script src="{{asset('/global/plugins/select2/js/select2.full.min.js')}}" type="text/javascript"></script>
+<script src="{{asset('/pages/scripts/components-select2.min.js')}}" type="text/javascript"></script>
 
 <script type="text/javascript">
 
@@ -746,6 +749,23 @@ th{text-align:center;}
 
         console.log(texto);
         return texto;
+
+    }
+
+    function relatorio()
+    {
+
+        var datainicio = $("#i-data-inicio-CONS").val();
+        var datafim = $("#i-data-fim-CONS").val();
+        var tipocompetencia = $("#tipocompetencia").val();
+        var tipocfc = $("#tipocfc").val();
+        var FIN_CFC_ID = $("#FIN_CFC_ID-CONS").val();
+        var FIN_SBC_ID= $("#FIN_SBC_ID-CONSO").val();
+
+        var url = "{{ route('caixa.cfcporperiodo') }}?datainicio="+datainicio+"&datafim="+datafim+
+                        "&tipocompetencia="+tipocompetencia+"&tipocfc="+tipocfc+"&FIN_CFC_ID="+FIN_CFC_ID+
+                        "&FIN_SBC_ID="+FIN_SBC_ID+"&relatorio=S";
+        window.open( url, '_blank');
 
     }
 

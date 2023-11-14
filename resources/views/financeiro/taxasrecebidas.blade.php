@@ -300,13 +300,15 @@ th{text-align:center;}
                         <option value="T">Todos</option>
                     </select>
                 </div>
-                <div class="col-md-1 div-center">
+
+<!--                <div class="col-md-1 div-center">
                     <label>Origem</label>
                     <select id="i-origem" class="form-control">
                         <option value="D" selected>Pelo Repasse</option>
                         <option value="T">Pelo Recebimento</option>
                     </select>
                 </div>
+            -->        
                 <div class="col-md-2 div-center">
                     <div class="form-actions noborder">
                         <button class="btn blue pull-right" id='btn-search-form' onClick="carga()">Pesquisar</button>
@@ -432,10 +434,8 @@ th{text-align:center;}
 
     function carga()
     {
-        if( $("#i-origem").val() == 'T' )
+
         url = "{{ route('recibolocatario.planilharecebimento') }}";
-            else
-        url = "{{ route('recibolocador.planilharepasses') }}";
 
         console.log( url );
         $('#resultTableTaxas').dataTable().fnClearTable();

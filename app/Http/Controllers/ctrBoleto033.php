@@ -253,22 +253,32 @@ class ctrBoleto033 extends Controller
                     $html = view('boleto.santander.boletosantander', compact( 'dadosboleto', 'im','ctr', 'imv','barcode', 'cpi' ) );
                     $banconumber='santander';
 
+                    Log::info('Enviado com try');
+                    try
+                    {
                     Mail::send('boleto.boletoemail', compact( 'dadosboleto', 'im','ctr', 'imv', 'banconumber' ) ,
                     function( $message ) use ($a, $html,$nossonumero_email, $imovel_log, $contrato_log)
                     {
 
+                        Log::info('Enviado para o A: '.$a );
+
                         if( strlen( $a ) > 4 )
                         {
-                            $pdf=PDF::loadHtml( $html,'UTF-8');
-                                $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
+//                            $pdf=PDF::loadHtml( $html,'UTF-8');
+  //                              $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
     //                        $message->to( "suporte@compdados.com.br" );
                             $message->to( $a  );
                             $message->subject('Aviso de vencimento');
                             app('App\Http\Controllers\ctrRotinas')
                             ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Boleto enviado para '.$a);
+                            Log::info('LogGravado contrato '.$contrato_log );
 
                         }
                     });
+                    }
+                    catch (\Illuminate\Database\QueryException $e) {
+                        Log::info( 'Erro: '.$e->getCode() );
+                    }                    
                 }
                 //echo "<script>window.close();</script>";
                 return response()->json('ok',200);
@@ -1325,10 +1335,12 @@ class ctrBoleto033 extends Controller
 
                     $cgp = mdlCobrancaGeradaPerm::find( $id );
 
+                    $valorjapago = 'N';
                     if( $cgp )
                     {
+                        Log::info( 'id '.$cgp->IMB_CGR_ID );
 
-                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                         if( $valorjapago <> 0 ) 
                             $japago='S';
                         else
@@ -1339,6 +1351,8 @@ class ctrBoleto033 extends Controller
 
                         }
 
+                        Log::info( 'passou');
+                        
                         $IMB_CTR_ID=$cgp->IMB_CTR_ID;
                         $ctr = mdlContrato::find( $cgp->IMB_CTR_ID );
                         if( $ctr )
@@ -1589,6 +1603,7 @@ class ctrBoleto033 extends Controller
                 $cCgc = str_replace('-','',$cCgc);
                 $cCgc = str_replace('/','',$cCgc);
 
+                $cpessoa = '01';
                 $clt = mdlCliente::where('IMB_CLT_CPF','=', $cCgc )->first();
                 if( $clt )
                 {
@@ -1983,6 +1998,7 @@ class ctrBoleto033 extends Controller
 
 
                 $cgp = mdlCobrancaGeradaPerm::find( $id );
+                $japago = 'N';
                 if( $cgp )
                 {
                     $IMB_CTR_ID=$cgp->IMB_CTR_ID;
@@ -1991,18 +2007,23 @@ class ctrBoleto033 extends Controller
                     $ctr = mdlContrato::find( $cgp->IMB_CTR_ID );
                     if( $ctr )
                     {
+                        Log::info( 'NOSSO NUMERO $cgp->IMB_CGR_NOSSONUMERO '.$cgp->IMB_CGR_NOSSONUMERO);
+                        Log::info( 'localizou o contrato');
+                        Log::info( 'id 2'.$cgp->IMB_CGR_ID );
+
                         //verificar pagagameto
-                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                         if( $valorjapago <> 0 ) 
                             $japago='S';
                         else
-                        {
-                            $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->jaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_VENCIMENTOORIGINAL );
-                            if( $valorjapago <> 0 ) 
-                                $japago='S';
+                            {
+                                $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->jaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_VENCIMENTOORIGINAL );
+                                if( $valorjapago <> 0 ) 
+                                    $japago='S';
+    
+                            }                        
 
-                        }
-
+                        Log::info( 'ja pago '.$japago);
 
                         $IMB_CTR_REFERENCIA=$ctr->IMB_CTR_REFERENCIA;
                         $IMB_IMV_ID=$ctr->IMB_IMV_ID;
@@ -2067,6 +2088,7 @@ class ctrBoleto033 extends Controller
                     $rb->nomedoarquivo = str_replace( 'C:\\fakepath\\','', $nomeoriginal);
                     $rb->pagonaoconfere ='S';                    
                     $rb->valorjapago = $valorjapago;
+
 
 
 

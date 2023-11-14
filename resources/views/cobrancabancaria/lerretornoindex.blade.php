@@ -96,7 +96,7 @@ td, th
         </div>
         <div class="row" >
             <div class="col-md-12">
-                <form action="{{route('cobrancabancaria.lerretorno.passo2')}}" method="post" enctype="multipart/form-data">
+                <form action="{{route('cobrancabancaria.lerretorno.passo2')}}" method="post" enctype="multipart/form-data" id="form-lerret">
                     @csrf
                     <div class="col-md-3 div-center">
                       <input type="hidden" id="nomedoarquivooriginal" name="nomeoriginal">
@@ -158,6 +158,11 @@ $( document ).ready(function()
     });
 
     cargaConta();
+
+    $("#form-lerret").submit( function()
+    {
+      $("#preloader").show();
+    });
 
 });
 

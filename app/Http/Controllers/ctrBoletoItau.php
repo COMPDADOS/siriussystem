@@ -88,11 +88,13 @@ class ctrBoletoItau extends Controller
             // DADOS DO BOLETO PARA O SEU CLIENTE
             $dias_de_prazo_para_pagamento = 5;
             $taxa_boleto = 0;
-            $data_venc = date('d/m/Y',strtotime( $cp->IMB_CGR_DATAVENCIMENTO ) );
+            $data_venc = date('d/m/Y',strtotime( $cp->IMB_CGR_DATALIMITE ) );
 
             //$data_venc = date("d/m/Y", time() + ($dias_de_prazo_para_pagamento * 86400));  // Prazo de X dias OU informe data: "13/04/2006";
             $valor_cobrado = $cp->IMB_CGR_VALOR; // Valor - REGRA: Sem pontos na milhar e tanto faz com "." ou "," ou com 1 ou 2 ou sem casa decimal
             $valor_boleto= number_format($valor_cobrado, 2, ',', '');
+            $dadosboleto["IMB_CGR_ID"] = $id;
+            $dadosboleto["FIN_CCI_BANCONUMERO"] = "341";
 
             $dadosboleto["nosso_numero"] = $cp->IMB_CGR_NOSSONUMERO;  // Nosso numero - REGRA: M�ximo de 8 caracteres!
             $dadosboleto["numero_documento"] = $cp->IMB_CTR_ID;	// Num do pedido ou nosso numero
@@ -186,6 +188,12 @@ class ctrBoletoItau extends Controller
 
             //PARAMETROS PARA INSTRUÇÕES
             $nInstrucoes = 0;
+            if( $par->IMB_PRM_COBBANTOLERANCIA <> '0' and $par->IMB_PRM_COBBANTOLERANCIA <> '')
+            {
+                $nInstrucoes = $nInstrucoes + 1;
+                $dadosboleto["instrucoes$nInstrucoes"] = "Não receber após $par->IMB_PRM_COBBANTOLERANCIA dias de vencido";
+            }
+
             if( $par->IMB_PRM_COBBANMULTA <> '0' and $par->IMB_PRM_COBBANMULTA <> '')
             {
                 //CALCULAR VALOR DA MULTA
@@ -195,9 +203,9 @@ class ctrBoletoItau extends Controller
                 $valormuta = round($basemultajuros['multa'] * $par->IMB_PRM_COBBANMULTA/100,2);
 
                 $nInstrucoes = $nInstrucoes + 1;
-                $dadosboleto["instrucoes$nInstrucoes"] = 'Multa de R$ '.number_format($valormuta, 2, ',', '.').' após vencimento';
+                $dadosboleto["instrucoes$nInstrucoes"] = 'Após '.date( 'd/m/Y',strtotime($cp->IMB_CGR_DATALIMITE) ).' Multa de R$ '.number_format($valormuta, 2, ',', '.').' após vencimento';
 
-                if( $par->IMB_PRM_COBMULTANDIAS <> '0' and $par->IMB_PRM_COBMULTANDIAS <> '')
+/*                if( $par->IMB_PRM_COBMULTANDIAS <> '0' and $par->IMB_PRM_COBMULTANDIAS <> '')
                 {
                     $basemultajuros = app( 'App\Http\Controllers\ctrCobrancaGerada')->baseMultaJurosBoletoPerm( $cp->IMB_CGR_ID,'permanente' );
                     $valormuta = round($basemultajuros['multa'] * $par->IMB_PRM_COBMULTANDIASPER/100,2);
@@ -207,7 +215,7 @@ class ctrBoletoItau extends Controller
                            'Após '.$par->IMB_PRM_COBMULTANDIAS.' dias de vencido, cobrar multa adicional de '.
                             'R$ '.number_format($par->IMB_PRM_COBMULTANDIASPER, 2, ',', '.');
                 }
-
+*/
             }
 
 
@@ -219,7 +227,7 @@ class ctrBoletoItau extends Controller
                 $valorjuros = round($basemultajuros['juros'] * $par->IMB_PRM_COBBANJUROSDIA/100,2);
 
                 $nInstrucoes = $nInstrucoes + 1;
-                $dadosboleto["instrucoes$nInstrucoes"] = 'Após o vencimento juros de R$ '.number_format($valorjuros, 2, ',', '.').' ao dia';
+                $dadosboleto["instrucoes$nInstrucoes"] = 'Após '.date( 'd/m/Y',strtotime($cp->IMB_CGR_DATALIMITE) ).'  juros de R$ '.number_format($valorjuros, 2, ',', '.').' ao dia';
                 if( $par->IMB_PRM_COBBANCORRECAO <> '0' and $par->IMB_PRM_COBBANCORRECAO <> '')
                 $dadosboleto["instrucoes$nInstrucoes"] =
                     $dadosboleto["instrucoes$nInstrucoes"] .', e '.
@@ -244,27 +252,42 @@ class ctrBoletoItau extends Controller
             if( $poremail == 'S' )
             {
                 app( 'App\Http\Controllers\ctrRotinas')->atualizarEmailLocatarioPrincipal( $ctr->IMB_CTR_ID, $email );
-
+                $banconumber='itau';
                 $email = $email;
                 $array = explode(";",$email);
                 foreach( $array as $a )
                 {
                     $a=str_replace( ';','',$a);
                     $html = view('boleto.341.boleto341', compact( 'dadosboleto', 'im','ctr', 'imv','barcode', 'cpi' ) );
-                    Mail::send('boleto.boletoemail', compact( 'dadosboleto', 'im','ctr', 'imv' ) ,
+                    try
+                    {
+
+                    Mail::send('boleto.boletoemail', compact( 'dadosboleto', 'im','ctr', 'imv','banconumber' ) ,
+
                     function( $message ) use ($a, $html,$nossonumero_email, $imovel_log, $contrato_log)
                     {
                         if( $a <>'' and filter_var($a, FILTER_VALIDATE_EMAIL))
                         {
-                            $pdf=PDF::loadHtml( $html,'UTF-8');
-                                $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
+                            Log::info( 'Enviando para: '.$a );
+                            //$pdf=PDF::loadHtml( $html,'UTF-8');
+                              //  $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
 //                        $message->to( "suporte@compdados.com.br" );
                             $message->to( $a  );
                             $message->subject('Aviso de vencimento de aluguel');
                         }
+                        app('App\Http\Controllers\ctrRotinas')
+                        ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Boleto enviado para '.$a);
+    
                     });
-                   app('App\Http\Controllers\ctrRotinas')
-                    ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Boleto enviado para '.$a);
+                    Log::info( 'Enviado para: '.$a );
+
+                    }
+                    
+                    catch (\Illuminate\Database\QueryException $e) {
+                        app('App\Http\Controllers\ctrRotinas')
+                        ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Erro ao enviar boleto por email '.$a);
+                    }                    
+
 
                 }
                 //echo "<script>window.close();</script>";
@@ -594,7 +617,7 @@ class ctrBoletoItau extends Controller
     }
 
 
-    function abastecerPermanente( $cg )
+    function abastecerPermanente( $cg, $arquivo )
     {
 
         $conta = mdlContaCaixa::find( $cg->FIN_CCR_ID);
@@ -682,6 +705,7 @@ class ctrBoletoItau extends Controller
         $cgp->FIN_CCI_CONTANUMERO  = $conta->FIN_CCI_CONCORNUMERO    ;
         $cgp->FIN_CCI_CONTADIGITO  = $conta->FIN_CCI_CONCORDIGITO    ;
         $cgp->FIN_CCI_LINHADIGITAVEL = $linhadigitavel;
+        $cgp->IMB_CGR_NOMEARQUIVO = $arquivo;
         $cgp->save();
 
         if( $cg->imb_cgr_idpermanente == '' )
@@ -762,6 +786,8 @@ class ctrBoletoItau extends Controller
         ->orderBy( 'IMB_CGR_ID')
         ->get();
 
+        Log::info('padrao antigo');
+
         $par = mdlParametros::find( Auth::user()->IMB_IMB_ID );
 
         if( $cgs <> '[]')
@@ -771,11 +797,15 @@ class ctrBoletoItau extends Controller
             $conta->FIN_CCI_COBRANCAARQSEQ = intval( $seqarq )+1;
             $conta->save();
 
-            $cToleranciaBoleto = '39';
+            $cToleranciaBoleto = '21';
 
 
             if ( $par->IMB_PRM_COBBANTOLERANCIA == 10  )
                 $cToleranciaBoleto = '20';
+
+
+            if ( $par->IMB_PRM_COBBANTOLERANCIA == 5 )
+                $cToleranciaBoleto = '19';
 
 
             if ( $par->IMB_PRM_COBBANTOLERANCIA == 15  )
@@ -829,7 +859,7 @@ class ctrBoletoItau extends Controller
                         '000001'.chr(13).chr(10);;
 
 
-            $nSequencia     = 0;
+            $nSequencia     = 1;
             $nTotalFat      = 1;
             $nTotalFatVal   = 0;
             $nTitulos       = 0;
@@ -838,7 +868,7 @@ class ctrBoletoItau extends Controller
             foreach( $cgs as $cg )
             {
 
-                $cp = $this->abastecerPermanente( $cg );
+                $cp = $this->abastecerPermanente( $cg, $filename );
 
                 $cCgc = $cg->IMB_CGR_CPF;
                 $cCgc = str_replace('.','',$cCgc);
@@ -879,7 +909,6 @@ class ctrBoletoItau extends Controller
                 ->cargaItensSemJson( $cg->IMB_CGR_ID );
                 $nSeqLote++;
 
-                $nSequencia++;
                 $nTotalFat++;
                 $nRegistroLote++;
                 $nTitulos++;
@@ -1009,6 +1038,7 @@ class ctrBoletoItau extends Controller
                 $ccidade=app('App\Http\Controllers\ctrRotinas')->tirarEspeciais($ccidade);
 
 
+                $dataLimite  = 
                 $nSequencia++;
                 $conteudo .= '1'. //001-001
                     '02'. //002-003
@@ -1019,15 +1049,15 @@ class ctrBoletoItau extends Controller
                     str_pad( $conta->FIN_CCI_CONCORDIGITO,1,' '). //029-029
                     str_repeat(' ', 4 ). //030-033
                     str_repeat('0',4 ).//034-37
-                    str_pad( $cg->imb_cgr_idpermanente, 25,' ' ). //38-62
+                    str_pad( $cp->IMB_CGR_ID, 25,' ' ). //38-62
                     $nossonumero.
                     str_repeat('0',13).//replicate('0',13 )+//071-083
                     str_pad( $conta->FIN_CCI_COBRANCACARTEIRA,'0',3 ).//084-086
                     str_repeat(' ',21 ) . //087-107
                     'I' . //108/108
                     '01'.//109-110
-                    $this->formata_numero($cg->imb_cgr_idpermanente,10,0 ).//111-120
-                    date('dmy', strtotime($cg->IMB_CGR_DATAVENCIMENTO )).//0121-126
+                    $this->formata_numero($cp->IMB_CGR_ID,10,0 ).//111-120
+                    date('dmy', strtotime($cg->IMB_CGR_DATALIMITE )).//0121-126
                     $cValTot.//127-139
                     '341'. //140+142
                     str_repeat('0', 5 ) . //143-147
@@ -1843,6 +1873,762 @@ class ctrBoletoItau extends Controller
         
     }
 
+    public function lerRetorno400( $conta, $arquivo, $ocor, $nomeoriginal )
+    {
+        $file = new SplFileObject($arquivo);
+
+        $cont = 0;
+
+        $array = [];
+        $id =  '';
+        $nossonumero = '';
+        $motivorejeicao = '';
+        $ocorrencia ='';
+        $valorcobranca = '';
+        $valorpago='';
+        $IMB_CTR_ID='';
+        $IMB_CTR_REFERENCIA='';
+        $IMB_IMV_ID='';
+        $endereco = '';
+        $bairro = '';
+        $condominio = '';
+        $locatario = '';
+        $datavencimento = '';
+        $datapagamento = '';
+        $datacredito='';
+        $encargos='';
+
+        $rb = mdlRetornoBancario::where('IMB_ATD_ID','=', Auth::user()->IMB_ATD_ID )->delete();
+
+        $ccx = mdlContaCaixa::find( $conta );
+
+	    while(!$file->eof())
+	    {
+
+            $cont++;
+		    $linha = $file->fgets();
+            if( substr( $linha,0,1 ) == '1' )
+            {
+                $id =  intval(trim(substr( $linha, 37,25 )));
+                $nossonumero = substr( $linha, 85,8 );
+                //$motivorejeicao = substr( $linha, 213,10 );
+                $ocorrencia =substr( $linha, 108,2 );
+                $valorcobranca = substr( $linha, 152,13 );
+                if( substr( $linha, 146,6) <>'000000')
+                    $datavencimento = '20'.substr( $linha, 150,2).'-'.
+                                  substr( $linha, 148,2).'-'.
+                                  substr( $linha, 146,2);
+                else
+                    $datavencimento=null;
+
+                $valorpago = substr( $linha, 253,13 );
+                if( substr($linha, 175,6) <> '000000' )
+                    $datacredito =    '20'.substr( $linha, 299,2).'-'.
+                        substr( $linha, 197,2).'-'.
+                        substr( $linha, 195,2);
+                else
+                    $datacredito = null;
+
+
+                $cgp = mdlCobrancaGeradaPerm::find( $id );
+                if( $cgp )
+                {
+                    $IMB_CTR_ID=$cgp->IMB_CTR_ID;
+
+                    $ctr = mdlContrato::find( $cgp->IMB_CTR_ID );
+                    if( $ctr )
+                    {
+                        //verificar pagagameto
+                        $japago = 'N';
+                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID );
+                        if( $valorjapago <> 0 ) 
+                            $japago='S';
+
+                        $IMB_CTR_REFERENCIA=$ctr->IMB_CTR_REFERENCIA;
+                        $IMB_IMV_ID=$ctr->IMB_IMV_ID;
+                        $imv = mdlImovel::find( $ctr->IMB_IMV_ID );
+                        if( $imv )
+                        {
+                            $endereco = $imv->IMB_IMV_ENDERECO.' '.
+                                        $imv->IMB_IMV_ENDERECONUMERO.' '.
+                                        $imv->IMB_IMV_NUMAPT.' '.
+                                        $imv->IMB_IMV_ENDERECOCOMPLEMENTO;
+                            $bairro = $imv->CEP_BAI_NOME;
+
+                            if( $imv->IMB_CND_ID <> 0 and $imv->IMB_CND_ID == ' ')
+                            {
+                                $condominio = app('App\Http\Controllers\ctrCondominio')
+                                ->busca($imv->IMB_CND_ID );
+                            }
+                            $locatario =
+                            app('App\Http\Controllers\ctrRotinas')
+                            ->nomeLocatarioPrincipal( $IMB_CTR_ID );
+
+                        }
+                    }
+
+
+
+                    if( substr($linha, 114,6) <> '000000' )
+                        $datapagamento =  '20'.substr( $linha, 114,2).'-'.
+                                    substr( $linha, 112,2).'-'.
+                                    substr( $linha, 110,2);
+                    else
+                        $datapagamento = null;
+
+                    $encargos=0;
+                    $rb = new mdlRetornoBancario;
+                    $rb->IMB_IMB_ID = Auth::user()->IMB_IMB_ID;
+                    $rb->IMB_ATD_ID = Auth::user()->IMB_ATD_ID;
+                    $rb->id = $id;
+                    $rb->imb_imv_id = $IMB_IMV_ID;
+                    $rb->imb_ctr_referencia = $IMB_CTR_REFERENCIA;
+                    $rb->codigoocorrencia = $ocorrencia;
+                    $rb->nomeocorrencia = $this->ocorrencia( $ocorrencia);
+                    $rb->nossonumero = $nossonumero;
+                    $rb->valorpago = intval($valorpago)/100;
+                    $rb->valorcobranca = intval($valorcobranca)/100;
+                    $rb->motivorejeicao = $motivorejeicao;
+//                    $rb->datacredito = $datacredito;
+                    $rb->encargos = intval($encargos);
+                    $rb->observacoes = '';
+                    $rb->endereco = $endereco;
+                    $rb->locatario = $locatario;
+                    $rb->datavencimento = $cgp->IMB_CGR_VENCIMENTOORIGINAL;
+                    $rb->datapagamento = $datapagamento;
+                    $rb->IMB_CTR_ID = $IMB_CTR_ID;
+                    $rb->condominio = $condominio;
+                    $rb->FIN_CCX_ID = $ccx->FIN_CCX_ID;
+                    $rb->IMB_CGR_VENCIMENTOORIGINAL = $cgp->IMB_CGR_VENCIMENTOORIGINAL ;
+
+                    $rb->contacorrente = $ccx->FIN_CCX_DESCRICAO;
+                    $rb->nomedoarquivo = str_replace( 'C:\\fakepath\\','', $nomeoriginal);
+                    $rb->pagonaoconfere ='S';                    
+                    $rb->valorjapago = $valorjapago;
+
+
+
+
+
+                    if( $ocorrencia == '06')
+                    {
+                        if( $japago == 'N')
+                            $rb->selecionado = 'S';
+                        $rb->pagonaoconfere ='N';                            
+                        $cgp->IMB_CGR_ARQRETORNO = $rb->nomedoarquivo;
+                        if( $ctr <> '' )
+                             app('App\Http\Controllers\ctrRotinas')
+                           ->gravarObs( $ctr->IMB_IMV_ID, $ctr->IMB_CTR_ID,0,0,0,'Leitura do arquivo retorno '.$rb->nomedoarquivo.
+                            ' como ENTRADA LIQUIDAÇÃO, Vencimento: '.implode("-", array_reverse(explode("-", trim($rb->datavencimento)))));
+
+                    }
+
+                    $rb->save();
+
+
+                    //setando o status do boleto depois de lido o boleto
+
+                    if( $ocorrencia == '02')
+                    {
+                        $cgp = mdlCobrancaGeradaPerm::find( $id );
+                        $cgp->IMB_CGR_NOSSONUMERO=$nossonumero;
+                        $cgp->IMB_CGR_ENTRADACONFIRMADA = 'S';
+                        $cgp->IMB_CGR_ARQRETORNO = $rb->nomedoarquivo;
+                        if( $ctr <> '' )
+                        app('App\Http\Controllers\ctrRotinas')
+                        ->gravarObs( $ctr->IMB_IMV_ID, $ctr->IMB_CTR_ID,0,0,0,'Leitura do arquivo retorno '.$rb->nomedoarquivo.
+                            ' como ENTRADA CONFIRMADA, Vencimento: '.implode("-", array_reverse(explode("-", trim($rb->datavencimento)))));
+                        $cgp->save();
+                    }
+                    else
+                    if( $ocorrencia == '03')
+                    {
+                        $cgp = mdlCobrancaGeradaPerm::find( $id );
+                        $cgp->IMB_CGR_ENTRADACONFIRMADA = 'N';
+                        $cgp->save();
+                        $cgp->IMB_CGR_ARQRETORNO = $rb->nomedoarquivo;
+                        if( $ctr <> '' )
+                        app('App\Http\Controllers\ctrRotinas')
+                        ->gravarObs( $ctr->IMB_IMV_ID, $ctr->IMB_CTR_ID,0,0,0,'Leitura do arquivo retorno '.$rb->nomedoarquivo.
+                            ' como ENTRADA REJEITADA, Vencimento: '.implode("-", array_reverse(explode("-", trim($rb->datavencimento)))));
+                    }
+                }
+                else
+                {
+                    Log::info( 'valor cob '.$valorcobranca);
+
+                    $rb = new mdlRetornoBancario;
+                    $rb->IMB_IMB_ID = Auth::user()->IMB_IMB_ID;
+                    $rb->IMB_ATD_ID = Auth::user()->IMB_ATD_ID;
+                    $rb->codigoocorrencia = $ocorrencia;
+                    $rb->nomeocorrencia = $this->ocorrencia( $ocorrencia);
+                    $rb->nossonumero = $nossonumero;
+                    $rb->valorpago = intval($valorpago)/100;
+                    $rb->valorcobranca = intval($valorcobranca)/100;
+                    $rb->motivorejeicao = $motivorejeicao;
+                    $rb->FIN_CCX_ID = $ccx->FIN_CCX_ID;
+//                    $rb->datacredito = $datacredito;
+                    $rb->encargos = intval($encargos);
+                    $rb->observacoes = 'NÃO IDENTIFICADO NO RETORNO';
+                    $rb->endereco = 'NÃO IDENTIFICADO NO RETORNO';
+                    $rb->locatario = 'NÃO IDENTIFICADO NO RETORNO';
+                    $rb->datavencimento = $datavencimento;
+//                    $rb->datapagamento = $datapagamento;
+                    $rb->nomedoarquivo = str_replace( 'C:\\fakepath\\','', $nomeoriginal);
+                    //$rb->valorjapago = $valorjapago;
+                    $rb->save();
+
+                }
+
+            };
+	    }
+
+        $retornos = mdlRetornoBancario::
+            where('IMB_ATD_ID','=', Auth::user()->IMB_ATD_ID )
+            ->orderBy( 'locatario');
+
+        if( $ocor <> '' )
+            $retornos = $retornos->where("codigoocorrencia",'=', $ocor );
+
+        $retornos = $retornos->get();
+
+       return view( 'cobrancabancaria.resultadoleitura', compact( 'retornos'));
+
+
+    }
+
+    public function ocorrencia( $id )
+    {
+        $nomeocorrencia='';
+        if( $id == '02' ) $nomeocorrencia = 'Entrada Confirmada';
+        if( $id == '03' ) $nomeocorrencia = 'Entrada rejeitada';
+        if( $id == '06' ) $nomeocorrencia = 'Liquidação';
+        if( $id == '07' ) $nomeocorrencia = 'Confirmação do recebimento da instrução de desconto';
+        if( $id == '08' ) $nomeocorrencia = 'Confirmação do recebimento do cancelamento do desconto';
+        if( $id == '09' ) $nomeocorrencia = 'Baixa';
+        if( $id == '10' ) $nomeocorrencia = 'Pedido de Baixa';
+        if( $id == '12' ) $nomeocorrencia = 'Confirmação do recebimento instrução de abatimento';
+        if( $id == '13' ) $nomeocorrencia = 'Confirmação do recebimento instrução de cancelamento abatimento';
+        if( $id == '14' ) $nomeocorrencia = 'Confirmação do recebimento instrução alteração de vencimento';
+        if( $id == '17' ) $nomeocorrencia = 'Liquidação após baixa ou liquidação título não registrado';
+        if( $id == '20' ) $nomeocorrencia = 'Confirmação do recebimento instrução de sustação/cancelamento de protesto';
+        if( $id == '23' ) $nomeocorrencia = 'Remessa a cartório (aponte em cartório)';
+        if( $id == '24' ) $nomeocorrencia = 'Entrada Rejeitada por CEP Irregular';
+        if( $id == '25' ) $nomeocorrencia = 'Protestado e baixado (baixa por ter sido protestado)';
+        if( $id == '26' ) $nomeocorrencia = 'Instrução rejeitada';
+        if( $id == '27' ) $nomeocorrencia = 'Confirmação do pedido de alteração de outros dados';
+        if( $id == '28' ) $nomeocorrencia = 'Débito de tarifas custas';
+        if( $id == '30' ) $nomeocorrencia = 'Alteração de dados rejeitada';
+        if( $id == '36' ) $nomeocorrencia = 'Baixa rejeitada';
+        if( $id == '51' ) $nomeocorrencia = 'Título DDA reconhecido pelo pagador';
+        if( $id == '52' ) $nomeocorrencia = 'Título DDA não reconhecido pelo pagador';
+        if( $id == '78' ) $nomeocorrencia = 'Confirmação de recebimento de pedido de negativação';
+        if( $id == '79' ) $nomeocorrencia = 'Confirmação de recebimento de pedido de exclusão de negativação';
+        if( $id == '80' ) $nomeocorrencia = 'Confirmação de entrada de negativação';
+        if( $id == '81' ) $nomeocorrencia = 'Entrada de negativação rejeitada';
+        if( $id == '82' ) $nomeocorrencia = 'Confirmação de exclusão de negativação';
+        if( $id == '83' ) $nomeocorrencia = 'Exclusão de Negativação rejeitada';
+        if( $id == '84' ) $nomeocorrencia = 'Exclusão de negativação por outros motivos';
+        if( $id == '85' ) $nomeocorrencia = 'Ocorrência informacional por outros motivos';
+        if( $id == '19' ) $nomeocorrencia = 'Confirmação do recebimento instrução de protesto';
+
+        return $nomeocorrencia;
+    }
+
+    public function gerarRemessaNovoPadrao()
+    {
+        $empresa=Auth::user()->IMB_IMB_ID;
+        $pasta='/files/'.$empresa;
+        $filename = 'cnab200.txt';
+
+        $cgs = mdlCobrancaGerada::where( 'IMB_CGR_SELECIONADA','=', 'S')
+        ->where('IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
+        ->where('IMB_ATD_ID','=', Auth::user()->IMB_ATD_ID )
+        ->orderBy( 'IMB_CGR_ID')
+        ->get();
+
+        $par = mdlParametros::find( Auth::user()->IMB_IMB_ID );
+        
+        Log::info('padrao antigo');
+        
+        if( $cgs <> '[]')
+        {
+            $conta = mdlContaCaixa::find( $cgs[0]->FIN_CCR_ID );
+            $seqarq = $conta->FIN_CCI_COBRANCAARQSEQ;
+            $conta->FIN_CCI_COBRANCAARQSEQ = intval( $seqarq )+1;
+            $conta->save();
+            $filename = $this->formata_numero( $conta->FIN_CCI_COBRANCAARQSEQ,6,0 ).'.rem';
+
+            $cToleranciaBoleto= '39';
+
+
+            if ( $par->IMB_PRM_COBBANTOLERANCIA == 10  )
+                $cToleranciaBoleto = '20';
+
+            if ( $par->IMB_PRM_COBBANTOLERANCIA == 5  )
+                $cToleranciaBoleto = '02';
+
+
+            if ( $par->IMB_PRM_COBBANTOLERANCIA == 15  )
+                $cToleranciaBoleto = '21';
+
+
+            if ( $par->IMB_PRM_COBBANTOLERANCIA == 20  )
+                $cToleranciaBoleto = '22';
+
+            if ( $par->IMB_PRM_COBBANTOLERANCIA == 30 )
+                $cToleranciaBoleto = '24';
+
+
+            $statuscobranca = 'REMESSA-PRODUCAO';
+
+            if( $conta->FIN_CCI_EMTESTE == 'S')
+                $statuscobranca ='REMESSA-TESTE';
+
+            $cCGCCedente = $conta->FIN_CCI_CGCCPF;
+
+            $cCGCCedente = str_replace('.','',$cCGCCedente);
+            $cCGCCedente = str_replace('-','',$cCGCCedente);
+            $cCGCCedente = str_replace('/','',$cCGCCedente);
+            $cCGCCedente = $this->formata_numero($cCGCCedente,14,0);
+
+            $cPessoaCEDENTE = '2';
+            if( $conta->FIN_CCI_PESSOA =='F')
+                $cPessoaCEDENTE = '1';
+
+            $nRegistroLote = 0;
+
+
+            $conteudo = '';
+
+
+            $conteudo .= '0'.   //001-001
+                        '1'. // 002-002
+                        'REMESSA'. //003-009
+                        '01'.  //010-011
+                        'COBRANCA       '. //12-26
+                        $this->formata_numero( $conta->FIN_CCI_AGENCIANUMERO,4,0). //27-30
+                        '00' . //31-32
+                        $this->formata_numero( $conta->FIN_CCI_CONCORNUMERO,5,0).//33-37
+                        str_pad( $conta->FIN_CCI_CONCORDIGITO,1,' '). //38-38
+                        str_repeat(' ',8).//39-46
+                        substr( str_pad($conta->FIN_CCI_CONCORNOME,30,' '),0,30).//47-76
+                        '341'. //77-79
+                        str_pad('BANCO ITAU SA',15,' ').
+                        date( 'dmy' ).
+                        str_repeat(' ',294).
+                        '000001'.chr(13).chr(10);;
+
+
+            $nSequencia     = 1;
+            $nTotalFat      = 1;
+            $nTotalFatVal   = 0;
+            $nTitulos       = 0;
+            $nSeqLote       =0;
+
+            foreach( $cgs as $cg )
+            {
+
+                $cp = $this->abastecerPermanente( $cg, $filename );
+
+                $cCgc = $cg->IMB_CGR_CPF;
+                $cCgc = str_replace('.','',$cCgc);
+                $cCgc = str_replace('-','',$cCgc);
+                $cCgc = str_replace('/','',$cCgc);
+
+                $clt = mdlCliente::where('IMB_CLT_CPF','=', $cCgc )->first();
+                if( $clt )
+                {
+                    if( $clt->IMB_CLT_PESSOA == 'J')
+                        $cpessoa = '02';
+                    else
+                        $cpessoa = '01';
+
+                }
+
+                $cCgc = $this->formata_numero($cCgc,14,0);
+
+                $cCepLt = $cg->IMV_CGR_CEP;
+                $cCepLt = str_replace('.','',$cCepLt);
+                $cCepLt = str_replace('-','',$cCepLt);
+                $cCepLt = $this->formata_numero($cCepLt,8,0);
+
+                $dadoscontrato = mdlContrato::find( $cg->IMB_CTR_ID);
+
+                $nValorLancamento   = 0;
+                $nValAlu            = 0;
+                $nValIPT            = 0;
+                $nValCob            = 0;
+                $nValBon            = 0;
+                $nValorCondominio   = 0;
+                $nValorFundoReserva = 0;
+                $nValDes            = 0;
+                $nValDiv            = 0;
+                $nValIRRF            =0;
+
+
+                $itens = app('App\Http\Controllers\ctrCobrancaGerada')
+                ->cargaItensSemJson( $cg->IMB_CGR_ID );
+                $nSeqLote++;
+
+                $nTotalFat++;
+                $nRegistroLote++;
+                $nTitulos++;
+
+                foreach( $itens as $item )
+                {
+
+                   $nValorLancamento = $item->IMB_LCF_VALOR;
+
+                   if( $item->IMB_RLT_LOCATARIOCREDEB == 'C' )
+                      $nValorLancamento = $item->IMB_LCF_VALOR * -1;
+
+
+                   if($item->IMB_TBE_ID == 1 )
+                      $nValAlu = $nValorLancamento;
+                   else
+                   if($item->IMB_TBE_ID == 17 )
+                      $nValIPT = $nValIPT + $nValorLancamento;
+                   else
+                   if($item->IMB_TBE_ID == 18 )
+                      $nValIRRF = $nValIRRF + $nValorLancamento;
+                   else
+                   if($item->IMB_TBE_ID == 23 )
+                      $nValCob = $nValCob + $nValorLancamento;
+                   else
+                   if($item->IMB_TBE_ID == 12 )
+                      $nValorCondominio = $nValorCondominio + $nValorLancamento;
+                   else
+                   if($item->IMB_TBE_ID == 55 or $item->IMB_TBE_ID == 62)
+                      $nValorFundoReserva = $nValorFundoReserva + $nValorLancamento;
+                   else
+                   if($item->IMB_TBE_ID == 8 )
+                      $nValDes = $nValDes + $nValorLancamento;
+                   else
+                      $nValDiv = $nValDiv + $nValorLancamento;
+                }
+
+
+
+                $nValTot = $cg->IMB_CGR_VALOR;
+                $nValTot = $nValTot + $nValDes; //jogo ele a mais no boleto para que
+                                                //o desconto saia na área de instruçoes
+
+                $dataencargos = $cg->IMB_CGR_DATAVENCIMENTO;
+                $dataencargos = new DateTime($dataencargos);
+                $dataencargos->add(new DateInterval('P1D'));
+
+                $dataencargos = ( new DateTime($cg->IMB_CGR_DATAVENCIMENTO))->modify('+1 day')->format('Y-m-d');
+                $dataencargos = ( new DateTime($dataencargos))->format('dmY');
+                $par = mdlParametros::find( Auth::user()->IMB_IMB_ID );
+
+                if( $par->IMB_PRM_COBBANJUROSDIA <> 0 and $par->IMB_PRM_COBBANJUROSDIA <> null)
+                {
+                    $basemultajuros = app( 'App\Http\Controllers\ctrCobrancaGerada')->baseMultaJurosBoletoPerm( $cp->IMB_CGR_ID,'permamente' );
+                    $valorjuros = round($basemultajuros['juros'] * $par->IMB_PRM_COBBANJUROSDIA/100,2);
+
+
+                    $cobrarjuros = '1';
+                    $cvaljuros = $valorjuros * 100;
+                    $cvaljuros = $this->formata_numero( intval($cvaljuros),13,0);
+
+                    $cdatajuros =$dataencargos;
+                    //$cdatajuros = date( $cdatajuros, strtotime( '+1 day' ));
+                }
+                else
+                {
+                    $valorjuros=0;
+                    $cobrarjuros = '0';
+                    $nTaxaJurosMes = 0;
+                    $cvaljuros =  str_repeat('0',13);
+                    $cdatajuros = str_repeat('0',10);
+
+                }
+
+
+
+                if( $par->IMB_PRM_COBBANMULTA <> 0 and $par->IMB_PRM_COBBANMULTA <> null )
+                {
+
+                    $basemultajuros = app( 'App\Http\Controllers\ctrCobrancaGerada')->baseMultaJurosBoletoPerm( $cp->IMB_CGR_ID,'permamente' );
+                    $valormulta = round($basemultajuros['multa'] * $par->IMB_PRM_COBBANMULTA/100,2);
+   
+
+                    $cobrarmulta = '1';
+                    $cmulta = $valormulta * 100;
+                    $cmulta = $this->formata_numero( intval($cmulta),13,0);
+                    $cdatamulta =$dataencargos;
+                }
+                else
+                {
+                    $valormulta=0;
+                    $cobrarmulta = '0';
+                    $cmulta = str_repeat( '0',13 );
+                    $cdatamulta = str_repeat( '0',10 );
+
+                }
+
+
+
+                $cDatBon = '000000';
+                $cValBon = $cg->IMB_CGR_VALORPONTUALIDADE*100;
+                $cValBon = $this->formata_numero( intval($cValBon),13,0);
+                if( $cg->IMB_CGR_VALORPONTUALIDADE <> 0 )
+                {
+                    $cDatBon = date('dmy',strtotime($cg->IMB_CGR_DATAVENCIMENTO));
+                    $cValBon = $cg->IMB_CGR_VALORPONTUALIDADE*100;
+                    $cValBon = $this->formata_numero( intval($cValBon),13,0);
+                }
+
+ //               dd( "cDatBon $cDatBon -  cValBon: $cValBon - cTipoBon: $cTipoBon");
+
+                $cValTot = $cg->IMB_CGR_VALOR*100;
+                $cValTot = $this->formata_numero( intval($cValTot),13,0);
+
+                //$conteudo .= "nossonumero ".$cp->IMB_CGR_NOSSONUMERO.chr(13).chr(10);
+                //$conteudo .= 'Pontualidade '.$nValBon.' até: '.$cDatBon.chr(13).chr(10);
+
+                if( $conta->FIN_CCI_CODIGOFLASH <> '' )                 
+                    $nossonumero = str_repeat( '0',8);
+            else
+                $nossonumero = $this->formata_numero( $cp->IMB_CGR_NOSSONUMERO,8,0);
+
+
+                $cdestinatario=substr($cg->IMB_CGR_DESTINATARIO,0,30);
+                $cdestinatario=app('App\Http\Controllers\ctrRotinas')->tirarEspeciais($cdestinatario);
+                $cEndereco =substr($cg->IMB_CGR_ENDERECO,0,40);
+                $cEndereco =app('App\Http\Controllers\ctrRotinas')->tirarEspeciais($cEndereco);
+                
+                $cbairro =substr($cg->IMB_CEP_BAI_NOME,0,12);
+                $cbairro=app('App\Http\Controllers\ctrRotinas')->tirarEspeciais($cbairro);
+
+                $ccidade =substr($cg->IMB_CEP_CID_NOME,0,15);
+                $ccidade=app('App\Http\Controllers\ctrRotinas')->tirarEspeciais($ccidade);
+
+
+                $nSequencia++;
+                $conteudo .= '1'. //001-001
+                    '02'. //002-003
+                    $cCGCCedente. //004-017
+                    $this->formata_numero( $conta->FIN_CCI_AGENCIANUMERO,4,0). //018-021
+                     '00'.
+                    $this->formata_numero( $conta->FIN_CCI_CONCORNUMERO,5,0).//024-28
+                    str_pad( $conta->FIN_CCI_CONCORDIGITO,1,' '). //029-029
+                    str_repeat(' ', 4 ). //030-033
+                    str_repeat('0',4 ).//034-37
+                    str_pad( $cp->IMB_CGR_ID, 25,' ' ). //38-62
+                    $nossonumero.
+                    str_repeat('0',13).//replicate('0',13 )+//071-083
+                    str_pad( $conta->FIN_CCI_COBRANCACARTEIRA,'0',3 ).//084-086
+                    str_repeat(' ',21 ) . //087-107
+                    'I' . //108/108
+                    '01'.//109-110
+                    $this->formata_numero($cp->IMB_CGR_ID,10,0 ).//111-120
+                    date('dmy', strtotime($cg->IMB_CGR_DATALIMITE )).//0121-126
+                    $cValTot.//127-139
+                    '341'. //140+142
+                    str_repeat('0', 5 ) . //143-147
+                    '01'. //148-149
+                    'N'. //150-150
+                    date('dmy'). //151-156
+                    $cToleranciaBoleto.
+                    '00'.  //159-160  NÃO RECEBER APOS VENCIMENTO
+                    $cvaljuros. //161-173
+                    $cDatBon. //174-179
+                    $cValBon. //180-192
+                    str_repeat('0', 13 ). //193-205
+                    str_repeat('0', 13 ). //206-218
+                    $cpessoa. //219-220
+                    $cCgc. //221-234
+                    str_pad($cdestinatario,30,' '). //235-264
+                    str_repeat(' ', 10 ). //265-274
+                    str_pad($cEndereco,40,' '). //275-314
+                    str_pad($cbairro,12,' ' ). //166-177
+                    $cCepLt. //327-334
+                    str_pad($ccidade,15,' ').//335-349
+                    str_pad($cg->CEP_UF_SIGLA,2,'X').//350-351
+                    str_repeat(' ', 30 ). //352-381
+                    str_repeat(' ', 4 ). //382-385
+                    date( 'dmy' ).//386-391
+                    $this->formata_numero( $par->IMB_PRM_COBBANTOLERANCIA,2,0). //392-393
+                    ' '. //394-394
+                    $this->formata_numero( $nSequencia,6,0).chr(13).chr(10);
+
+                $nSequencia++;
+                $conteudo .='2'.//001-001
+                    '1'. //002-002
+                    date('dmY', strtotime($cg->IMB_CGR_DATALIMITE )). //003-010
+                    $cmulta .
+                    str_repeat(' ', 371 ).
+                    $this->formata_numero( $nSequencia,6,0 ).
+                    chr(13).chr(10);
+        
+                if( $conta->FIN_CCI_CODIGOFLASH <> ''  )
+                {
+                    $nSequencia++;
+                    $conteudo .= '7'. //001-001
+                        trim( $conta->FIN_CCI_CODIGOFLASH). //002-004
+                        '01'.
+                        str_pad( str_pad( substr( $cdestinatario,0,40),59,' ' ).
+                        str_pad( trim($cCgc),20,' ').
+                        str_pad( date( 'd/m/Y', strtotime($cg->IMB_CGR_DATAVENCIMENTO)),15,' '), 128,' ').
+                        '03'.
+                        str_repeat( ' ', 16).
+                        str_pad( trim( 'CART.:'.trim( $conta->FIN_CCI_COBRANCACARTEIRA)),10,' ').
+                        str_repeat( ' ',51 ).
+                        str_pad( $this->formata_numero( $conta->FIN_CCI_AGENCIANUMERO,4,0).'/'.
+                            $this->formata_numero( $conta->FIN_CCI_CONCORNUMERO,5,0).'-'.
+                            str_pad( $conta->FIN_CCI_CONCORDIGITO,1,' '), 15 , ' ').
+                        str_repeat( ' ', 36 ).
+                        '06'.
+                        str_pad( 
+                            str_pad( date( 'd/m/Y',strtotime($dadoscontrato->IMB_CTR_INICIO)),18,' ').
+                            str_pad( date( 'd/m/Y',strtotime($dadoscontrato->IMB_CTR_DATAREAJUSTE)),14,' ').
+                            str_repeat(' ',20).
+                            str_repeat(' ',8).
+                            str_pad( $dadoscontrato->IMB_CTR_REFERENCIA,16,' ').
+                            str_pad( 'R$ '.number_format( $cg->IMB_CGR_VALOR,2,',','.'),15),127,' '  ).
+                        '0'.
+                        $this->formata_numero( $nSequencia,6,0).chr(13).chr(10);
+
+                    $nSequencia++;
+                    $conteudo .= '7'. //001-001
+                        trim( $conta->FIN_CCI_CODIGOFLASH). //002-004
+                        '08'.
+                        str_pad( trim($cEndereco),128 ).
+                        '09'.
+                        str_pad( 'Imovel: '.trim($cEndereco),128,' ').
+                        '10'.
+                        str_pad( trim( $cdestinatario),127).
+                        '0'.
+                        $this->formata_numero( $nSequencia,6,0).chr(13).chr(10);                                                
+                          
+
+                    $nRegistroMensagem= 0;
+                    $nLinhadoSacado =10;
+                    $cMensagemFlash1 = '';
+                    $cMensagemFlash2 = '';
+                    $cMensagemFlash3= '';
+                           
+                    foreach( $itens as $item )
+                    {          
+                        $evento = app('App\Http\Controllers\ctrRotinas')-> pegaNomeEvento( $item->IMB_TBE_ID);
+                        $evento = app('App\Http\Controllers\ctrRotinas')->tirarEspeciais($evento);
+
+                        $obs = $item->IMB_LCF_OBSERVACAO;
+                        $obs = app('App\Http\Controllers\ctrRotinas')->tirarEspeciais($obs);
+
+
+                        $nRegistroMensagem = $nRegistroMensagem + 1;
+                        $nLinhadoSacado = $nLinhadoSacado + 1;
+                
+                        if ( $nRegistroMensagem == 1 )
+                            $cMensagemFlash1 =
+                                $this->formata_numero($nLinhadoSacado,2,0).
+                               str_pad( 
+                                str_pad(substr($evento,0,29),29,' ').
+                                str_pad( 'R$ '.number_format( $item->IMB_LCF_VALOR,2,',','.'),10,' ').
+                                substr( ' '.$obs,0,86),128,' ');
+
+
+                        if ( $nRegistroMensagem == 2 )
+                            $cMensagemFlash2 =
+                               $this->formata_numero($nLinhadoSacado,2,0).
+                               str_pad( 
+                                str_pad(substr($evento,0,29),29,' ').
+                                str_pad( 'R$ '.number_format( $item->IMB_LCF_VALOR,2,',','.'),10,' ').
+                                substr( ' '.$obs,0,86),128,' ');
+                                               
+                        if ( $nRegistroMensagem == 3 )
+                               $cMensagemFlash3 =
+                               $this->formata_numero($nLinhadoSacado,2,0).
+                               str_pad( 
+                                        str_pad(substr($evento,0,29),29,' ').
+                                        str_pad( 'R$ '.number_format( $item->IMB_LCF_VALOR,2,',','.'),10,' ').
+                                        ' '.substr( $obs,0,85),127,' ');
+                            
+                        if($nRegistroMensagem == 3 )
+                        {
+                            $nSequencia = $nSequencia + 1;
+                            $conteudo .= '7'. //001-001
+                                trim( $conta->FIN_CCI_CODIGOFLASH). //002-004
+                                $cMensagemFlash1.
+                                $cMensagemFlash2.
+                                $cMensagemFlash3.
+                                '0'.
+                                $this->formata_numero( $nSequencia,6,0).chr(13).chr(10);
+                            $nRegistroMensagem = 0;
+                            $cMensagemFlash1 ='';
+                            $cMensagemFlash2 ='';
+                            $cMensagemFlash3 ='';                                
+                        }
+
+
+             
+                    }
+
+
+                    if ( $nRegistroMensagem == 1  )
+                    {
+                        $nLinhadoSacado =  $nLinhadoSacado + 1;
+                        $cMensagemFlash2 =
+                            $this->formata_numero($nLinhadoSacado,2,0).
+                            str_repeat(' ', 128);
+
+                        $nLinhadoSacado =  $nLinhadoSacado + 1;
+                        $cMensagemFlash3 =
+                            $this->formata_numero($nLinhadoSacado,2,0).
+                            str_repeat(' ',127 );
+                    }
+
+               
+                    if ($nRegistroMensagem == 2 )
+                    {
+                        $nLinhadoSacado =  $nLinhadoSacado + 1;
+                        $cMensagemFlash3 =
+                            $this->formata_numero($nLinhadoSacado,2,0).
+                            str_repeat(' ',127 );
+                    }
+               
+                    if ($nRegistroMensagem <> 0)
+                    {
+                        $nSequencia = $nSequencia + 1;
+                        $conteudo .= '7'. //001-001
+                            trim( $conta->FIN_CCI_CODIGOFLASH). //002-004
+                            $cMensagemFlash1.
+                            $cMensagemFlash2.
+                            $cMensagemFlash3.
+                            '0'.
+                            $this->formata_numero( $nSequencia,6,0).chr(13).chr(10);                                                
+                    }
+
+                }
+
+            }
+
+            $nSequencia++;
+            $conteudo .='9'.
+                str_repeat(' ', 393 ).
+                $this->formata_numero( $nSequencia,6,0).chr(13).chr(10);;
+
+
+
+          
+
+            Storage::disk('public')->makeDirectory( $pasta);
+            Storage::disk('public')->put($pasta.'/'.$filename, $conteudo);
+            $url = URL::to('/').'/storage'.$pasta.'/'.$filename;
+
+            $cg = mdlCobrancaGerada::where( 'IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID )->delete();
+            $cgi = mdlCobrancaGeradaItem::where( 'IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID )->delete();
+
+            return $url;
+
+            //echo '<a href='.'"
+        }
+
+
+    }
 
 
 }

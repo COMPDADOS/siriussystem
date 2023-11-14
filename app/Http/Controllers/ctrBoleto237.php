@@ -267,6 +267,8 @@ class ctrBoleto237 extends Controller
 
 
                     $html = view('boleto.237.boleto237', compact( 'dadosboleto', 'im','ctr', 'imv','barcode', 'cpi' ) );
+                    try
+                    {
                     Mail::send('boleto.boletoemail', compact( 'dadosboleto', 'im','ctr', 'imv','banconumber' ) ,
                     function( $message ) use ($a, $html,$nossonumero_email, $imovel_log, $contrato_log)
                     {
@@ -275,8 +277,8 @@ class ctrBoleto237 extends Controller
                         if( $a <>'' and filter_var($a, FILTER_VALIDATE_EMAIL))
                         {
 
-                            $pdf=PDF::loadHtml( $html,'UTF-8');
-                                    $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
+//                            $pdf=PDF::loadHtml( $html,'UTF-8');
+  //                                  $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
     //                        $message->to( "suporte@compdados.com.br" );
                             $message->to( $a  );
                             $message->cc( $copiaend );
@@ -288,6 +290,11 @@ class ctrBoleto237 extends Controller
                         }
     
                     });
+                    }
+                    catch (\Illuminate\Database\QueryException $e) {
+                    Log::info( 'Erro: '.$e->getCode() );
+                }                                        
+
 
                 }
                 //echo "<script>window.close();</script>";
@@ -359,11 +366,13 @@ class ctrBoleto237 extends Controller
         $linha = substr($barra,0,4) . $dv . substr($barra,4);
         $linhadigitavel = $this->monta_linha_digitavel($linha);
 
-        if( $cg->imb_cgr_idpermanente == '' )
+        Log::info( 'id permanente: '.$cg->imb_cgr_idpermanente);
+        if( intval($cg->imb_cgr_idpermanente == 0 ) )
             $cgp = new mdlCobrancaGeradaPerm;
         else
             $cgp = mdlCobrancaGeradaPerm::find( $cg->imb_cgr_idpermanente );
 
+            Log::info( 'imovel anes de setar: '.$cg->IMB_IMV_ID);
         $cgp->IMB_IMV_ID = $cg->IMB_IMV_ID;
         $cgp->IMB_CGR_DESTINATARIO = $cg->IMB_CGR_DESTINATARIO;
         $cgp->IMB_CGR_ENDERECO = $cg->IMB_CGR_ENDERECO;
@@ -547,7 +556,7 @@ class ctrBoleto237 extends Controller
 
 
 
-            $nSequencia     = 0;
+            $nSequencia     = 1;
             $nTotalFat      = 1;
             $nTotalFatVal   = 0;
             $nTitulos       = 0;
@@ -556,6 +565,7 @@ class ctrBoleto237 extends Controller
             foreach( $cgs as $cg )
             {
 
+                Log::info( 'imovel: '.$cg->IMB_IMV_ID);
                 $cp = $this->abastecerPermanente( $cg, $filename );
 
                 $cCgc = $cg->IMB_CGR_CPF;
@@ -646,7 +656,7 @@ class ctrBoleto237 extends Controller
                 ->cargaItensSemJson( $cg->IMB_CGR_ID );
                 $nSeqLote++;
 
-                $nSequencia++;
+                
                 $nTotalFat++;
                 $nRegistroLote++;
                 $nTitulos++;
@@ -823,9 +833,9 @@ class ctrBoleto237 extends Controller
                 str_pad(  $cmensagemmulta, 40,' ').
                 str_repeat( ' ', 40 ).
                 '000000'.
-                str_repeat( ' ', 13 ).
-                str_repeat( ' ', 6).
-                str_repeat( ' ', 13 ).
+                str_repeat( '0', 13 ).
+                str_repeat( '0', 6).
+                str_repeat( '0', 13 ).
                 str_repeat( ' ', 7).
                 $this->formata_numero($conta->FIN_CCI_COBRANCACARTEIRA,3,0 ). //009-013
                 $this->formata_numero($conta->FIN_CCI_AGENCIANUMERO,5,0 ). //009-013
@@ -968,7 +978,7 @@ class ctrBoleto237 extends Controller
 
                             //verificar pagagameto
                             $japago = 'N';
-                            $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                            $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                             if( $valorjapago <> 0 ) 
                                 $japago='S';
                             else
@@ -1176,7 +1186,7 @@ class ctrBoleto237 extends Controller
                     {
                         //verificar pagagameto
                         $japago = 'N';
-                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO );
+                        $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                         if( $valorjapago <> 0 ) 
                             $japago='S';
 

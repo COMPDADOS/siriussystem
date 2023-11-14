@@ -11,7 +11,7 @@
     use App\mdlClienteUsuario;
     use App\mdlClienteAtendimento;
     use App\mdlLocatarioContrato;
-    use App\ mdlPropImovel;
+    use App\mdlPropImovel;
     use DataTables;
     use App\User;
     use DB;
@@ -142,7 +142,7 @@
                     WHERE IMB_CLIENTE.IMB_CLT_ID = IMB_LOCATARIOCONTRATO.IMB_CLT_ID)" ));
                 }
 
-                if( $request->tipopesquisa == 'FD')
+                if( $request->tipopesquisa == 'FD' )
                 {
                     $cFiltrou = 'S';
                     $clientes->whereRaw( DB::raw("IMB_CLT_NOME LIKE '%{$request->pesquisagenerica}%' AND exists( SELECT IMB_CLT_ID FROM IMB_FIADORCONTRATO
@@ -553,7 +553,7 @@
             $cliente->save();
 
 
-            return $cliente->IMB_CLT_ID;      //$cliente->save();
+            return response()->json($cliente->IMB_CLT_ID,200);      //$cliente->save();
 
 //            return $cliente->IMB_CLT_ID;
 

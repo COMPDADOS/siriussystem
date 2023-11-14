@@ -74,7 +74,6 @@
 .lbl-medidas-outrositens {
   text-align: left;
   font-size: 12px;
-  color: #4682B4;
 }
 
 .cardtitulo {
@@ -104,6 +103,11 @@ td, th
 {
     text-align:center;
 }
+div.corporel {
+  width: 60%;
+  height: 500px;
+  overflow: scroll;
+}
 
 </style>
 <script src="{{asset('/global/plugins/sweetalert/sweetalert2.min.js')}}"></script>
@@ -120,52 +124,88 @@ td, th
     <div class="col-md-12">
 
         <div class="col-md-12 escondido" id = "div-filtro-dem">
-            <div class="col-md-3">
-                <label> Locador</label>
-                <select  class="select2" id="i-locadores">
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="label-control" for="i-data-inicio">Data Inicial
-                <input class="form-control" type="date" id="i-data-inicio">
-                </label>
-            </div>
-            <div class="col-md-2">
-                <label class="label-control" for="i-data-fim">Data Final
-                    <input class="form-control" type="date" id="i-data-fim">
-                </label>
-            </div>
-            <div class="col-md-1">
-                <label class="label-control" for="i-data-fim">Pasta
-                    <input class="form-control" type="text" id="IMB_CTR_REFERENCIA_DEMONST">
-                </label>
-            </div>
-            <div class="col-md-1">
-                <label class="label-control" for="i-data-fim">Cód.Imóvel
-                    <input class="form-control" type="text" id="IMB_IMV_ID_DEMONST">
-                </label>
-            </div>
-            <div class="col-md-1 div-center">
-                <a href="javascript: modalEmailLocadorDem()" title="Enviar por email"><i class="fa fa-envelope-o fa-3x" aria-hidden="true"></i></a>
-            </div>
-            <div class="col-md-1 div-center">
-                <a href="javascript:cargaDemonstrativo('N')" title="Imprimir um Relatório com as Informações"><i class="fa fa-print fa-3x" aria-hidden="true"></i></a>
-            </div>
+            <p>
+                .
+            </p>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        <label> Locador</label>
+                        <select  class="select2" id="i-locadores">
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control" for="i-data-inicio">Data Inicial
+                            <input class="form-control" type="date" id="i-data-inicio">
+                        </label>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control" for="i-data-fim">Data Final
+                            <input class="form-control" type="date" id="i-data-fim">
+                        </label>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="label-control">Pasta
+                            <input class="form-control" type="text" id="IMB_CTR_REFERENCIA_DEMONST">
+                        </label>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="label-control" for="i-data-fim">Cód.Imóvel
+                            <input class="form-control" type="text" id="IMB_IMV_ID_DEMONST">
+                        </label>
+                    </div>        
+                    <div class="col-md-2">
+                        <label class="label-control" >&nbsp;</label>
+                        <button title="Carregar informações"class="btn btn-primary" onClick="visualiarRelDemonstrativo()">Visualizar Informações</button>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-12">
+                        <label class="control-label">Email do Locador</label>
+                        <input class="form-control" type="text" id="i-email-locador-demonstrativo" >
+                    </div>
 
-            <div class="col-md-1 div-center">
-                <a class="btn success" href="javascript:enviarTodos()" title="Enviar para todos os locadores que tiveram pagamento dentro do periodo informado"></i>Enviar em Lote</a>
+                </div>
             </div>
-
-            <div class="col-md-1 ">
-                <button title="Limpar os filtros" class="btn btn-danger" onClick="limparFiltros()">Limpar</button>
-            </div>
+            
         </div>
 
     </div>
 
 </div>
+<div class="col-md-12 escondido" id="div-rel">
+    <div class="col-md-8 corporel" id="corpo-rel" >
+    </div>
+    <div class="col-md-1">
+        <div class="row">
+            <hr>
+        </div>
+        <div class="row">
+            <div class="col-md-12 div-center">
+            <a href="javascript: enviarDemonstrativoPorEmail()" title="Enviar por email"><i class="fa fa-envelope-o fa-3x" aria-hidden="true"></i></a>
+            </div>
+        </div>
+        <div class="row">
+            <hr>
+        </div>
+        <div class="row">
+            <div class="col-md-12 div-center">
+                <a href="javascript:cargaDemonstrativo('N')" title="Imprimir um Relatório com as Informações"><i class="fa fa-print fa-3x" aria-hidden="true"></i></a>
+            </div>
+        </div>
+        <div class="row">
+            <hr>
+        </div>
+        <div class="row">
+            <div class="col-md-12 div-center">
+                <a class="btn success" href="javascript:enviarTodos()" title="Enviar para todos os locadores que tiveram pagamento dentro do periodo informado"></i>Enviar em Lote</a>
+            </div>
+        </div>
+    </div>
+</div>
+                    
+</div>
 
-@include('layout.modalemailgenerico')
 
 
 @endsection
@@ -183,6 +223,64 @@ $( document ).ready(function()
 {
 
     limparFiltros();
+    $("#IMB_CTR_REFERENCIA_DEMONST").change(function()
+    {
+        if( $(this).val() =='' )
+            cargaLocadores();
+        else
+            $.ajax(
+            {
+                url : "{{ route('locadores.contrato')}}/"+$(this).val(),
+                dataType:'json',
+                type:'get',
+                async:false,
+                success:function( data )
+                {
+                    $("#i-locadores").empty();
+                    linha ='<option value="">Selecione o Locador</option>';
+                    $("#i-locadores").append( linha );
+                    for( nI=0;nI < data.length;nI++)
+                    {
+                        linha =
+                            '<option value="'+data[nI].IMB_CLT_ID+'">'+
+                                data[nI].IMB_CLT_NOME+
+                                "</option>";
+                        $("#i-locadores").append( linha );
+                    }
+                }
+            });
+    });
+    $("#IMB_IMV_ID_DEMONST").change(function()
+    {
+        if( $(this).val() =='' )
+            cargaLocadores();
+        else
+            $.ajax(
+            {
+                url : "{{ route('propimo.carga')}}/"+$(this).val(),
+                dataType:'json',
+                type:'get',
+                async:false,
+                success:function( data )
+                {
+                    $("#i-locadores").empty();
+                    linha ='<option value="">Selecione o Locador</option>';
+                    $("#i-locadores").append( linha );
+                    for( nI=0;nI < data.length;nI++)
+                    {
+                        linha =
+                            '<option value="'+data[nI].IMB_CLT_ID+'">'+
+                                data[nI].IMB_CLT_NOME+
+                                "</option>";
+                        $("#i-locadores").append( linha );
+                    }
+                }
+            });
+    });
+
+    
+
+
     //cargaCarteira();
     $("#sirius-menu").click();
     $("#i-locadores").change( function()
@@ -196,48 +294,14 @@ $( document ).ready(function()
                 async:false,
                 success:function( data )
                 {
-                    $("#i-email-modal-generico").val( data.IMB_CLT_EMAIL);
+                    $("#i-email-locador-demonstrativo").val( data.IMB_CLT_EMAIL);
                 }
             }
         )
         
     })
 
-    $("#btn-email-generico").click( function()
-    {
-        var url = "{{route('cliente.atualizaremail')}}";
-
-        var dados =
-        {
-            IMB_CLT_ID : $("#i-locadores").val(),
-            email : $("#i-email-modal-generico").val(),
-        }
-
-        $.ajaxSetup(
-            {
-              headers:
-              {
-                  'X-CSRF-TOKEN': "{{csrf_token()}}"
-              }
-            });
-
-        $.ajax(
-            {
-                url:url,
-                dataType:'json',
-                type:'post',
-                data:dados,
-                success:function()
-                {
-
-                }
-            }
-        );
-
-        cargaDemonstrativo('S');
-        $("#modalemailgenerico").modal('hide');        
-
-    })
+    
     $(".select2").select2(
         {
             placeholder: 'Selecione',
@@ -265,8 +329,8 @@ function cargaDemonstrativo( email)
         alert('Informe a data inicio');
         return false;
     }
-
-
+        
+    
     if( $("#i-data-fim").val() == '' )
     {
         alert('Informe a data fim');
@@ -286,6 +350,7 @@ function cargaDemonstrativo( email)
 
     if( email != 'S' )
     {
+
         var url = "{{route('recibolocador.demonstrativosnew')}}?IMB_CLT_ID="+
                     $("#i-locadores").val()+
                     "&datainicial="+$("#i-data-inicio").val()+
@@ -391,6 +456,80 @@ function enviarTodos()
     }
 }
 
+function visualiarRelDemonstrativo()
+{
+     url = "{{route('recibolocador.demonstrativosnew')}}?IMB_CLT_ID="+
+                    $("#i-locadores").val()+
+                    "&datainicial="+$("#i-data-inicio").val()+
+                    "&datafinal="+$("#i-data-fim").val()+"&email="+
+                    "&IMB_IMV_ID="+$("#IMB_IMV_ID_DEMONST").val()+"&IMB_CTR_REFERENCIA="+$("#IMB_CTR_REFERENCIA_DEMONST").val()+"&retornajson=S";
+ 
+       //Essa é a função success
+    //O parâmetro é o retorno da requisição 
+    $.ajax(
+        {
+            url:url,
+            dataType:'json',
+            type:'get',
+            complete:function( data )
+            {
+                $('#div-rel').load(data);
+            },
+            success:function(data)
+            {
+
+            },
+            error:function(res)
+            {
+                $('#div-rel').show();
+                $('#corpo-rel').html(res.responseText);
+                
+
+            },
+            done:function( data )
+            {
+            }
+
+        }
+    )
+    
+}
+
+function enviarDemonstrativoPorEmail()
+{
+        var url = "{{route('cliente.atualizaremail')}}";
+
+        var dados =
+        {
+            IMB_CLT_ID : $("#i-locadores").val(),
+            email : $("#i-email-locador-demonstrativo").val(),
+        }
+
+        $.ajaxSetup(
+            {
+              headers:
+              {
+                  'X-CSRF-TOKEN': "{{csrf_token()}}"
+              }
+            });
+
+        $.ajax(
+            {
+                url:url,
+                dataType:'json',
+                type:'post',
+                data:dados,
+                success:function()
+                {
+
+                }
+            }
+        );
+
+        cargaDemonstrativo('S');
+
+    
+}
 </script>
 
 @endpush

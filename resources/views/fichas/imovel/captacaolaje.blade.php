@@ -26,7 +26,7 @@
         
     <tr>
             <td>
-                <img src="http://www.siriussystem.com.br/sys/storage/images/{{Auth::user()->IMB_IMB_ID}}/logos/logo.jpg" 
+                <img src="h{{env('APP_URL')}}/storage/images/{{Auth::user()->IMB_IMB_ID}}/logos/logo.jpg" 
                     alt='logo' width='120' height='60' />
             </td>
             <td colspan='5'>

@@ -33,23 +33,15 @@
 </div>
 
 <div class="portlet light bordered">
-    <div class="portlet-title">
-        <div class="caption font-blue">
-            <span class="caption-subject bold uppercase"> Pesquisa</span>
-            <i class="fa fa-search font-blue"></i>
-        </div>
-    </div>
+    
     <div class="portlet-body form">
         <div class="form-body">
-            <div class="row">
+            <div class="col-md-12">
                 <div class="col-md-5">
-                    <div class="form-group">
-                        <input type="text" 
-                        class="form-control" 
-                                placeholder="por ser um pedaço do nome"
-                                id="i-nome-pesquisa">
-                    </div>
-                </div>
+               </div>
+               <div class="col-md-3">
+                    <a href="{{route('camposmesclagempesquisar')}}" class="form-control btn btn-warning" >Visualizar Campos de Mesclagem</a>
+               </div>
                 <div class="col-md-2">
                     <div class="form-group">
                         <button class="btn blue pull-right" id='i-add' onClick="adicionar()">Adicionar</button>
@@ -119,8 +111,10 @@ function cargaDocumentos()
                     '<tr>'+
                     '   <td>'+data[nI].GER_DCA_NOME+'-'+cword+'</td>'+
                     '   <td style="text-align:center"> '+
-                        '<a href="javascript:visualizarDocto('+data[nI].GER_DCA_ID+')" class="btn btn-sm btn-primary">Editar</a>'+                              
-                        '<a href="javascript:desativar('+data[nI].GER_DCA_ID+')" class="btn btn-sm btn-danger">Excluir</a>'+                              
+                        '<a href="javascript:visualizarDocto('+data[nI].GER_DCA_ID+')" class="btn btn-sm btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i></a>'+                              
+                        '<a title="excluir este modelo" href="javascript:desativar('+data[nI].GER_DCA_ID+')" class="btn btn-sm btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>'+        
+                        '<a title="download o modelo" href="javascript:download( \''+data[nI].GER_DCA_DOWNLOAD+'\')" class="btn btn-sm btn-danger"><i class="fa fa-download" aria-hidden="true"></i></a>'+        
+                                                                        
                         '</td> ';
                     '</tr>';
                 $("#tabela").append( linha );
@@ -177,6 +171,11 @@ function desativar( id )
         }
     );
 
+}
+
+function download( arquivo )
+{
+    window.location = "{{env('APP_URL')}}/storage/automaticos/"+arquivo;
 }
 </script>
 @endpush

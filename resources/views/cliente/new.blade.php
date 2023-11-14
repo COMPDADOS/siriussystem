@@ -88,8 +88,7 @@
                     <div class="col-md-3" id="i-div-estado-civil">
                       <div class="form-group">
                         <label class="control-label">Estado Civil</label>
-                        <select name="CIMB_CLT_ESTADOCIVIL" class="form-control"
-                        id="IMB_CLT_ESTADOCIVIL">
+                        <select name="CIMB_CLT_ESTADOCIVIL" class="form-control" id="IMB_CLT_ESTADOCIVIL">
                           <option value="S">Solteiro
                           </option>
 
@@ -1327,6 +1326,7 @@
           IMB_IMB_ID2      : $("#IMB_IMB_IDAGENCIA").val(),
           IMB_CLT_SENHA      : $("#IMB_CLT_SENHA").val(),
           IMB_CLTCJG_CPF      : cpfcjg,
+          IMB_CLT_ESTADOCIVIL : $("#IMB_CLT_ESTADOCIVIL").val(),
           IMB_CLTCJG_PROFISSAO      : $("#IMB_CLTCJG_PROFISSAO").val(),
           IMB_CLTCJG_RG      : $("#IMB_CLTCJG_RG").val(),
           IMB_CLTCJG_RGORGAO      : $("#IMB_CLTCJG_RGORGAO").val(),
