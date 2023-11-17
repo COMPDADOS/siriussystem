@@ -689,6 +689,9 @@
             IMB_PRM_TCPAR4INCTA : $("#IMB_PRM_TCPAR4INCTA").prop( "checked" )   ? 'S' : 'N',
 
             IMB_PRM_DEMONSTRATIVOPDF : $("#IMB_PRM_DEMONSTRATIVOPDF").prop( "checked" )   ? 'S' : 'N',
+            IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA : $("#IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA").prop( "checked" )   ? 'S' : 'N',
+            IMB_PRM_REAJUSTARMESSEGUINTE : $("#IMB_PRM_REAJUSTARMESSEGUINTE").prop( "checked" )   ? 'S' : 'N',
+                        
 
             IMB_FORPAG_IDLOCADOR : $("#IMB_FORPAG_IDLOCADOR").val(),
             FIN_CCX_ID_PADRAO_REP : $("#FIN_CCX_ID_PADRAO_REP").val(),
@@ -886,6 +889,9 @@
                     $("#FIN_CCX_ID_PADRAO_REP").val( data.FIN_CCX_ID_PADRAO_REP);
                                         
                     $("#IMB_PRM_DEMONSTRATIVOPDF").prop( 'checked',(data.IMB_PRM_DEMONSTRATIVOPDF == 'S') );
+                    $("#IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA").prop( 'checked',(data.IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA == 'S') );
+                    $("#IMB_PRM_REAJUSTARMESSEGUINTE").prop( 'checked',(data.IMB_PRM_REAJUSTARMESSEGUINTE == 'S') );
+                                        
                     
                             
                 },

@@ -49,6 +49,12 @@
                                     <label class="control-label">Exibir Número da Parcela</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_USARPARCELAS">
                                 </div>
+                                <div class="col-md-6 div-center dark-soft-plus">
+                                    <label class="control-label">reajuste no Mês Seguinte a Data do Próximo Reajuste</label>
+                                    <input type="checkbox" class="form-control" id="IMB_PRM_REAJUSTARMESSEGUINTE">
+                                </div>
+                                
+                                
                             </div>
 
                         </div>

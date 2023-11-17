@@ -640,6 +640,11 @@ $this->verificarExistencia( "TMP_RELRECEBIMENTODIA","DEBITOS",'NUMERIC(12,2)' );
 $this->verificarExistencia( "TMP_RELRECEBIMENTODIA","TOTALRECIBO",'NUMERIC(12,2)' );
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_DATAREPASSEDODIA",'CHAR(01)' );
 $this->verificarExistencia( "IMB_RECIBOLOCATARIO","IMB_RLT_PIX",'NUMERIC(12,2)' );
+$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA",'CHAR(01)' );
+$this->verificarExistencia( "IMB_PARAMETROS2","FIN_CCX_ID_PADRAO_REP",'VARCHAR(10)' );
+$this->verificarExistencia( "IMB_PARAMETROS2 ","IMB_PRM_REAJUSTARMESSEGUINTE",'CHAR(01)' );
+
+
 
 $this->videosTreinamento( 'acesso_ao_sistema.mp4', 'Acessando o Sirius System', 'sirius system acesso acessando entrando sistema plataforma'  );
         $this->videosTreinamento( 'Prontos_introducao.mp4', 'Introdução ao Ambiente de Aprendizado Virtual', 'Treinamentos cursos treinamento curso'  );
@@ -654,8 +659,11 @@ $this->videosTreinamento( 'acesso_ao_sistema.mp4', 'Acessando o Sirius System', 
         $this->videosTreinamento( 'informando_proprietario_imovel.mp4', 'Informando proprietário do Imovel', 'Locador proprietário participacao informando '  );
         $this->videosTreinamento( 'alteracaocaixa.mp4', 'Alteração de Informações em Bancos/Caixa', 'Alterações caixa alteração'  );
         $this->videosTreinamento( 'reajustesdealuguel.mp4', 'Reajuste de Aluguéres', 'Reajuste reajustar aluguel contrato'  );
-                                
-                                        
+        $this->videosTreinamento( 'TREINAMENTO_ESTRUTURA_MENU\TREINAMENTO_ESTRUTURA_MENU.mp4', 'Estrutura dos Menus e Botões de Acesso', 'menu botões acesso tela principal'  );
+        $this->videosTreinamento( 'treinamento_configuracao_plataforma.mp4', 'Configuração Inicial da PLataforma', 'configuração plataforma configurações'  );
+        $this->videosTreinamento( 'treinamentocriardocumentomodelo.mp4', 'Modelos de Documentos - Como Criar', 'modelos criar inclusão incluir automaticos documentos contratos procuração avisos lembretes'  );
+        $this->videosTreinamento( 'Alterar_documento_modelo_completo.mp4', 'Modelos de Documentos - Alterar textos e campos', 'modelos alterar alteração automaticos documentos contratos procuração avisos lembretes'  );
+                                                
         
                 
 

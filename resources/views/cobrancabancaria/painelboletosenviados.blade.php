@@ -31,7 +31,7 @@
             <div class="tab-content">
                 <div class="portlet box blue">
                     <div class="portlet-title">
-                        <div class="caption">Reajustes de Aluguéres
+                        <div class="caption">Boletos Enviados
                         </div>
                         <div class="tools">
                             <a href="javascript:;" class="collapse"> </a>
@@ -66,7 +66,7 @@
             </div>
             <div class="portlet box blue">
                     <div class="portlet-title">
-                        <div class="caption">Contratos a Reajustar
+                        <div class="caption">Boletos Enviados
                         </div>
                         <div class="tools">
                             <a href="javascript:;" class="collapse"> </a>
@@ -127,10 +127,7 @@ $("#i-ano").val( moment().format('YYYY'));
 
     var table = $('#tblcontratos').DataTable(
     {
-        dom: 'Bfrtip',
-        buttons: [
-            'print',
-        'excel'],
+        "pageLength": 1000,
         "language":
         {
             "sEmptyTable": "Nenhum registro encontrado",
@@ -141,6 +138,8 @@ $("#i-ano").val( moment().format('YYYY'));
             "sInfoThousands": ".",
             "sLengthMenu": "_MENU_ resultados por página",
             "sLoadingRecords": "Carregando...",
+            sLoadingRecords: '<img src="{{asset('/layouts/layout/img/loader.gif')}}"/>',
+            sProcessing: '<img src="{{asset('/layouts/layout/img/loader.gif')}}"/>',
             "sProcessing": "Processando...",
             "sZeroRecords": "Nenhum registro encontrado",
             "sSearch": "Pesquisar",

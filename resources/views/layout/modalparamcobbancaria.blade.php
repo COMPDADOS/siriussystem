@@ -20,7 +20,7 @@
                                     <label class="control-label">D+</label>
                                     <input class="form-control" type="text" class="form-control" 
                                     id="IMB_PRM_DIADMAIS"                                        
-                                    onkeypress="return isNumber(event)" onpaste="return false;">
+                                    onkeypress="return isNumber(event)" onpaste="return false;" >
                                 </div>
                                 <div class="col-md-2 div-center">
                                     <input type="checkbox" class="form-control" id="IMB_PRM_TOLERANCIABOLETO">Vencto sair com a data limite
@@ -81,6 +81,11 @@
                                         <input class="form-control" type="text" id="IMB_PRM_COBMULTANDIASPER"
                                         onkeypress="return isNumber(event)" onpaste="return false;">Dias
                                     </div>
+                                    <div class="col-md-3">
+                                        <label class="label-control">Enviar Boleto Somente c/ Entrada Confirmada</label>
+                                        <input type="checkbox" class="form-control" id="IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA">
+                                    </div>
+                                        
                                 </div>
                             </div>
 

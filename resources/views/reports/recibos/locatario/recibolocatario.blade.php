@@ -772,6 +772,7 @@ hr.dashed-vencimento
                     <div class="col-xs-2 informacoes  " >
                         Em Pix: <b>{{number_format( $rec[0]->IMB_RLT_PIX,2,',','.')}}</b>
                     </div>
+                </div>
 
                     <br>
                     <br>

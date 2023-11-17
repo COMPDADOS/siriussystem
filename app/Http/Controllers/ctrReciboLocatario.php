@@ -109,7 +109,7 @@ class ctrReciboLocatario extends Controller
                                     ->dataLimite( $idcontrato, $dados[0]['IMB_RLT_DATACOMPETENCIA'] );
             $recibo->FIN_LCX_DINHEIRO       = $dados[0]['FIN_LCX_DINHEIRO'];
             $recibo->FIN_LCX_CHEQUE         = $dados[0]['FIN_LCX_CHEQUE'];
-            $recibo->IMB_RLT_PIX         = $dados[0]['IMB_RLT_PIX'];
+            //$recibo->IMB_RLT_PIX         = $dados[0]['IMB_RLT_PIX'];
             $recibo->FIN_CFC_ID             = $idcfc;
             $recibo->IMB_CLT_ID_LOCATARIO   = $idlocatario;
             $recibo->IMB_CLT_ID_LOCADOR     = $idlocador;
@@ -218,7 +218,7 @@ class ctrReciboLocatario extends Controller
                                     ->dataLimite( $idcontrato, $d['IMB_RLT_DATACOMPETENCIA'] );
             $recibo->FIN_LCX_DINHEIRO       = $d['FIN_LCX_DINHEIRO'];
             $recibo->FIN_LCX_CHEQUE         = $d['FIN_LCX_CHEQUE'];
-            $recibo->IMB_RLT_PIX            = $d['IMB_RLT_PIX'];
+            //$recibo->IMB_RLT_PIX            = $d['IMB_RLT_PIX'];
             $recibo->FIN_CFC_ID             = $idcfc;
             $recibo->IMB_CLT_ID_LOCATARIO   = $idlocatario;
             $recibo->IMB_CLT_ID_LOCADOR     = $idlocador;
@@ -508,7 +508,7 @@ class ctrReciboLocatario extends Controller
                 'IMB_RLT_TOTALRECIBO',
                 'FIN_LCX_DINHEIRO',
                 'IMB_RLT_TROCO',
-                'IMB_RLT_PIX',
+//                'IMB_RLT_PIX',
                 'FIN_LCX_CHEQUE',
                 'FIN_PCT_NOSSONUMERO',
                 'IMB_RECIBOLOCATARIO.IMB_IMV_ID',

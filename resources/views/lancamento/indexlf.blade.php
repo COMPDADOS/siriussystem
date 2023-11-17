@@ -910,7 +910,7 @@ tr
 <script src="{{asset('/global/plugins/jquery-inputmask/jquery.inputmask.bundle.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('/pages/scripts/form-input-mask.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('/global/plugins/jquery.input-ip-address-control-1.0.min.js')}}" type="text/javascript"></script>
-<script src="{{asset('/global/scripts/moment.min.js')}}" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
 <script type="text/javascript" src="{{asset('/js/jquery-ui-timepicker-addon.js')}}"></script>
 <script type="text/javascript" src="{{asset('/js/i18n/jquery-ui-timepicker-addon-i18n.min.js')}}"></script>
 

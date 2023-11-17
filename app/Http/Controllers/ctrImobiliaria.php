@@ -188,6 +188,9 @@ class ctrImobiliaria extends Controller
         $param2->VIS_STA_IDALUGADO                 = $request->VIS_STA_IDALUGADO;
         $param2->IMB_PRM_DEMONSTRATIVOPDF                 = $request->IMB_PRM_DEMONSTRATIVOPDF;
         $param2->IMB_TBE_IDSEGINC                 = $request->IMB_TBE_IDSEGINC;
+        $param2->IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA                 = $request->IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA;
+        $param2->IMB_PRM_REAJUSTARMESSEGUINTE                 = $request->IMB_PRM_REAJUSTARMESSEGUINTE;
+       
         $param->save();
 
         $param2->save();

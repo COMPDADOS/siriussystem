@@ -9,6 +9,7 @@ use App\mdlLocatarioContrato;
 use App\mdlCliente;
 use App\mdlReciboLocador;
 use App\mdlTelefone;
+use App\mdlParametros2;
 use DateTime;
 use DateInterval;
 use Auth;
@@ -19,6 +20,7 @@ class ctrProcessosAutomaticos extends Controller
     public function boletosAutomaticos( Request $request)
     {
 
+        Log::info('processos automaticos');
         $logged='S';
         if( ! Auth::check())
         {
@@ -28,6 +30,8 @@ class ctrProcessosAutomaticos extends Controller
         $datainicio = $request->datainicio;
         $datafim = $request->datafim;
         $whatsapp=$request->whatsapp;
+
+        $param2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID );
 
         if( $datafim == '' and $datafim == '' )
         {
@@ -63,9 +67,13 @@ class ctrProcessosAutomaticos extends Controller
             $cobrancas = mdlCobrancaGeradaPerm::
                 where( 'IMB_CTR_SITUACAO','=','ATIVO')
                 ->whereNull( 'IMB_CGR_DATABAIXA')
-                ->whereNull( 'IMB_CGR_DTHINATIVO')
-                ->where( 'IMB_CGR_ENTRADACONFIRMADA','=','S' )
-                ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_COBRANCAGERADAPERM.IMB_CTR_ID' )
+                ->whereNull( 'IMB_CGR_DTHINATIVO');
+            
+                if( $param2->IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA == 'S')
+                $cobrancas = $cobrancas->where( 'IMB_CGR_ENTRADACONFIRMADA','=','S' );
+    
+
+            $cobrancas = $cobrancas->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_COBRANCAGERADAPERM.IMB_CTR_ID' )
                 //->where( 'IMB_CGR_DATAVENCIMENTO','>=', $datainicio )
     //            ->where( 'IMB_CGR_DATAVENCIMENTO','<=', $datafim );
                 ->whereRaw( "( DATEDIFF (IMB_CGR_DATAVENCIMENTO, CURDATE() ) in $dias ) or ( IMB_CGR_DTHGERACAO = CURDATE() )" );
@@ -80,14 +88,17 @@ class ctrProcessosAutomaticos extends Controller
                 ->whereNull( 'IMB_CGR_DATABAIXA')
                 ->whereNull( 'IMB_CGR_DTHINATIVO')
                 ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_COBRANCAGERADAPERM.IMB_CTR_ID' )
-                ->where( 'IMB_CGR_ENTRADACONFIRMADA','=','S' )
                 ->where( 'IMB_CGR_DATAVENCIMENTO','>=', $datainicio )
                 ->where( 'IMB_CGR_DATAVENCIMENTO','<=', $datafim );
+                if( $param2->IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA == 'S')
+                    $cobrancas = $cobrancas->where( 'IMB_CGR_ENTRADACONFIRMADA','=','S' );
+    
         }
 
             
        // Log::info( 'enviando cobrancas '.$datainicio.' a '.$datafim );
-       // Log::info( 'sql: '.$cobrancas->toSql());
+       Log::info( $param2->IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA);
+        Log::info( 'sql: '.$cobrancas->toSql());
 
 
         $cobrancas = $cobrancas->get();

@@ -2775,17 +2775,25 @@ class ctrCobrancaGerada extends Controller
         $datainicio = $request->datainicio;
         $datafim = $request->datafim;
 
+        $param2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID );
+
+
         $cobrancas = mdlCobrancaGeradaPerm::select( '*',
         db::Raw( '( select PEGAEMAILLOCATARIOCONTRATO( IMB_COBRANCAGERADAPERM.IMB_CTR_ID) ) EMAIL'))
                 ->where( 'IMB_CTR_SITUACAO','=','ATIVO')
                 ->whereNull( 'IMB_CGR_DATABAIXA')
                 ->whereNull( 'IMB_CGR_DTHINATIVO')
                 ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_COBRANCAGERADAPERM.IMB_CTR_ID' )
-                ->where( 'IMB_CGR_ENTRADACONFIRMADA','=','S' )
                 ->where( 'IMB_CGR_DATAVENCIMENTO','>=', $datainicio )
                 ->where( 'IMB_CGR_DATAVENCIMENTO','<=', $datafim );
+        if( $param2->IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA == 'S')
+                    $cobrancas = $cobrancas->where( 'IMB_CGR_ENTRADACONFIRMADA','=','S' );
+
 
         $cobrancas = $cobrancas->get();
+
+        if( $logged == 'N')
+        Auth::logout();
 
         return response()->json($cobrancas,200 );
 
@@ -2803,7 +2811,7 @@ class ctrCobrancaGerada extends Controller
             db::raw( '( SELECT IMB_CTR_REFERENCIA FROM IMB_CONTRATO WHERE IMB_CONTRATO.IMB_CTR_ID = IMB_OBSERVACAOGERAL.IMB_CTR_ID) AS IMB_CTR_REFERENCIA' ),
             db::raw( '( select PEGALOCATARIOCONTRATO( IMB_OBSERVACAOGERAL.IMB_CTR_ID) ) AS IMB_CLT_NOME')
         )
-        ->whereRaw( " cast(IMB_OBS_DTHATIVO as date ) between '$datainicio' and '$datafim' and  IMB_OBS_OBSERVACAO like 'Boleto enviado para%'")
+        ->whereRaw( " cast(IMB_OBS_DTHATIVO as date ) between '$datainicio' and '$datafim' and  IMB_OBS_OBSERVACAO like '%Boleto%'")
         ->orderBy( 'IMB_OBS_ID','desc' );
 
 

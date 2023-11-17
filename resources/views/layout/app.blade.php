@@ -461,6 +461,13 @@
 
                         @php
                             $parametros2 = app('App\Http\Controllers\ctrRotinas')->parametros2( Auth::User()->IMB_IMB_ID );
+                            $contarepassepadrao = '';
+                            $formaerpassepadrao ='';
+                            if( $parametros2 <> '')
+                            {
+                                $contarepassepadrao = $parametros2->FIN_CCX_ID_PADRAO_REP;
+                                $formaerpassepadrao =$parametros2->IMB_FORPAG_IDLOCADOR;
+                            }
 
                         @endphp
 
@@ -469,8 +476,8 @@
                         <input type="hidden"  id="i-cfcdescricaopesquisa">
                         <input type="hidden"  id="i-subcontapesquisa">
                         <input type="hidden"  id="i-subcontadescricaopesquisa">
-                        <input type="hidden"  id="i-contarepassepadrao" value="{{$parametros2->FIN_CCX_ID_PADRAO_REP}}">
-                        <input type="hidden"  id="i-formarepassepadrao" value="{{$parametros2->IMB_FORPAG_IDLOCADOR}}">
+                        <input type="hidden"  id="i-contarepassepadrao" value="{{$contarepassepadrao}}">
+                        <input type="hidden"  id="i-formarepassepadrao" value="{{$formaerpassepadrao}}">
 
                         <ul class="nav navbar-nav pull-right">
                             <!-- BEGIN NOTIFICATION DROPDOWN -->

@@ -458,27 +458,31 @@ class ctrRotinas extends Controller
       $imv = mdlImovel::find( $idimovel );
       $bairro = $this->pegarBairroImovel(  $idimovel );
       $imovel = '';
-      if( $imv->IMB_CND_ID <> '' )
+      if( $imv <> '' )
       {
-         $cnd = mdlCondominio::find( $imv->IMB_CND_ID );
-         if( $cnd )
+         if( $imv->IMB_CND_ID <> '' )
          {
-            $imovel = 'Condomínio '.$cnd->IMB_CND_NOME.', ';
-      
+            $cnd = mdlCondominio::find( $imv->IMB_CND_ID );
+            if( $cnd )
+            {
+               $imovel = 'Condomínio '.$cnd->IMB_CND_NOME.', ';
+         
+            }
          }
-      }
-      
-      if( $imv->IMB_IMV_NUMAPT <> '' and $imv->IMB_IMV_NUMAPT <> '0' )
-      {
-         $imovel = $imovel.$imv->IMB_IMV_ENDERECO.' '.$imv->IMB_IMV_ENDERECONUMERO.' '.'Apto: '.$imv->IMB_IMV_NUMAPT.' '.$imv->IMB_IMV_ENDERECOCOMPLEMENTO;
+         
+         if( $imv->IMB_IMV_NUMAPT <> '' and $imv->IMB_IMV_NUMAPT <> '0' )
+         {
+            $imovel = $imovel.$imv->IMB_IMV_ENDERECO.' '.$imv->IMB_IMV_ENDERECONUMERO.' '.'Apto: '.$imv->IMB_IMV_NUMAPT.' '.$imv->IMB_IMV_ENDERECOCOMPLEMENTO;
+         }
+         else
+            $imovel = $imovel.$imv->IMB_IMV_ENDERECO.' '.$imv->IMB_IMV_ENDERECONUMERO.' '.$imv->IMB_IMV_ENDERECOCOMPLEMENTO;
       }
       else
-         $imovel = $imovel.$imv->IMB_IMV_ENDERECO.' '.$imv->IMB_IMV_ENDERECONUMERO.' '.$imv->IMB_IMV_ENDERECOCOMPLEMENTO;
-
-      //else
-         //$imovel = $imovel.$imv->IMB_IMV_ENDERECO.' '.$imv->IMB_IMV_ENDERECONUMERO.' '.$imv->IMB_IMV_ENDERECOCOMPLEMENTO;
-      
-      //Log:info( 'imovel '.$imovel );
+         $imovel = 'Imovel não localizado('.$idimovel.')';
+         //else
+            //$imovel = $imovel.$imv->IMB_IMV_ENDERECO.' '.$imv->IMB_IMV_ENDERECONUMERO.' '.$imv->IMB_IMV_ENDERECOCOMPLEMENTO;
+         
+         //Log:info( 'imovel '.$imovel );
       
       return $imovel;
    }
@@ -1212,6 +1216,7 @@ class ctrRotinas extends Controller
 
    public function realizarReajuste( Request $request )
    {
+      $param2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID);
       $id = $request->IMB_CTR_ID;
       $ctr = mdlContrato::find( $id );
       $valordigitado=$request->valordigitado;
@@ -1246,7 +1251,8 @@ class ctrRotinas extends Controller
 
          $data =$ctr->IMB_CTR_DATAREAJUSTE;
          $dataparcela = $data;
-         //$dataparcela = $this->addMeses( $ctr->IMB_CTR_DIAVENCIMENTO,  1, $data);
+         if( $param2->IMB_PRM_REAJUSTARMESSEGUINTE == 'S')
+            $dataparcela = $this->addMeses( $ctr->IMB_CTR_DIAVENCIMENTO,  1, $data);
          
          //$data = date_create_from_format("m-d-Y", $data);
          $novovalor = $ctr->IMB_CTR_VALORALUGUEL + ( $ctr->IMB_CTR_VALORALUGUEL * $tc->IMB_TBC_FATOR / 100 );

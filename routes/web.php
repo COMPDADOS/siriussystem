@@ -1386,6 +1386,10 @@ Route::get('/estatistica/crm', function(){ return view( 'estatisticas.estatcrm')
     Route::get('/cliente/meuimovel/demonstrativosnew', 'ctrClienteAcesso@demonstrativosNew')->name('portal.demonstrativosnew');
 
     Route::get('/processosautomaticos','ctrProcessosAutomaticos@boletosAutomaticos')->name('processosautomaticos');
+    Route::get('/processosautomaticosjson', function()
+        {
+            return view( 'cobrancabancaria.telaprocessoautomatico');
+    })->name('processosautomaticosjson');
     Route::get('/processosautomaticos/demonstrativosdiario','ctrProcessosAutomaticos@demonstrativosLocadorDiario')->name('processos.demodiario');
 
     Route::get('/cartacobranca/fiador/carta/{idcontrato?}/{idcliente?}','ctrDocsAutomaticos@cartaCobrancaFiador')->name('cartacobrancafiador');

@@ -308,7 +308,16 @@ class ctrTeste extends Controller
 
         $dados =  $data['data'];
 
-        dd( $dados);
+        foreach( $dados as $dado )
+        {
+            dd( $dado);
+            $imv = new mdlImovel;
+            
+            $imv->IMB_IMV_ID = $dado['id_imovel_imo'];
+            
+        }
+
+        
 
     }
 }
