@@ -12,6 +12,12 @@
 |
 */
 
+Route::get( 'bbtoken', 'APIController@token' )->name('bbtoken');
+Route::get( 'bbregistrar', 'APIController@registrar' )->name('bbregistrar');
+Route::get( 'bblistar', 'APIController@listar' )->name('bblistar');
+Route::get( 'bbconsultar', 'APIController@consultar' )->name('bbconsultar');
+Route::get( 'bbbaixar', 'APIController@baixar' )->name('bbbaixar');
+Route::get( 'bbatualizar', 'APIController@atualizar' )->name('bbatualizar');
 
 
 Route::get('/whatsapp/init', 'ctrWhatsApp@instanceInit')->name('whastapp.instance');
