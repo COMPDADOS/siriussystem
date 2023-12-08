@@ -514,10 +514,37 @@ $tb = "CREATE TABLE if not exists CAMPOSDOSISTEMA(".
             "FIN_CFC_UNIQUEID VARCHAR(100),".
             "FIN_LCX_ID INT)";
         DB::statement("$tb");
+
+        $tb ="CREATE TABLE IF NOT EXISTS IMB_IMOVELPROPOSTA(".
+                        "IMB_PRI_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,".
+                        "IMB_IMB_ID INT NOT NULL,".
+                        "IMB_IMV_ID INT NOT NULL,".
+                        "IMB_CLT_ID INT,".
+                        "IMB_CLA_ID INT,".
+                        "IMB_MDI_ID INT,".
+                        "IMB_PRI_ONSERVACAO TEXT,".
+                        "IMB_PRI_COMOFINANCIAR VARCHAR(300),".
+                        "IMB_ATD_IDCORRETORATENDIMENTO INT,".
+                        "IMB_PRI_ATENDENDOCOMO CHAR(01),".
+                        "IMB_ATD_IDCADASTRO INT NOT NULL,".
+                        "IMB_PRI_PRETENSAO VARCHAR(10),".
+                        "IMB_PRI_VALORPROPOSTA NUMERIC(12,2),".
+                        "IMB_PRI_DATARESERVAR DATE,".
+                        "IMB_PRI_VALIDADEPROPOSTADIAS INT,".
+                        "IMB_PRI_COMUNICARPROP CHAR(01),".
+                        "IMB_PRI_COMUNICARRESP CHAR(01),".
+                        "IMB_ATD_IDPROPOSTARESPONSAVEL INT,".
+                        "IMB_PRI_CONDICOESCOMERCIAIS TEXT,".
+                        "IMB_PRI_COMENTARIOS TEXT,".
+                        "IMB_PRI_STATUS VARCHAR(20))";
+        DB::statement("$tb");
+            
+                    
                
 $this->verificarExistencia( "TMP_RELRECEBIMENTODIA","IMB_CTR_REFERENCIA","VARCHAR(10)" );
 
 
+$this->verificarExistencia( "IMB_CLIENTE","IMB_CLT_DEMONSTRATIVOSOMENTEMANUAL", 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_DEMONSTRATIVOPDF", 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_PLARECTCDATARECTO", 'CHAR(01)');
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_WSAPELIDO", 'VARCHAR(20)');
@@ -642,8 +669,21 @@ $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_DATAREPASSEDODIA",'CHAR(0
 $this->verificarExistencia( "IMB_RECIBOLOCATARIO","IMB_RLT_PIX",'NUMERIC(12,2)' );
 $this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA",'CHAR(01)' );
 $this->verificarExistencia( "IMB_PARAMETROS2","FIN_CCX_ID_PADRAO_REP",'VARCHAR(10)' );
-$this->verificarExistencia( "IMB_PARAMETROS2 ","IMB_PRM_REAJUSTARMESSEGUINTE",'CHAR(01)' );
+$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_REAJUSTARMESSEGUINTE",'CHAR(01)' );
+$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_RECIBOLTRETORNO",'CHAR(01)' );
+$this->verificarExistencia( "IMB_PARAMETROS2","IMB_PRM_RELREPASSEAGRUFORMA",'CHAR(01)' );
 
+$this->verificarExistencia( "IMB_CLIENTE","IMB_CLT_INSCRMUNICIPAL",'VARCHAR(20)' );
+$this->verificarExistencia( "IMB_CLIENTE","IMB_CLT_RAMOATIVIDADE",'VARCHAR(30)' );
+$this->verificarExistencia( "IMB_CLIENTE","CEP_BAI_NOMECOM",'VARCHAR(40)' );
+$this->verificarExistencia( "IMB_CLIENTE","IMB_CLT_IDENTIFICADORPROP_PES_SL",'VARCHAR(20)' );
+$this->verificarExistencia( "IMB_CLIENTE","IMB_CLT_BANCOOPERACAO",'VARCHAR(10)' );
+$this->verificarExistencia( "IMB_CLIENTE","IMB_CLT_IDENTIFICACAOSL",'VARCHAR(10)' );
+$this->verificarExistencia( "IMB_IMOVEIS","IMB_IMV_IDENTIFICADOR",'VARCHAR(100)' );
+$this->verificarExistencia( "IMB_IMOVEIS","IMB_CLT_IDSACADO",'INT' );
+
+$this->verificarExistencia( "IMB_IMOVEIS","IMB_IMV_RURALURBANO",'CHAR(1)' );
+$this->verificarExistencia( "IMB_CONTRATO","IMB_CTR_MESREAJUSTE",'INT' );
 
 
 $this->videosTreinamento( 'acesso_ao_sistema.mp4', 'Acessando o Sirius System', 'sirius system acesso acessando entrando sistema plataforma'  );
@@ -663,8 +703,9 @@ $this->videosTreinamento( 'acesso_ao_sistema.mp4', 'Acessando o Sirius System', 
         $this->videosTreinamento( 'treinamento_configuracao_plataforma.mp4', 'Configuração Inicial da PLataforma', 'configuração plataforma configurações'  );
         $this->videosTreinamento( 'treinamentocriardocumentomodelo.mp4', 'Modelos de Documentos - Como Criar', 'modelos criar inclusão incluir automaticos documentos contratos procuração avisos lembretes'  );
         $this->videosTreinamento( 'Alterar_documento_modelo_completo.mp4', 'Modelos de Documentos - Alterar textos e campos', 'modelos alterar alteração automaticos documentos contratos procuração avisos lembretes'  );
+        $this->videosTreinamento( 'todosdemonstrativos.mp4', 'Extrato de Repasses - Enviar para TODOS por Email', 'demonstrativo locador repasse extrato'  );
                                                 
-        
+                
                 
 
 

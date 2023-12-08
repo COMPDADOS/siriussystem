@@ -93,15 +93,6 @@
                     </a>
                 </div>
                 @php
-                    $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'RelatórioGeralContratos', 'Relatório Geral Contratos Aluguéres', 'ADM', 'Contratos','S', 'X', 'Botão');
-                @endphp
-                <div class="col-md-2 div-center {{$acesso}}">
-                    <a href="">
-                        <img src="{{asset('global/img/relcontratos.png')}}" alt="">
-                        <p>Relatórios de Contratos</p>
-                    </a>
-                </div>
-                @php
                     $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'CentralRepasse', 'Central de Repasses', 'ADM', 'Repasses ao Locador','S', 'X', 'Botão');
                 @endphp
                 <div class="col-md-2 div-center {{$acesso}}">
@@ -338,7 +329,7 @@
 
                 <div class="col-md-2 div-center  {{$acesso}}">
                     <p>
-                    <a href="{{route('estatistica.admimovel')}}">
+                    <a href="{{route('estatistica.crm')}}">
                         <img src="{{asset('global/img/estatisticas.png')}}" alt="">
                             <p>Estatística do CRM</p>
                     </a>
@@ -442,8 +433,45 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="row" id='id-advertencia'>
+    <h2 class="div-center font-20-red-white">ADVERTÊNCIAS IMPORTANTES</h2>
+    @php
+        $boletos = app( 'App\Http\Controllers\ctrCobrancaGerada')->boletosAVencerSemRegistrar();
+        $qtboletossemretorno = 0;
+        foreach ($boletos  as $boleto)
+        {
+            $qtboletossemretorno = $qtboletossemretorno + 1;
+        }
+    @endphp
+    @if( $qtboletossemretorno > 0 )
+        <div class="col-md-12" id="i-adv-boletos-sem-registro">
+            <h3 class="font-red div-center">Boletos sem Informações de Retorno(Não foi lido o retorno)</h3>
+            @foreach( $boletos as $boleto)
+                <div class="row">
+                    <div class="col-md-1">
+                        Pasta: <b>{{ app('App\Http\Controllers\ctrRotinas')->pegarReferencia( $boleto->IMB_CTR_ID)}}</b>
+                    </div>
+                    <div class="col-md-3">
+                        Vencto: <b>{{date( 'd/m/Y', strtotime( $boleto->IMB_CGR_DATAVENCIMENTO))}}</b>
+                    </div>
+                    <div class="col-md-2">
+                        Valor: <b> R$ {{ number_format( $boleto->IMB_CGR_VALOR,2,',','.')}}</b>
+                    </div>
+                    <div class="col-md-3">
+                        <b>{{$boleto->IMB_CGR_IMOVEL}}</b>
+                    </div>
+                    <div class="col-md-3">
+                        <b>{{$boleto->IMB_CGR_DESTINATARIO}}</b>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
 
     
+
 </div>
 
 

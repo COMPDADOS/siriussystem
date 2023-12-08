@@ -127,10 +127,14 @@ class ctrTabelaIRRF extends Controller
 
        // Log::info( 'ctrtabelairrf - Imóvel: '.$idimovel);
 
+       Log::info( '$locatario->IMB_CLT_PESSOA '.$locatario->IMB_CLT_PESSOA);
         if( $locatario->IMB_CLT_PESSOA <> 'J' )
             return [];
 
-        if( $par2->IMB_PRM_IRRFRESPEITARCTR =='S' and $ctr->IMB_CTR_IRRF <> 'S' )
+            Log::info( '$par2->IMB_PRM_IRRFRESPEITARCTR '.$par2->IMB_PRM_IRRFRESPEITARCTR);
+            Log::info( '$ctr->IMB_CTR_IRRF '.$ctr->IMB_CTR_IRRF);
+            Log::info( '$par2->IMB_PRM_NUNCAIRRF '.$par2->IMB_PRM_NUNCAIRRF);
+            if( $par2->IMB_PRM_IRRFRESPEITARCTR =='S' and $ctr->IMB_CTR_IRRF <> 'S' )
             return [];
 
         if( $par2->IMB_PRM_NUNCAIRRF =='S' )
@@ -145,15 +149,19 @@ class ctrTabelaIRRF extends Controller
 
 
 
+        Log::info( "propimovel vou entrar");
 
         foreach( $propimo as $prop)
         {
+            Log::info( "entrei");
+
 //Log::info('ctrtabelairrf - Cliente: '.$prop->IMB_CLT_ID);
 
             $baseprop = $nvalorbase * $prop->IMB_IMVCLT_PERCENTUAL4 /100;
 
             $cliente = mdlCliente::find( $prop->IMB_CLT_ID );
-            //Log::info('Ld: '.$cliente->IMB_CLT_NOME.' - '.$baseprop);
+            Log::info('Ld: '.$cliente->IMB_CLT_NOME.' - '.$baseprop);
+            Log::info('Pessoa: '.$cliente->IMB_CLT_PESSOA );
 
             if( $cliente->IMB_CLT_PESSOA == 'F')
             {

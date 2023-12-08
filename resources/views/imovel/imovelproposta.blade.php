@@ -3,37 +3,53 @@
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
   <script src="//code.jquery.com/jquery-1.12.4.js"></script>
   <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-@endsection
+  @endsection
 @section('scripttop')
 <style>
-
-
-.gi-2x{font-size: 2em;}
-.gi-3x{font-size: 3em;}
-.gi-4x{font-size: 4em;}
-.gi-5x{font-size: 5em;}
-p.round3 {
-  border: 2px solid red;
-  border-radius: 12px;
-  padding: 5px;
+    input::-webkit-datetime-edit-day-field:focus,
+    input::-webkit-datetime-edit-month-field:focus,
+    input::-webkit-datetime-edit-year-field:focus {
+    background-color: red;
+    color: white;
+    outline: none;
 }
+label
+{
+    margin-bottom:0px;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="checkbox"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {   
+  border-color: rgba(126, 239, 104, 0.8);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
+  outline: 0 none;
+}
+
 .escondido
 {
     display:none;
 }
 
 
-.rounded-pill-left {
-  border-top-left-radius: 5rem !important;
-  border-bottom-left-radius: 5rem !important;
-  border-color:darkgray;
-}
-.rounded-pill-right {
-  border-top-right-radius: 10rem !important;
-  border-bottom-right-radius: 10rem !important;
-  border-color:darkgray;
-}
+div{
+    padding: 0px;}
 
+    
 .div-center {
     text-align: center;
   }
@@ -199,85 +215,134 @@ table.dataTable tbody th, table.dataTable tbody td
 @section('content')
 
 
-<div class="page-bar">
-    <ul class="page-breadcrumb">
-        <li>
-            <a href="{{route('home')}}">home</a>
-            <i class="fa fa-circle"></i>
-        </li>
-    </ul>
-</div>
-
-
-@include('layout.modalfluxonegociocliente')
-<div class="portlet light bordered">
+<div class="portlet orange bordered">
     <div class="portlet-title">
         <div class="caption font-blue">
-            <span class="caption-subject bold uppercase"> Pesquisa</span>
+            
+            <span class="caption-subject bold uppercase"> Propostas</span>
             <i class="fa fa-search font-blue"></i>
         </div>
-        <div>
-            <button class="btn btn-danger pull-right" type="button" id="btn-limpar"
-            onClick="limparCampos()">Limpar Filtro</button>
-        </div>
+
+
 
         @php
-            $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'Clientes', 'Clientes', 'CRM', 'Clientes','S', 'I', 'Botão');
+            $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'imovelproposta', 'Propostas em Imóveis', 'CRM', 'Imovel','N', 'X', 'Botão');
         @endphp
-        <form action="{{route( 'cliente.add' )}}" method="get" target="_blank">
-            <button type="submit" class="btn green pull-right {{$acesso}}" type="button" id="i-btn-novo">Novo Cliente</button>
-        </form>
 
     </div>
     <div class="portlet-body form">
        <form role="form" id="search-form">
         <!--<form acion="/cliente/list" method="get">-->
-        <input type="hidden" id="IMB_IMB_IDMASTER" name="empresamaster" value="{{ Auth::User()->IMB_IMB_ID }}">
-        <input type="hidden" id="i-corretor" name="corretor">
-        <input type="hidden" id="i-clientetipopesquisa"name="tipopesquisa" value="{{session()->pull('clientetipopesquisa')}}">
-        <input type="hidden" id="i-pesquisagenerica"name="pesquisagenerica" value="{{session()->pull('clientepesquisa')}}">
 
             <div class="form-body">
                 <div class="col-md-2">
-                        <div class="form-group">
-                            <label class="control-label" >Telefone</label>
-                            <input type="text" class="form-control telefone rounded-pill-left rounded-pill-right" placeholder="somente números"
-                            name="fone" id="i-fone-cliente" onkeypress="return isNumber(event)"  >
-                        </div>
+                    <div class="form-group">
+                        <label class="control-label" >Status</label>
+                         <select class="form-control color-blue" id="i-statusproposta">
+                            <option value="TO">Todas</option>
+                            <option value="AP">Aprovada Pelo Proprietário</option>
+                            <option value="CA">Cancelada</option>
+                            <option value="PE">Pendente</option>
+                            <option value="RP">Recusada pelo Proprietário</option>
+                            <option value="VE">Vencida</option>
+                        </select>
+                        
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label" for="nome">Nome(nome fantasia)</label>
-                            <input type="text" class="form-control rounded-pill-left rounded-pill-right" id="i-nome" name="nome"
-                            placeholder="por ser um pedaço do nome" >
-                        </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label class="control-label" >Ref. Proposta </label>
+                        <input type="text" class="form-control  rounded-pill-left rounded-pill-right"
+                         id="i-ref-proposta" onkeypress="return isNumber(event)"  >
                     </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label class="control-label" for="cnpj">CPF/CNPJ</label>
-                            <input type="text" class="form-control rounded-pill-left rounded-pill-right" name="cnpj" id="i-cnpj">
-                        </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <label class="control-label" for="nome">Ref. Imóvel</label>
+                            <input type="text" class="form-control rounded-pill-left rounded-pill-right" id="i-idimovel" >
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="control-label" for="cnpj">CPF Proprietário</label>
+                        <input type="text" class="form-control rounded-pill-left rounded-pill-right"  id="i-cpfproprietario">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="control-label" for="cnpj">Nome Proprietário</label>
+                        <input type="text" class="form-control rounded-pill-left rounded-pill-right" id="i-nomeproprietario">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="control-label" for="cnpj">CPF Interessado</label>
+                        <input type="text" class="form-control rounded-pill-left rounded-pill-right"  id="i-cpfinteressado">
+                    </div>
+                </div>
 
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="control-label" for="cnpj">Nome Interessado</label>
+                        <input type="text" class="form-control rounded-pill-left rounded-pill-right"  id="i-nomeinteressado">
+                    </div>
+                </div>
 
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label  class="control-label">Corretor</label>
-    		    			<select class="form-control rounded-pill-left rounded-pill-right" id="i-select-corretor" >
-							</select>
-                            <span>
-                                <label class="control-label">
-                                    <input class="form-check-input" type="checkbox"
-                                        id="id-corretoresativos"  checked>Somente Ativos
-                                </label>
-                            </span>
-                        </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label  class="control-label">Corretor</label>
+    		    		<select class="form-control rounded-pill-left rounded-pill-right" id="i-select-corretor" >
+						</select>
+                        <span>
+                            <label class="control-label">
+                                <input class="form-check-input" type="checkbox"
+                                    id="id-corretoresativos"  checked>Somente Ativos
+                            </label>
+                        </span>
                     </div>
-                    <div class="form-actions noborder">
-                        <button class="btn blue pull-right" id='btn-search-form'>Pesquisar</button>
+                </div>
+
+                <div class="col-md-1">
+                    <label  class="control-label">Pretensão</label>
+    		    	<select class="form-control rounded-pill-left rounded-pill-right" id="i-pretensao" >
+                        <option value="V">Venda</option>
+                        <option value="L">Locação</option>
+					</select>
+                </div>
+                <div class="col-md-1">
+                    <label  class="control-label">tipo de Período</label>
+    		    	<select class="form-control rounded-pill-left rounded-pill-right" id="i-tipoperiodo" >
+                            <option title="pela data de expiração" value="X">Expiração </option>
+                            <option title="Pela data de atualização" value="A">Atualização</option>
+                            <option title="Pela data da proposta" value="P" selected>Proposta</option>
+					</select>
+                </div>
+                <div class="col-md-4">
+                    <div class="col-md-6">
+                        <label class="control-label">De:</label>
+                        <input type="date" class="form-control  rounded-pill-left rounded-pill-right" id="i-data-inicio">
                     </div>
+                    <div class="col-md-6">
+                        <label class="control-label">Até:</label>
+                        <input type="date" class="form-control  rounded-pill-left rounded-pill-right" id="i-data-fim">
+                    </div>
+                    <h5 id="lbl-periodo"></h5>
+                </div>
+                <div class="col-md-1 div-center">
+                    <label> Em Negociação</label>
+                    <input type="checkbox" id="i-emnegociacao" class="form-control">
+                </div>
+                <div class="col-md-1 div-center">
+                    <label> Fechadas</label>
+                    <input type="checkbox" id="i-fechadas" class="form-control">
+                </div>
+                <div class="col-md-1 div-center">
+                    <button class="btn blue pull-right" id='btn-search-form'>Pesquisar</button>
+                </div>
+                <div class="col-md-1 div-center">
+                    <button class="btn btn-danger pull-right" type="button" id="btn-limpar" onClick="limparCampos()">Limpar Filtro</button>
+                </div>
             </div>
-
         </form>
         <div class="row">
             <div class="col-md-12">
@@ -734,6 +799,13 @@ table.dataTable tbody th, table.dataTable tbody td
     $(document).ready(function()
     {
         $( "#tabs" ).tabs();
+
+        $(".multiple-select").select2(
+        {
+                placeholder: 'Selecione ',
+                width: null
+        });
+
 
         preencherSelectUsuarios();
 

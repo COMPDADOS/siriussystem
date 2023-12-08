@@ -244,7 +244,7 @@ class ctrWhatsApp extends Controller
                 $m->IMB_ATD_ID = Auth::user()->IMB_ATD_ID;
                 $m->save();
             
-                $tb = "UPDATE IMB_TELEFONES SET IMB_CLT_WHATSID = '$remoteJid', IMB_TLF_TIPOTELEFONE='Whastapp(confirmado)' ".
+                $tb = "UPDATE IMB_TELEFONES SET IMB_CLT_WHATSID = '$remoteJid' ".
                 "WHERE IMB_TLF_DDD=$ddd and IMB_TLF_NUMERO= $numero" ;
                 DB::statement("$tb");        
 

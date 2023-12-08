@@ -37,6 +37,7 @@ class ctrContrato extends Controller
         $contrato = mdlContrato::select(
             [
                 'IMB_CONTRATO.IMB_IMV_ID',
+                'IMB_CONTRATO.IMB_CTR_DIAVENCIMENTO',
                 'IMB_CONTRATO.IMB_CTR_ID',
                 'IMB_CONTRATO.IMB_CTR_REFERENCIA',
                 'IMB_CONTRATO.IMB_CTR_VALORALUGUEL',
@@ -49,6 +50,7 @@ class ctrContrato extends Controller
                 'IMB_CONTRATO.IMB_CTR_DATARESCISAO',
                 'IMB_CTR_PROXIMOREPASSE',
                 'IMB_CTR_REPASSEDIAFIXO',
+                'IMB_IMV_PREDIO',
                 DB::Raw('(SELECT imovel(IMB_CONTRATO.IMB_IMV_ID) ) AS ENDERECOCOMPLETO'),
 
                 DB::Raw('(SELECT VISUALLANCALTCONTRATOHTML(IMB_CONTRATO.IMB_CTR_ID,
@@ -175,9 +177,9 @@ class ctrContrato extends Controller
 
             if ($request->has('condominio') && strlen(trim($request->condominio)) > 0){
                 $cFiltrou = 'S';
-                $contrato->whereRaw( DB::raw("exists( SELECT IMB_CND_ID FROM IMB_CONDOMINIO
+                $contrato->whereRaw( "( exists( SELECT IMB_CND_ID FROM IMB_CONDOMINIO
                 WHERE IMB_IMOVEIS.IMB_CND_ID = IMB_CONDOMINIO.IMB_CND_ID AND
-                IMB_CND_NOME LIKE '%{$request->condominio}%')"));
+                IMB_CND_NOME LIKE '%{$request->condominio}%') or IMB_IMV_PREDIO LIKE '%{$request->condominio}%')") ;
             }
 
 
@@ -260,6 +262,7 @@ class ctrContrato extends Controller
 
         if( $imprimirvisao == 'S') 
         {
+            $contrato = $contrato->orderBy('IMB_CTR_DIAVENCIMENTO');
             $contrato = $contrato->get();
 
             $titulo = 'Relatório de Contratos ';
@@ -283,6 +286,9 @@ class ctrContrato extends Controller
         if ( $cFiltrou == 'N') {
             $contrato->limit(0);
         }
+
+        //Log::info('ctrcontrato');
+        //Log::info( $contrato->toSql());
 
         return DataTables::of($contrato)->make(true);
     }
@@ -794,6 +800,7 @@ class ctrContrato extends Controller
             [
                 'IMB_CONTRATO.*',
                 'IMB_IMOVEIS.*',
+                'IMB_CONTRATO.IMB_IMB_ID2 AS IMB_IMB_ID2',
                 DB::raw( '( SELECT IMB_CND_NOME FROM IMB_CONDOMINIO 
                             WHERE IMB_CONDOMINIO.IMB_CND_ID = IMB_IMOVEIS.IMB_CND_ID ) AS IMB_CND_NOME' ),
                 DB::raw( 'PEGALOCATARIOCONTRATO( IMB_CONTRATO.IMB_CTR_ID ) AS LOCATARIO'),
@@ -1324,6 +1331,12 @@ class ctrContrato extends Controller
                 $contrato = $contrato->first();
                 return $contrato;
             //
+        }
+
+        public function findSoContrato( $id)
+        {
+            $contrato = mdlContrato::find( $id );
+            return $contrato;
         }
 
 }

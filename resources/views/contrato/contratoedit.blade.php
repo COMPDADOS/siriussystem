@@ -97,6 +97,8 @@
   @php
     $ctr = app('App\Http\Controllers\ctrContrato')->findFull( $idcontratopesquisa);
     $imv = app('App\Http\Controllers\ctrImovel')->carga( $ctr->IMB_IMV_ID);
+    $soctr = app('App\Http\Controllers\ctrContrato')->findSoContrato( $idcontratopesquisa);
+    
   @endphp
 
   <div class="col-md-2">
@@ -128,11 +130,23 @@
 
     <div id="tab-imovel">
       <div class="row">
-          <div class="col-md-2">
+        <div class="col-md-2">
+          <label class="label-form">Unidade da Locação</label>
+          @php
+            $imbs = app( 'App\Http\Controllers\ctrImobiliaria')->carga( 0 );
+          @endphp
+          <select class="form-control" id="IMB_IMB_ID2">
+            @foreach( $imbs as $imb )
+              <option value="{{$imb->IMB_IMB_ID}}" @if( $imb->IMB_IMB_ID == $ctr->IMB_IMB_ID2) selected @endif>{{$imb->IMB_IMB_NOME}}</option>
+            @endforeach
+          </select>
+        </div>
+
+          <div class="col-md-1">
             <label class="label-control">Código</label>
             <input class="form-control" type="text" id="IMB_IMV_ID" value="{{$ctr->IMB_IMV_ID}}" readonly>
           </div>
-          <div class="col-md-2">
+          <div class="col-md-1">
             <label class="label-control">Refer.</label>
             <input class="form-control" type="text" id="IMB_IMV_REFERE" value="{{$ctr->IMB_IMV_REFERE}}" readonly>
           </div>
@@ -194,17 +208,6 @@
             <option value="V" @if( $ctr->IMB_CTR_EXIGENCIA=='V') selected @endif>Cartão de Crédito</option>
             <option value="P" @if( $ctr->IMB_CTR_EXIGENCIA=='P') selected @endif>Titulo Capitalização</option>
             <option value="D" @if( $ctr->IMB_CTR_EXIGENCIA=='D') selected  @endif>Dispensado</option>
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label class="label-form">Unidade da Locação</label>
-          @php
-            $imbs = app( 'App\Http\Controllers\ctrImobiliaria')->carga( 0 );
-          @endphp
-          <select class="form-control" id="IMB_IMB_ID2" value="{{$ctr->IMB_IMB_ID2}}">
-            @foreach( $imbs as $imb )
-              <option value="{{$imb->IMB_IMB_ID}}" @if( $imb->IMB_IMB_ID == $ctr->IMB_IMB_ID2) selected @endif>{{$imb->IMB_IMB_NOME}}</option>
-            @endforeach
           </select>
         </div>
 
@@ -1005,79 +1008,83 @@
       </div>
     </div>
     <div id="tab-corretores">
-        <div class="row">
-          <div class="portlet box blue-hoki">
-            <div class="portlet-title">
-              <div class="caption">
-                <i class="fa fa-gift"></i>Corretor
+      <div class="row">
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <div class="portlet box blue-hoki">
+              <div class="portlet-title">
+                <div class="caption">
+                  <i class="fa fa-gift"></i>Corretor
+                </div>
+                <div class="tools">
+                  <a href="javascript:;" class="collapse"> </a>
+                </div>
               </div>
-              <div class="tools">
-                <a href="javascript:;" class="collapse"> </a>
+
+              <div class="portlet-body form">
+                <table  id="tbcorctr" class="table table-striped table-bordered table-hover" >
+                  <thead class="thead-dark">
+                    <tr>
+                      <th style="text-align:center"> Corretor </th>
+                      <th width="100" style="text-align:center"> Percentual </th>
+                      <th width="200" style="text-align:center"> Ações </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
               </div>
-            </div>
-
-            <div class="portlet-body form">
-              <table  id="tbcorctr" class="table table-striped table-bordered table-hover" >
-                <thead class="thead-dark">
-                  <tr>
-                    <th style="text-align:center"> Corretor </th>
-                    <th width="100" style="text-align:center"> Percentual </th>
-                    <th width="200" style="text-align:center"> Ações </th>
-                  </tr>
-                </thead>
-                <tbody>
-                </tbody>
-              </table>
-            </div>
-            <div class="table-footer" >
-              <a  class="btn btn-sm btn-primary"
-                            role="button" onClick="adicionarCorImo()" >
-                            Adicionar Corretor </a>
-                            <!--data-toggle="modal" data-target="#modalFormaPagamento"-->
-            </div>
-
-          </div>
-        </div>
-        <div class="row">
-          <div class="portlet box blue-hoki">
-            <div class="portlet-title">
-              <div class="caption">
-                <i class="fa fa-gift"></i>Captador
+              <div class="table-footer div-right" >
+                <a  class="btn btn-sm btn-success"
+                              role="button" onClick="adicionarCorCtr()" >
+                              Adicionar Corretor </a>
+                              <!--data-toggle="modal" data-target="#modalFormaPagamento"-->
               </div>
-              <div class="tools">
-                <a href="javascript:;" class="collapse"> </a>
+
+            </div>
+          </div>            
+          <div class="col-md-6">
+            <div class="portlet box blue-hoki">
+              <div class="portlet-title">
+                <div class="caption">
+                  <i class="fa fa-gift"></i>Captador
+                </div>
+                <div class="tools">
+                  <a href="javascript:;" class="collapse"> </a>
+                </div>
               </div>
-            </div>
 
-            <div class="portlet-body form">
-              <table  id="tbcapctr" class="table table-striped table-bordered table-hover" >
-                <thead class="thead-dark">
-                  <tr>
-                    <th style="text-align:center"> Captador </th>
-                    <th width="100" style="text-align:center"> Percentual </th>
-                    <th width="200" style="text-align:center"> Ações </th>
-                  </tr>
-                </thead>
-                <tbody>
-                </tbody>
-              </table>
-            </div>
-            <div class="table-footer" >
-              <a  class="btn btn-sm btn-primary"
-                            role="button" onClick="adicionarCapCtr()" >
-                            Adicionar Captador </a>
+              <div class="portlet-body form">
+                <table  id="tbcapctr" class="table table-striped table-bordered table-hover" >
+                  <thead class="thead-dark">
+                    <tr>
+                      <th style="text-align:center"> Captador </th>
+                      <th width="100" style="text-align:center"> Percentual </th>
+                      <th width="200" style="text-align:center"> Ações </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-footer div-right" >
+                <a  class="btn btn-sm btn-success"
+                              role="button" onClick="adicionarCapCtr()" >
+                              Adicionar Captador </a>
+
+              </div>
 
             </div>
-
           </div>
         </div>
 
       </div>    
+    </div>
     <div id="tab-outras">
       <div class="row">
         <div class="col-md-12">
           <label class="label-control">Mensagem Locador(informes) até 200 caracteres</label>
-          <input class="form-control" type="text" id="IMB_CTR_OBSERVACAOLOCADOR" maxlength="200" value="{{$ctr->IMB_CTR_COBTAXAADM4}}">
+          <input class="form-control" type="text" id="IMB_CTR_OBSERVACAOLOCADOR" maxlength="200" value="{{$ctr->IMB_CTR_OBSERVACAOLOCADOR}}">
         </div>
       </div>
       <div class="row">
@@ -1089,7 +1096,7 @@
       <div class="row">
         <div class="col-md-12">
           <label class="label-control">Mensagem Imóvel/contrato até 200 caracteres</label>
-          <input class="form-control" type="text" id="IMB_CTR_OBSERVACAO" maxlength="200" value="{{$ctr->IMB_CTR_OBSERVACAOLOCATARIO}}">
+          <input class="form-control" type="text" id="IMB_CTR_OBSERVACAO" maxlength="200" value="{{$ctr->IMB_CTR_OBSERVACAO}}">
         </div>
       </div>
 
@@ -1525,6 +1532,8 @@
 </div>
 
 @include('layout.modalcapctr')
+@include('layout.modalcorctr')
+
 
 <nav class="quick-nav">
   <a class="quick-nav-trigger" href="#0">
@@ -2281,6 +2290,7 @@
     function CarregarCorCtr( nId )
     {
         var url = "{{ route('corctr.carga') }}"+"/"+nId;
+        debugger;
         $.getJSON( url, function( data)
         {
             linha = "";
@@ -2290,12 +2300,12 @@
               var perc = parseFloat( data[nI].IMB_CORIMO_PERCENTUAL );
               var percbr = formatarBRSemSimbolo( perc );
                 linha =
-                    '<tr>'+
+                    '<tr id="l-cor'+data[nI].IMB_ATD_ID+'">'+
                     '   <td>'+data[nI].IMB_ATD_NOME+'</td>'+
                     '   <td>'+percbr+'%</td>'+
                     '   <td style="text-align:center"> '+
                     '<a  class="btn btn-sm btn-primary" href=javascript:editarCorImo('+data[nI].IMB_CORCTR_ID+')>     Editar</a>'+
-                    '<a  class="btn btn-sm btn-danger" href=javascript:apagarCorImo('+data[nI].IMB_CORCTR_ID+')>     Apagar</a>'+
+                    '<a  class="btn btn-sm btn-danger" href=javascript:apagarCorCtr('+data[nI].IMB_CORCTR_ID+')>     Apagar</a>'+
                     '   </td>'+
                     '</tr>';
 
@@ -3086,26 +3096,7 @@
       $("#modalcapctr").modal('show');
     }
 
-    function preencherUnidades()
-    {
-
-        $.getJSON( "{{route('imobiliaria.carga')}}/"+$("#IMB_IMB_IDMASTER").val(), function( data )
-        {
-
-            $("#IMB_IMB_ID2").empty();
-            for( nI=0;nI < data.length;nI++)
-            {
-                linha =
-                '<option value="'+data[nI].IMB_IMB_ID+'">'+
-                    data[nI].IMB_IMB_NOME+"</option>";
-                    $("#IMB_IMB_ID2").append( linha );
-
-            }
-
-        });
-
-    }
-
+    
     function ClienteCargaEnvolvido( id )
   {
     $("#id-cliente-env").val( id );
@@ -3153,6 +3144,38 @@
     }
   }
 
+
+  function apagarCorCtr( id )
+    {
+        var url = "{{ route('corctr.apagar') }}"+"/"+id;
+
+        if (confirm("Tem certeza que deseja excluir?"))
+        {
+            $.ajaxSetup({
+            headers:
+            {
+            'X-CSRF-TOKEN': "{{csrf_token()}}"
+            }
+        });
+            $.ajax
+            ({
+                type: "delete",
+                url: url,
+                context: this,
+                success: function()
+                {
+                    CarregarCorCtr( $("#IMB_CTR_ID").val() );
+                },
+                error: function( error )
+                {
+                    console.log(error);
+                }
+            });
+        };
+
+    }
+
+  
 
 </script>
 

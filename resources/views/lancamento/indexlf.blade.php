@@ -1605,11 +1605,14 @@ function buscaIncremental()
     debugger;
     dif = parseFloat($("#i-ref-final").val()) - parseFloat($("#i-ref-inicial").val()) + 1;
        
-    if( dif != $("#i-meses").val())
+    if( $("#i-autopreenchimento").prop( 'checked') == true )
     {
-      alert( 'Quantidade de meses informado não bate com o referencia inicial e final');
-      return false;
-      
+      if( dif != $("#i-meses").val())
+      {
+        alert( 'Quantidade de meses informado não bate com o referencia inicial e final');
+        return false;
+        
+      }
     }
     $("#i-dia").val( moment( $("#IMB_LCF_DATAVENCIMENTO").val()).format( 'DD') );
 
@@ -1618,6 +1621,7 @@ function buscaIncremental()
     var evento =  $("#i-select-evento").val();
     var valor = $("#IMB_LCF_VALOR").val();
     var nDiaVencimento = $("#i-dia").val();
+    var nDiaVencimentoOriginal = $("#i-dia").val();
     var meses = $("#i-meses").val();
 
     var locadorcredeb   = $("#i-locadorcredeb").val();
@@ -1695,7 +1699,7 @@ function buscaIncremental()
     nIni = 1;
     nFim = $("#i-meses").val()
     nLinha = 0;
-    //nFim = nParcelas;
+    nParcelas=1;
     if( $("#i-autopreenchimento").prop( 'checked' ) == true )
     {
         nIni = $("#i-ref-inicial").val();
@@ -1714,9 +1718,9 @@ function buscaIncremental()
         }
         nUltimoDia = ultimoDiaMes( nMes+1, nAno );
 
-        
-        if ( nUltimoDia < nDiaVencimento )
-          nDiaVencimento = nUltimoDia;
+        nDiaVencimento = nDiaVencimentoOriginal;
+        if ( nUltimoDia < nDiaVencimentoOriginal )
+        nDiaVencimento = nUltimoDia;
 
         datainicial = new Date( nAno, nMes, nDiaVencimento );
 
@@ -3039,6 +3043,36 @@ function calcularTotalRecebendo()
       
     })
 
+    $("#i-total-pix").blur( function()
+    {
+      var nTotalApurado = realToDolar( $("#i-total-apurado").val() );
+      var nTotalDinheiro = realToDolar( $("#i-total-dinheiro").val() );
+      var nCheque = realToDolar( $("#i-total-cheque").val() );
+      var nPix = realToDolar( $("#i-total-pix").val() );
+
+
+      var nTroco =  parseFloat(nTotalApurado) - 
+                      ( parseFloat(nTotalDinheiro) +
+                        parseFloat(nPix) +
+                        parseFloat(nCheque) ) ;
+      
+      if( nTroco != 0 )
+      {
+        $("#div-troco-futuro").show();
+        if( nTroco > 0 ) 
+        {
+          $("#div-abater").show();
+        }
+        else
+        if( nTroco < 0 )
+        {
+          $("#div-abater").hide();
+        }
+      }
+      $("#i-troco").val(  formatarBRSemSimbolo( nTroco) );
+
+    })
+
     $("#i-total-cheque").blur( function()
     {
       var nTotalApurado = realToDolar( $("#i-total-apurado").val() );
@@ -3093,10 +3127,19 @@ function confirmarRecebimento()
     if ( isNaN( nTroco))
       nTroco = 0;
 
+
+
+    var nPix = realToDolar( $("#i-total-pix").val() );
+    if ( isNaN( nPix) )
+      nPix = 0;
+
+
       if( $("#i-debito-futuro").prop( "checked" ) ||  $("#i-credito-futuro").prop( "checked" ) )
         nTroco = nTroco
       else
         nTroco = 0;
+
+
 
       recibogerado = gerandoReciboLocatario(
       "i-tblselecionados",
@@ -3113,7 +3156,8 @@ function confirmarRecebimento()
       parseFloat(realToDolar($("#i-total-apurado").val())),
       moment( $("#i-datadevencimentoavulso").val()).format( 'YYYY-MM-DD'),
       'L',
-      'N'
+      'N',
+      nPix
     );
 
     if( confirm( "Processo concluído. Deseja emitir o recibo?") )

@@ -51,6 +51,7 @@ class ctrBoleto033 extends Controller
     public function index( $id, $poremail, $email )
     {
 
+        Log::info( 'email chegando: '.$email);
 
         $cp = mdlCobrancaGeradaPerm::find( $id );
         $cpi = mdlCobrancaGeradaItemPerm::where( 'IMB_CGR_ID','=',$id)->get();
@@ -183,11 +184,6 @@ class ctrBoleto033 extends Controller
             $dv = $this->digitoVerificador_barra($barra);
             // Numero para o codigo de barras com 44 digitos
             $linha = substr($barra,0,4) . $dv . substr($barra,4);
-            Log::info('substr($barra,0,4) '.substr($barra,0,4) );
-            Log::info('$dv '.$dv );
-            Log::info('substr($barra,4) '.substr($barra,4) );
-            Log::Info('$linha = substr($barra,0,4) . $dv . substr($barra,4): '.$linha);
-
 
             $agencia_codigo = $agencia." / ". $conta."-".$this->modulo_10($agencia.$conta);
 
@@ -236,41 +232,39 @@ class ctrBoleto033 extends Controller
             $generator = new Picqer\Barcode\BarcodeGeneratorPNG();
             $barcode = $generator->getBarcode($dadosboleto["codigo_barras"], $generator::TYPE_INTERLEAVED_2_5);
             $nossonumero_email=$dadosboleto["nosso_numero"];
+            $vencimento = $dadosboleto["data_vencimento"];
             $imovel_log = $ctr->IMB_IMV_ID;
             $contrato_log = $ctr->IMB_CTR_ID;
 
             if( $poremail == 'S' )
             {
 
-                app( 'App\Http\Controllers\ctrRotinas')->atualizarEmailLocatarioPrincipal( $ctr->IMB_CTR_ID, $email );
-
-                $email = $email.';'.env('APP_MAILBOLETOCOPIA');
                 $array = explode(";",$email);
-                foreach( $array as $a )
+                Log::info( 'Email completo: '.$email);
+                foreach( $array as $emailsacado )
                 {
 
-                    $a=str_replace( ';','',$a);
+
                     $html = view('boleto.santander.boletosantander', compact( 'dadosboleto', 'im','ctr', 'imv','barcode', 'cpi' ) );
                     $banconumber='santander';
 
-                    Log::info('Enviado com try');
                     try
                     {
                     Mail::send('boleto.boletoemail', compact( 'dadosboleto', 'im','ctr', 'imv', 'banconumber' ) ,
-                    function( $message ) use ($a, $html,$nossonumero_email, $imovel_log, $contrato_log)
+                    function( $message ) use ($emailsacado, $html,$nossonumero_email, $imovel_log, $contrato_log,$vencimento)
                     {
 
-                        Log::info('Enviado para o A: '.$a );
-
-                        if( strlen( $a ) > 4 )
+                        Log:info( 'Email Sacado antes do filter: '.$emailsacado );
+                        if( strlen( $emailsacado ) > 4 and filter_var($emailsacado, FILTER_VALIDATE_EMAIL) )
                         {
-//                            $pdf=PDF::loadHtml( $html,'UTF-8');
-  //                              $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
-    //                        $message->to( "suporte@compdados.com.br" );
-                            $message->to( $a  );
+
+                            $copiaend = env('APP_MAILBOLETOCOPIA');
+                            Log::info('Email Sacaco: '. $emailsacado);
+                            $message->to( $emailsacado  );
+                            $message->cc( $copiaend );
                             $message->subject('Aviso de vencimento');
                             app('App\Http\Controllers\ctrRotinas')
-                            ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Boleto enviado para '.$a);
+                            ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Boleto vencimento '.$vencimento.', enviado para '.$emailsacado.' Nosso Número: '.$nossonumero_email);
                             Log::info('LogGravado contrato '.$contrato_log );
 
                         }
@@ -597,34 +591,27 @@ class ctrBoleto033 extends Controller
         // 31 a 34  Fator de vencimento (qtdade de dias desde 07/10/1997 at� a data de vencimento)
         // 35 a 44  Valor do t�tulo
 
-        Log::info( "Codigo: ".$codigo );
         // 1. Primeiro Grupo - composto pelo c�digo do banco, c�digo da mo�da, Valor Fixo "9"
         // e 4 primeiros digitos do PSK (codigo do cliente) e DV (modulo10) deste campo
         $campo1 = substr($codigo,0,3) . substr($codigo,3,1) . substr($codigo,19,1) . substr($codigo,20,4);
-        Log::info( "Campo1 Antes: ".$campo1 );
         $campo1 = $campo1 . $this->modulo_10($campo1);
          $campo1 = substr($campo1, 0, 5).'.'.substr($campo1, 5);
-         Log::info( "Campo1 com moodulo 10: ".$campo1 );
 
 
 
         // 2. Segundo Grupo - composto pelas 3 �ltimas posi�oes do PSK e 7 primeiros d�gitos do Nosso N�mero
         // e DV (modulo10) deste campo
         $campo2 = substr($codigo,24,10);
-        Log::info( "Campo2 Antes: ".$campo2 );
         $campo2 = $campo2 . $this->modulo_10($campo2);
           $campo2 = substr($campo2, 0, 5).'.'.substr($campo2, 5);
-          Log::info( "Campo2 com modulo 10: ".$campo2 );
 
 
         // 3. Terceiro Grupo - Composto por : Restante do Nosso Numero (6 digitos), IOS, Modalidade da Carteira
         // e DV (modulo10) deste campo
         $campo3 = substr($codigo,34,10);
-        Log::info( "Campo3 altes: ".$campo3 );
 
         $campo3 = $campo3 . $this->modulo_10($campo3);
         $campo3 = substr($campo3, 0, 5).'.'.substr($campo3, 5);
-        Log::info( "Campo3 com moodulo 10: ".$campo3 );
 
 
 
@@ -638,7 +625,6 @@ class ctrBoleto033 extends Controller
         // tratar de valor zerado, a representacao deve ser 0000000000 (dez zeros).
         $campo5 = substr($codigo, 5, 4) . substr($codigo, 9, 10);
 
-        Log::info( "Linha $campo1 $campo2 $campo3 $campo4 $campo5");
         return "$campo1 $campo2 $campo3 $campo4 $campo5";
     }
 
@@ -1338,7 +1324,6 @@ class ctrBoleto033 extends Controller
                     $valorjapago = 'N';
                     if( $cgp )
                     {
-                        Log::info( 'id '.$cgp->IMB_CGR_ID );
 
                         $valorjapago = app( 'App\Http\Controllers\ctrReciboLocatario')->boletoJaRecebido( $cgp->IMB_CTR_ID,$cgp->IMB_CGR_NOSSONUMERO, $cgp->IMB_CGR_ID  );
                         if( $valorjapago <> 0 ) 

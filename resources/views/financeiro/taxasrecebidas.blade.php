@@ -485,8 +485,9 @@ th{text-align:center;}
                 {
                     d.datafim = $('#i-data-fim-taxas').val();
                     d.datainicio = $('#i-data-inicio-taxas').val();
-                    d.dimob = $("#i-dimob").val();
+                    d.dimob =  $("#i-dimob").val();
                     d.origem = $("#i-origem").val();
+                    d.metodologia = $("#i-metodologia").val();
                 }
             },
             "drawCallback":function()

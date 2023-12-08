@@ -165,20 +165,23 @@ class ctrTelefone extends Controller
 
     public function salvarLote( Request $request )
     {
-//        $exis = mdlTelefone::where( 'IMB_TLF_ID_CLIENTE','=', $request->IMB_CLT_ID)
-        //->delete();
+        Log::info( 'entrei salvarfonelote');
+        $exis = mdlTelefone::where( 'IMB_TLF_ID_CLIENTE','=', $request->IMB_CLT_ID)->delete();
         
         $telefones = $request->numeros;
-
+        Log::info('entrando no goreadch');
+        
         foreach( $telefones as $telefone )
         {
+        Log::info('entrado no goreadch');
 
-            $id=$telefone[4];
+            $telefoneok = str_replace( '-','', $telefone[2]);
+            $telefoneok = str_replace( ' ','', $telefoneok);
+            $telefoneok = str_replace( '.','',$telefoneok);
+            $telefoneok = str_replace( '/','', $telefoneok);
 
-            if( $id=='' )
-                $tel = new mdlTelefone;
-            else
-                $tel =  mdlTelefone::find( $id );
+
+            $tel = new mdlTelefone;
 
             $tel->IMB_TLF_ID_CLIENTE = $request->IMB_CLT_ID;
             $tel->IMB_IMB_ID = Auth::user()->IMB_IMB_ID;
@@ -186,7 +189,7 @@ class ctrTelefone extends Controller
             $tel->IMB_TLF_ID_CLIENTE = $request->IMB_CLT_ID;
             $tel->IMB_TLF_TIPO = 'C';
             $tel->IMB_TLF_TIPOTELEFONE = $telefone[3];
-            $tel->IMB_TLF_NUMERO = $telefone[2];
+            $tel->IMB_TLF_NUMERO = $telefoneok;
             $tel->IMB_TLF_DDI = $telefone[0];
             $tel->IMB_TLF_DDD = $telefone[1];
             $tel->IMB_TLF_DTHALTERACAO = date( 'Y/m/d');

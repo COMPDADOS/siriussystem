@@ -251,7 +251,7 @@ class ctrBoletoItau extends Controller
 
             if( $poremail == 'S' )
             {
-                app( 'App\Http\Controllers\ctrRotinas')->atualizarEmailLocatarioPrincipal( $ctr->IMB_CTR_ID, $email );
+                //app( 'App\Http\Controllers\ctrRotinas')->atualizarEmailLocatarioPrincipal( $ctr->IMB_CTR_ID, $email );
                 $banconumber='itau';
                 $email = $email;
                 $array = explode(";",$email);
@@ -1335,8 +1335,8 @@ class ctrBoletoItau extends Controller
             $cTotDoc = $this->formata_numero($nTotalFatVal*100,20,0);
             $cTotDocQuantMoeda =$this->formata_numero($nTotalFatVal*100,13,0);
 
-            $nRegistrosLote .= 1;
-            $nSequencia.= 1;
+            $nRegistrosLote =  $nRegistrosLote + 1;
+            $nSequencia = $nSequencia + 1;
             $texto .=            
             $this->formata_numero( $contacaixa->FIN_CCI_BANCONUMERO,3,0). //001-003
                 '0001'.//004-007  lote de serviço
@@ -1349,7 +1349,7 @@ class ctrBoletoItau extends Controller
                 str_repeat(' ', 10 ).
                 chr(13).chr(10);
 
-            $nSequencia.= 1;
+            $nSequencia = $nSequencia + 1;
             $texto .=   
             $this->formata_numero( $contacaixa->FIN_CCI_BANCONUMERO,3,0). //001-003
                 '9999'.//004-007  lote de serviço
@@ -1479,11 +1479,11 @@ class ctrBoletoItau extends Controller
                     else
                         $cNumeroBanco = $this->formata_numero( $item->GER_BNC_NUMERO,3,0);
          
-                    $cNumeroAgencia = '00000';
+                    $cNumeroAgencia = '0000';
                     if( $item->GER_BNC_AGENCIA == '' )
                         $inconsistencia .= 'Imovel '.$item->IMB_IMV_ID.' Sem Agencia ';
                     else
-                        $cNumeroAgencia =$this->formata_numero( $item->GER_BNC_AGENCIA,5,0);
+                        $cNumeroAgencia =$this->formata_numero( $item->GER_BNC_AGENCIA,4,0);
           
                     $cNumeroContaCorrente = '000000000000';
                     if( $item->IMB_CLTCCR_NUMERO == '' )
@@ -1575,8 +1575,8 @@ class ctrBoletoItau extends Controller
                 $cTotDoc = $this->formata_numero($nTotalFatVal*100,20,0);
                 $cTotDocQuantMoeda =$this->formata_numero($nTotalFatVal*100,13,0);
     
-                $nRegistrosLote .= 1;
-                $nSequencia.= 1;
+                $nRegistrosLote = $nRegistrosLote + 1;
+                $nSequencia = $nSequencia + 1;
                 $texto .=            
                 $this->formata_numero( $contacaixa->FIN_CCI_BANCONUMERO,3,0). //001-003
                     '0001'.//004-007  lote de serviço
@@ -1589,7 +1589,7 @@ class ctrBoletoItau extends Controller
                     str_repeat(' ', 10 ).
                     chr(13).chr(10);
     
-                $nSequencia.= 1;
+                $nSequencia =$nSequencia + 1;
                 $texto .=   
                 $this->formata_numero( $contacaixa->FIN_CCI_BANCONUMERO,3,0). //001-003
                     '9999'.//004-007  lote de serviço
@@ -1907,6 +1907,8 @@ class ctrBoletoItau extends Controller
 
             $cont++;
 		    $linha = $file->fgets();
+
+            $valortarifa = 0;
             if( substr( $linha,0,1 ) == '1' )
             {
                 $id =  intval(trim(substr( $linha, 37,25 )));
@@ -1921,8 +1923,9 @@ class ctrBoletoItau extends Controller
                 else
                     $datavencimento=null;
 
-                $valorpago = substr( $linha, 253,13 );
-                if( substr($linha, 175,6) <> '000000' )
+                    $valorpago = substr( $linha, 253,13 );
+                    $valortarifa = substr( $linha, 175,13 );
+                    if( substr($linha, 295,6) <> '000000' )
                     $datacredito =    '20'.substr( $linha, 299,2).'-'.
                         substr( $linha, 197,2).'-'.
                         substr( $linha, 195,2);
@@ -1986,7 +1989,7 @@ class ctrBoletoItau extends Controller
                     $rb->codigoocorrencia = $ocorrencia;
                     $rb->nomeocorrencia = $this->ocorrencia( $ocorrencia);
                     $rb->nossonumero = $nossonumero;
-                    $rb->valorpago = intval($valorpago)/100;
+                    $rb->valorpago = (intval($valorpago)/100 ) + (intval($valortarifa)/100);
                     $rb->valorcobranca = intval($valorcobranca)/100;
                     $rb->motivorejeicao = $motivorejeicao;
 //                    $rb->datacredito = $datacredito;
@@ -2063,7 +2066,7 @@ class ctrBoletoItau extends Controller
                     $rb->codigoocorrencia = $ocorrencia;
                     $rb->nomeocorrencia = $this->ocorrencia( $ocorrencia);
                     $rb->nossonumero = $nossonumero;
-                    $rb->valorpago = intval($valorpago)/100;
+                    $rb->valorpago =  (intval($valorpago)/100 ) + (intval($valortarifa)/100);
                     $rb->valorcobranca = intval($valorcobranca)/100;
                     $rb->motivorejeicao = $motivorejeicao;
                     $rb->FIN_CCX_ID = $ccx->FIN_CCX_ID;

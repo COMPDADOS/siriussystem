@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\mdlTipoImovel;
 use App\mdlContrato;
 use App\mdlCobrancaGeradaPerm;
+use App\mdlLocatarioContrato;
 use App\mdlImovel;
 use App\mdlCliente;
+use App\mdlPropImovel;
 use App\mdlWSMessages;
 use stdClass;
 use DB;
@@ -320,4 +322,148 @@ class ctrTeste extends Controller
         
 
     }
+
+    public function lerJsonContratos()
+    {
+        $jsonString = File::get('/home/redentora-miami/sys/storage/app/public/contratos_json.json');
+
+
+        $data = json_decode($jsonString, true);
+
+        $dados =  $data['data'];
+
+        //dd( $dados );
+
+        $imv = mdlImovel::whereNotNull( 'IMB_IMV_ID')->delete();
+        $ppi = mdlPropImovel::whereNotNull( 'IMB_IMV_ID')->delete();
+        
+        $lct = mdlLocatarioContrato::whereNotNull('IMB_CTR_ID')->delete();
+        $ctr = mdlContrato::whereNotNull('IMB_CTR_ID')->delete();
+        
+        foreach( $dados as $dado )
+        {
+            $imv = new mdlImovel;
+            $ctr = new mdlContrato;
+
+            $datareaj = date( 'm/d/Y', strtotime($dado['dt_ultimoreajuste_con']));
+            $anoultreajuste = date( 'Y',strtotime($datareaj));
+            $datareaj = date( 'Y/m/d', strtotime($datareaj) );
+
+            $inicont = date( 'm/d/Y', strtotime($dado['dt_inicio_con']));
+            $inicont = date( 'Y/m/d', strtotime($inicont) );
+
+            $tercont = date( 'm/d/Y', strtotime($dado['dt_fim_con']));
+            $tercont = date( 'Y/m/d', strtotime($tercont) );
+
+            $datalocacao = date( 'm/d/Y', strtotime($dado['dt_cadastro_con']));
+            $datalocacao = date( 'Y/m/d', strtotime($datalocacao) );
+
+            
+            
+            $tipocontrato = 'Residencial';
+            if( $dado['id_tipo_con']==3 ) $tipocontrato = 'Comercial';
+            $ctr->IMB_IMB_ID = 1;
+            $ctr->IMB_IMV_ID = $dado['id_imovel_imo'];
+            $ctr->IMB_CTR_SITUACAO='ATIVO';
+            $ctr->IMB_CTR_ID = $dado['id_contrato_con'];
+            $ctr->IMB_CTR_INICIO = $inicont;
+            $ctr->IMB_CTR_TERMINO = $tercont;
+            $ctr->IMB_CTR_TAXAADMINISTRATIVA =  $dado['tx_adm_con'];
+            $ctr->IMB_CTR_VALORALUGUEL =  $dado['vl_aluguel_con'];
+            $ctr->IMB_CTR_DIAVENCIMENTO =  $dado['nm_diavencimento_con'];
+            $ctr->IMB_CTR_REPASSEDIA =  $dado['nm_diarepasse_con'];
+            $ctr->IMB_CTR_MESREAJUSTE =  $dado['nm_mesreajuste_con'];
+            $ctr->IMB_CTR_DATAULTIMOREAJUSTE =  $datareaj;
+            $ctr->IMB_CTR_FINALIDADE =$tipocontrato;
+            $ctr->IMB_CTR_DATAREAJUSTE =($anoultreajuste+1).'/'.$ctr->IMB_CTR_MESREAJUSTE.'/01';
+            $ctr->IMB_CTR_DATALOCACAO = $datalocacao;
+            $ctr->IMB_CTR_REFERENCIA = $dado['codigo_contrato'];
+
+
+            $pps =  $dado['proprietarios_beneficiarios'];
+            foreach( $pps as $pp )
+            {
+                $ppi = new mdlPropImovel;
+                $ppi->IMB_IMB_ID = 1;
+                $ppi->IMB_IMV_ID = $dado['id_imovel_imo'];
+                $ppi->IMB_CLT_ID = $pp['id_pessoa_pes'];
+                $ppi->IMB_IMVCLT_PERCENTUAL4 = $pp['nm_fracao_prb'];
+                if( $pp['fl_principal_prb'] == 1 )
+                {
+                    $ppi->IMB_IMVCLT_PRINCIPAL ='S';
+                    $imv->IMB_CLT_ID = $dado['id_imovel_imo'];
+                }
+                $ppi->save();
+            }
+            
+            $ctr->save();
+            
+            
+            
+
+
+            //$ctr->IMB_CTR_DATAULTIMOREAJUSTE
+
+            $inq = $dado['inquilinos'];
+            foreach( $inq as $lt )
+            {
+
+                //dd( $lt);
+                $lct = new mdlLocatarioContrato;
+                $lct->IMB_IMB_ID = 1;
+                $lct->IMB_CLT_ID = $lt['id_pessoa_pes'];
+                $lct->IMB_LCTCTR_PRINCIPAL ='N';
+                if( $lt['fl_principal_inq'] == 1 )
+                    $lct->IMB_LCTCTR_PRINCIPAL ='S';
+                $lct->IMB_LCTCTR_PERCENTUAL4 = $lt['nm_fracao_inq'];
+                $lct->IMB_CTR_ID = $lt['id_contrato_con'];
+                $lct->save();
+            }
+            $tipoimovel = 0;
+            if( $dado['id_imovel_imo'] == 11)
+                $tipoimovel = 4;
+            if( $dado['id_imovel_imo'] == 4)
+                $tipoimovel = 8;
+            if( $dado['id_imovel_imo'] == 7)
+                $tipoimovel = 26;
+            if( $dado['id_imovel_imo'] == 1)
+                $tipoimovel = 9;
+            if( $dado['id_imovel_imo'] == 2)
+                $tipoimovel = 16;
+
+            if( $dado['id_imovel_imo'] == 16)
+                $tipoimovel = 33;
+
+            if( $dado['id_imovel_imo'] == 17)
+                $tipoimovel = 2;
+
+            if( $dado['id_imovel_imo'] == 24)
+                $tipoimovel = 3;
+
+            $imv->IMB_IMV_ID = $dado['id_imovel_imo'];
+            $imv->IMB_IMB_ID = 1;
+            $imv->IMB_TIM_ID = $tipoimovel;
+            $imv->IMB_IMV_ENDERECO = $dado['st_endereco_imo'];
+            $imv->IMB_IMV_IDENTIFICADOR = $dado['st_identificador_imo'];
+            $imv->IMB_IMV_ENDERECOCOMPLEMENTO = $dado['st_complemento_imo'];
+            $imv->CEP_BAI_NOME = $dado['st_bairro_imo'];
+            $imv->CEP_BAI_NOME = $dado['st_bairro_imo'];
+            $imv->IMB_IMV_ENDERECONUMERO = $dado['st_numero_imo'];
+            $imv->IMB_IMV_ENDERECOCEP = str_replace( '-','', $dado['st_cep_imo']);
+            $imv->IMB_IMV_CIDADE = $dado['st_cidade_imo'];
+            $imv->IMB_IMV_ESTADO = $dado['st_estado_imo'];
+            $imv->IMB_IMV_WEBOBS = $dado['st_observacao_imo'];
+            $imv->IMB_IMV_ARETOT = $dado['st_areatotal_imo'];
+            if( $dado['vl_venda_imo'] <> '' )
+                $imv->IMB_IMV_VALVEN = $dado['vl_venda_imo'];
+            else
+                $imv->IMB_IMV_VALVEN = 0;
+
+            $imv->save();
+            
+        }
+
+        
+
+    }    
 }

@@ -198,7 +198,7 @@ div.corporel {
         </div>
         <div class="row">
             <div class="col-md-12 div-center">
-                <a class="btn success" href="javascript:enviarTodos()" title="Enviar para todos os locadores que tiveram pagamento dentro do periodo informado"></i>Enviar em Lote</a>
+                <a class="btn success" href="javascript:enviarTodos()" title="Enviar para todos os locadores que tiveram pagamento dentro do periodo informado"></i><b>Todos Por Email</b></a>
             </div>
         </div>
     </div>
@@ -222,6 +222,7 @@ div.corporel {
 $( document ).ready(function()
 {
 
+    $("#preloader").show();
     limparFiltros();
     $("#IMB_CTR_REFERENCIA_DEMONST").change(function()
     {
@@ -310,6 +311,7 @@ $( document ).ready(function()
     cargaLocadores();
     $("#div-aguarde-demons").hide();
     $("#div-filtro-dem").show();
+    $("#preloader").hide();
 
 
 
@@ -336,52 +338,88 @@ function cargaDemonstrativo( email)
         alert('Informe a data fim');
         return false;
     }
-
-    dados =
+    debugger;
+    if( $("#i-locadores").val() != '' ) 
     {
+        dados =
+        {
 
-        datainicial: $("#i-data-inicio").val(),
-        datafinal: $("#i-data-fim").val(),
-        idcliente: $("#i-locador").val(),
-        email: email,
-        IMB_CTR_ID : $("#IMB_CTR_REFERENCIA_DEMONST").val(),
-        IMB_IMV_ID : $("#IMB_IMV_ID_DEMONST").val(),
-    }
+            datainicial: $("#i-data-inicio").val(),
+            datafinal: $("#i-data-fim").val(),
+            idcliente: $("#i-locadores").val(),
+            email: email,
+            IMB_CTR_ID : $("#IMB_CTR_REFERENCIA_DEMONST").val(),
+            IMB_IMV_ID : $("#IMB_IMV_ID_DEMONST").val(),
+        }
 
-    if( email != 'S' )
-    {
+        if( email != 'S' )
+        {
 
-        var url = "{{route('recibolocador.demonstrativosnew')}}?IMB_CLT_ID="+
-                    $("#i-locadores").val()+
-                    "&datainicial="+$("#i-data-inicio").val()+
-                    "&datafinal="+$("#i-data-fim").val()+"&email="+email+
-                    "&IMB_IMV_ID="+$("#IMB_IMV_ID_DEMONST").val()+"&IMB_CTR_REFERENCIA="+$("#IMB_CTR_REFERENCIA_DEMONST").val()
-        window.open(url,'_blank');
+            var url = "{{route('recibolocador.demonstrativosnew')}}?IMB_CLT_ID="+
+                        $("#i-locadores").val()+
+                        "&datainicial="+$("#i-data-inicio").val()+
+                        "&datafinal="+$("#i-data-fim").val()+"&email="+email+
+                        "&IMB_IMV_ID="+$("#IMB_IMV_ID_DEMONST").val()+"&IMB_CTR_REFERENCIA="+$("#IMB_CTR_REFERENCIA_DEMONST").val()
+            window.open(url,'_blank');
+        }
+        else
+        {
+            var url = "{{route('recibolocador.demonstrativosnew')}}?IMB_CLT_ID="+
+                        $("#i-locadores").val()+
+                        "&datainicial="+$("#i-data-inicio").val()+
+                        "&datafinal="+$("#i-data-fim").val()+"&email="+email+
+                        "&IMB_IMV_ID="+$("#IMB_IMV_ID_DEMONST").val()+"&IMB_CTR_REFERENCIA="+$("#IMB_CTR_REFERENCIA_DEMONST").val();
+
+            $.ajax(
+            {
+                url:url,
+                dataType:'json',
+                type:'get',
+    //            async:false,
+                success:function()
+                {
+                    alert('Email enviado!');
+                },
+                complete:function()
+                {
+                    alert('Email enviado');
+                }
+            });
+        }
     }
     else
     {
-        var url = "{{route('recibolocador.demonstrativosnew')}}?IMB_CLT_ID="+
-                    $("#i-locadores").val()+
-                    "&datainicial="+$("#i-data-inicio").val()+
-                    "&datafinal="+$("#i-data-fim").val()+"&email="+email+
-                    "&IMB_IMV_ID="+$("#IMB_IMV_ID_DEMONST").val()+"&IMB_CTR_REFERENCIA="+$("#IMB_CTR_REFERENCIA_DEMONST").val();
-
-        $.ajax(
+        if( email == 'S' )
         {
-            url:url,
-            dataType:'json',
-            type:'get',
-//            async:false,
-            success:function()
+            url = "{{route('processos.demodiario')}}";
+            $("#preloader").show();
+            dados =
             {
-                alert('Email enviado!');
-            },
-            complete:function()
-            {
-                alert('Email enviado');
+                datainicial: $("#i-data-inicio").val(),
+                datafinal: $("#i-data-fim").val(),
+//                idcliente: $("#i-locador").val(),
             }
-        });
+            $.ajax(
+            {
+                url:url,
+                dataType:'js1on',
+                type:'get',
+                data:dados,
+    //            async:false,
+                success:function()
+                {
+                    alert('Email enviado!');
+                    $("#preloader").hide();
+                },
+                complete:function()
+                {
+                    $("#preloader").hide();
+                }
+            });
+        }
+    
     }
+    
 
 
 }
@@ -438,18 +476,60 @@ function enviarTodos()
     if (confirm("Todos os demonstrativos referentes ao periodo informado, serão enviados aos locadores. O sistema irá enviar pra todos e você pode continuar seu trabalho tranquilamente enquanto isso é realizado! Deseja continuar?") == true) 
     {
         var url = "{{route('processos.demodiario')}}";
+        dados = 
+        {
+            datainicial: $("#i-data-inicio").val(),
+            datafinal: $("#i-data-fim").val(),
+            voltardados:'S',
+        }
+        debugger;
+        $("#preloader").show();
         $.ajax(
             {
                 url:url,
                 dataType:'json',
                 type:'get',
-                success:function( )
+                data:dados,
+                async:false,
+                success:function( data )
                 {
-                    alert('Demonstrativos do dia enviados aos locadores');
+                    debugger;
+                    for( nI=0;nI < data.length;nI++)
+                    {
+                        dados =
+                        {
+                            datainicial: $("#i-data-inicio").val(),
+                            datafinal: $("#i-data-fim").val(),
+                            idcliente: data[nI].IMB_CLT_ID,
+                        }
+                        var url = "{{route('recibolocador.demonstrativosnew')}}?IMB_CLT_ID="+
+                            data[nI].IMB_CLT_ID+
+                            "&datainicial="+$("#i-data-inicio").val()+
+                            "&datafinal="+$("#i-data-fim").val()+"&email=S";
+                        $.ajax(
+                        {
+                            url:url,
+                            dataType:'json',
+                            type:'get',
+                            success:function()
+                            {
+                                //alert('Email enviado!');
+                            },
+                            complete:function()
+                            {
+                                //alert('Email enviado');
+                            }
+                        });
+                    }
+                    alert('Demonstrativos enviados aos locadores');
                 },
                 error:function()
                 {
-                    alert('Erro ao enviar os demonstraticos aos locadores');
+                    $("#preloader").hide();
+                },
+                complete:function()
+                {
+                    $("#preloader").hide();
                 }
             }
         )
@@ -466,6 +546,7 @@ function visualiarRelDemonstrativo()
  
        //Essa é a função success
     //O parâmetro é o retorno da requisição 
+    $("#preloader").show();
     $.ajax(
         {
             url:url,
@@ -477,17 +558,21 @@ function visualiarRelDemonstrativo()
             },
             success:function(data)
             {
+                $("#preloader").show();
 
             },
             error:function(res)
             {
                 $('#div-rel').show();
                 $('#corpo-rel').html(res.responseText);
+                $("#preloader").hide();
                 
 
             },
-            done:function( data )
+            complete:function( data )
             {
+                $("#preloader").hide();
+
             }
 
         }
@@ -498,6 +583,12 @@ function visualiarRelDemonstrativo()
 function enviarDemonstrativoPorEmail()
 {
         var url = "{{route('cliente.atualizaremail')}}";
+
+        if( $("#i-locadores").val() == '' )
+        {
+            alert('Utilize essa opção para enviar para um Locador selecionado. Caso queira enviar pra todos clique no TODOS POR EMAIL');
+            return false;
+        }
 
         var dados =
         {

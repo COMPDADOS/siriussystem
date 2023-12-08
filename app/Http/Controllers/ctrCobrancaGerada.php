@@ -1606,6 +1606,7 @@ class ctrCobrancaGerada extends Controller
     public function cargaTmpRetorno( Request $request )
     {
         $somentebaixados = $request->somentebaixados;
+        $ordem = $request->ordem;
 
         $retornos = mdlRetornoBancario::
         where('IMB_ATD_ID','=', Auth::user()->IMB_ATD_ID );
@@ -1613,7 +1614,13 @@ class ctrCobrancaGerada extends Controller
         if( $somentebaixados == 'S' )
             $retornos->where('selecionado','=', 'S');
 
-        $retornos ->orderBy( 'imb_ctr_referencia')->get();
+            if( $ordem == 'P') 
+            $retornos ->orderBy( 'imb_ctr_referencia')->get();
+        else
+        if( $ordem == 'L') 
+            $retornos ->orderBy( 'locatario')->get();
+        if( $ordem == 'D') 
+            $retornos ->orderBy( 'datavencimento')->get();
 
         return DataTables::of($retornos)->make(true);
 
@@ -1626,11 +1633,11 @@ class ctrCobrancaGerada extends Controller
         $retornos = mdlRetornoBancario::
         where('IMB_ATD_ID','=', Auth::user()->IMB_ATD_ID );
 
-        if( $somentebaixados == 'S' )
-            $retornos->where('selecionado','=', 'S');
+        //if( $somentebaixados == 'S' )
+          //  $retornos->where('selecionado','=', 'S');
 
-        if( $codigoocorrencia <> '' )
-            $retornos->where('codigoocorrencia','=', $codigoocorrencia);
+        //if( $codigoocorrencia <> '' )
+            $retornos->where('codigoocorrencia','=', '06');
 
         $retornos = $retornos->orderBy( 'imb_ctr_referencia')->get();
 
@@ -2798,6 +2805,48 @@ class ctrCobrancaGerada extends Controller
         return response()->json($cobrancas,200 );
 
     }
+    public function cargaBoletosPeriodoJsonWhats( Request $request )
+    {
+
+        $logged='S';
+        if( ! Auth::check())
+        {
+            Auth::loginUsingId( 1,false);
+            $logged = 'N';
+        }
+        $datainicio = $request->datainicio;
+        $datafim = $request->datafim;
+
+        $param2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID );
+
+
+        $cobrancas = mdlCobrancaGeradaPerm::select( '*',
+            'IMB_TLF_DDI',
+            'IMB_TLF_DDD',
+            'IMB_TLF_NUMERO',
+            'IMB_LOCATARIOCONTRATO.IMB_CLT_ID',
+            DB::raw('IMB_CONTRATO.IMB_CTR_ID as IMB_CTR_ID' )
+        )->where( 'IMB_CTR_SITUACAO','=','ATIVO')
+                ->whereNull( 'IMB_CGR_DATABAIXA')
+                ->whereNull( 'IMB_CGR_DTHINATIVO')
+                ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_COBRANCAGERADAPERM.IMB_CTR_ID' )
+                ->leftJoin( 'IMB_LOCATARIOCONTRATO','IMB_LOCATARIOCONTRATO.IMB_CTR_ID','IMB_CONTRATO.IMB_CTR_ID' )
+                ->leftJoin( 'IMB_TELEFONES','IMB_TELEFONES.IMB_TLF_ID_CLIENTE','IMB_LOCATARIOCONTRATO.IMB_CLT_ID' )
+                ->where( 'IMB_CGR_DATAVENCIMENTO','>=', $datainicio )
+                ->where( 'IMB_CGR_DATAVENCIMENTO','<=', $datafim );
+
+        if( $param2->IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA == 'S')
+                    $cobrancas = $cobrancas->where( 'IMB_CGR_ENTRADACONFIRMADA','=','S' );
+
+
+        $cobrancas = $cobrancas->get();
+
+        if( $logged == 'N')
+        Auth::logout();
+
+        return response()->json($cobrancas,200 );
+
+    }
 
     public function painelBoletosEnviadosCarga( Request $request )
     {
@@ -2820,6 +2869,13 @@ class ctrCobrancaGerada extends Controller
 
 
 
+    }
+
+    public function boletosAVencerSemRegistrar()
+    {
+        $boletos = mdlCobrancaGeradaPerm::whereRaw( " coalesce(IMB_CGR_ENTRADACONFIRMADA, '') = '' ".
+        " and IMB_CGR_DATAVENCIMENTO >= curdate() ")->get();
+        return $boletos;
     }
 
 

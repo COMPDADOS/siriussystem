@@ -115,6 +115,8 @@ td, th
 @endsection
 @section('content')
 
+<input type="hidden" id="wsmsg-assunto">
+<textarea class="escondido"  id="wsmsg-mensagem"></textarea>
 <div class="page-bar">
     <div class="col-md-12">
         <div class="col-md-3">
@@ -199,10 +201,14 @@ td, th
         <div class="col-md-1 div-center">
             <a href="javascript:exportTableToExcel('resultTable', 'boleto_da_carteira')" title="Exportar para o Excel"><img src="{{asset('/global/img/excel-50.png')}}" alt=""></a>
         </div>
-        <div class="col-md-3">
-
+        <div class="col-md-1 div-center">
+            <p></p>
+            <a href="javascript:enviarPraTodosWs()" title="Enviar todos por whatsapp"><i class="fa fa-whatsapp fa-3x" aria-hidden="true"></i></a>
         </div>
-        <div class="col-md-4" id="div-email">;
+        <div class="col-md-3">
+                &nbsp;
+        </div>
+        <div class="col-md-4" id="div-email">
             <h3>Ultimo email enviado: </h5>
             <div id="progress-bar"></div>
 
@@ -912,7 +918,10 @@ function enviarVariosBoletosJson()
                     {
                         
                         if( data[nI].EMAIL  != '' )
+                        {
                             enviarBoletoPorEmailJson( data[nI].IMB_CGR_ID,data[nI].FIN_CCI_BANCONUMERO, data[nI].EMAIL);
+                            console.log( data[nI].EMAIL );
+                        }
 
                     };
 
@@ -973,7 +982,7 @@ function enviarBoletoPorEmailJson( id, banco, email)
   if( banco == 33 )
   {
      url ="{{route('boleto.santander')}}/"+id+'/S/'+email;
-     console.log('ATENCAO: '+url );
+     console.log( 'email no banco 33 '+email );
      $.ajax(
        {
          url    : url,
@@ -1136,6 +1145,143 @@ function inativarBoleto( id )
     });
 
 }
+function EnviarWsMsg( id, banco, ddi, ddd,numero, idcontrato, idcliente)
+    {
+        var imb = "{{Auth::user()->IMB_IMB_ID}}";
+
+        var nomeimobi = "{{ Auth::user()->imobiliaria("+imb+") }}"
+
+        var url = "{{route('whastapp.enviarmsg')}}";
+
+        if( banco == 33 )
+            var link= "{{route('boleto.santander')}}/"+id+'/N/X';
+
+          if( banco == 237 )
+            var link=  "{{route('boleto.237')}}/"+id+'/N/X';
+          if( banco == 341 )
+            var link= "{{route('boleto.itau')}}/"+id+'/N/X';
+          
+          if( banco == 756 )
+            var link=  "{{route('boleto.756')}}/"+id+'/N/X';
+
+          if( banco == 84 )
+            var link=  "{{route('boleto.084')}}/"+id+'/N/X';
+
+          if( banco == 1 )
+            var link= "{{route('boleto.001')}}/"+id+'/N/X';
+
+          if( banco == 748 )
+            var link= "{{route('boleto.748')}}/"+id+'/N/X';
+
+
+          $("#wsmsg-assunto").val( 'Segue seu boleto');
+
+          $("#wsmsg-mensagem").val( '*'+nomeimobi+'* Informa:Prezado cliente. Segue o link para que você possa pegar seu boleto de forma prática e segura. Link: '+
+          link);
+
+
+        dados =
+        {
+            ddi:ddi,
+            ddd:ddd,
+            numero:numero,
+            msg : $("#wsmsg-mensagem").val(),
+            assunto: $("#wsmsg-assunto").val(),
+            idcontrato: idcontrato,
+            idcliente:idcliente,
+        }
+
+        $.ajax(
+            {
+                url:url,
+                dataType:'json',
+                type:'get',
+                data : dados,
+                success:function( data )
+                {
+
+                    var retorno = data;
+                    if (retorno.substring(0,3)=='999') 
+                        document.getElementById("i-ws").style.color = "red"
+                    else
+                        document.getElementById("i-ws").style.color = "green"
+//                    alert(data);
+                },
+                error:function( data )
+                {
+                    console.log( data );
+                }
+                
+            }
+        )
+    }
+
+    function enviarPraTodosWs()
+    {
+        if (confirm("BOLETOS POR WHATSAPP: Esta opção enviará todos os boletos "+
+            "RESPEITANDO O PERÍODO INFORMADO. Você pode confirmar e o sistema tratará de enviar os boleto. "+
+            "Assim você poderá continuar seu trabalho normalmente enquanto o sistema envia os boletos. "+
+            "Posso continuar?") == true) 
+    {
+        
+        
+        var dados = 
+        {
+            datainicio  : moment( $("#i-data-inicio").val()).format( 'YYYY-MM-DD'),
+            datafim     : moment( $("#i-data-fim").val()).format( 'YYYY-MM-DD'),
+        }
+
+        $("#preloader").show();
+
+        var url = "{{route('boleto.periodo.whats.json')}}";
+        console.log(url);
+        var progressBar = $('#progress-bar');
+
+        $.ajax
+        (
+            {
+                url:url,
+                dataType:'json',
+                type:'get',
+                data:dados,
+//                async:false,
+                success:function( data )
+                {
+                    $("#preloader").show();
+                    for( nI=0;nI < data.length;nI++)
+                    {
+                        
+                        if( data[nI].IMB_TLF_NUMERO!= '' )
+                        {
+                            EnviarWsMsg(    data[nI].IMB_CGR_ID,   
+                                            data[nI].FIN_CCI_BANCONUMERO, 
+                                            data[nI].IMB_TLF_DDI,
+                                            data[nI].IMB_TLF_DDD, 
+                                            data[nI].IMB_TLF_NUMERO, 
+                                            data[nI].IMB_CTR_ID, 
+                                            data[nI].IMB_CLT_ID);
+                        }
+
+                    };
+
+                    alert('Boletos enviados por Whatsapp!!!')
+
+                },
+                complete:function()
+                {
+                    $("#preloader").html( '');
+                    $("#preloader").hide();
+
+                    $("#div-email").html( 'Processo finalizado!!!!');
+                }
+            }
+        )
+
+    }
+    
+    
+
+    }
 
 </script>
 

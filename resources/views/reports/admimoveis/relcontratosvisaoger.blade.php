@@ -73,8 +73,9 @@ tr:nth-child(even) {
   <table class="table"> 
     <thead>
       <tr>
+        <th class="div-center" width="5%">Dia</th>
         <th class="div-center" width="5%">#Pasta</th>
-        <th class="div-center" width="30%%">Endereço</th>
+        <th class="div-center" width="25%">Endereço</th>
         <th class="div-center" width="25%">Locatário</th>
         <th class="div-center" width="25%">Locador</th>
         <th class="div-center" width="7%">Prox. Recto.</th>
@@ -85,6 +86,7 @@ tr:nth-child(even) {
     
     @foreach( $contrato as $ctr )
     <tr>
+      <td class="div-center">{{$ctr->IMB_CTR_DIAVENCIMENTO}}</td>
       <td class="div-center">{{$ctr->IMB_CTR_REFERENCIA}}</td>
         <td class="div-center">{{$ctr->ENDERECOCOMPLETO}}</td>
         <td class="div-center">{{$ctr->IMB_CLT_NOMELOCATARIO}}</td>

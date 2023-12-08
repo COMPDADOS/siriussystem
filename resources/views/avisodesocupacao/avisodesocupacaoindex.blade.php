@@ -141,8 +141,11 @@ td
 
 $(document).ready(function()
 {
+    //$("#i-inicio").val( moment().format( 'YYYY-MM-DD'));
+    //$("#i-termino").val( moment().format( 'YYYY-MM-DD'));
 
     $("#sirius-menu").click();
+
 
 });
 

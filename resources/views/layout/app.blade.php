@@ -59,7 +59,32 @@
 
         <style>
 
-        .modal-body-notif {
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="checkbox"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+select:focus,
+.select2:focus,
+.valor:focus,
+.uneditable-input:focus {   
+  border-color: rgba(126, 239, 104, 0.8);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
+  outline: 0 none;
+}
+
+
+.modal-body-notif {
             height: 80vh;
             overflow-x: auto;
             }
@@ -254,6 +279,8 @@
     <div id="preloader">
 
     </div>
+
+    </div>
     <body class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid">
         <!-- BEGIN HEADER -->
         <div class="page-header navbar navbar-fixed-top">
@@ -262,7 +289,7 @@
                 <!-- BEGIN LOGO -->
                 <div class="page-logo">
                     <a href="{{route('dashboard.comercial.panorama')}}">
-                        <img src="{{asset('/layouts/layout/img/logo.png')}}" alt="logo" class="logo-default" /> </a>
+                        <img src="https://www.redentora-miami.com.br/sys/assets/layouts/layout/img/logo.png" alt="logo" class="logo-default" /> </a>
                     <div class="menu-toggler sidebar-toggler"id="sirius-menu">
                         <!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
                     </div>
@@ -489,6 +516,7 @@
                             <!-- BEGIN USER LOGIN DROPDOWN -->
                             <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
                             <li class="dropdown dropdown-extended dropdown-notification" id="header_notification_bar">
+                                
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <i class="icon-bell" style="color:red"></i>
                                     <span class="badge badge-default" id="i-notificacoes" title="Novas Notificações"></span>

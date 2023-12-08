@@ -5,7 +5,7 @@
 .estornado
 {
   text-decoration: line-through;
-  color: #ffad99;
+  color: red;
 }
 
 .dashed{
@@ -17,6 +17,10 @@
     text-align:right;
   }
 
+.totalprocesso
+{
+  color:blue;
+}
 .td-center
   {
     text-align:center;
@@ -78,13 +82,14 @@
         <table  id="tblhistoricolocador" class="table-striped table-bordered table-hover" >
           <thead class="thead-dark">
             <tr>
-              <th width="10%" style="text-align:center"> Ações </th>
+              <th width="15%" style="text-align:center"> Ações </th>
               <th width="20%" style="text-align:center"> Locador </th>
-              <th width="15%" style="text-align:center"> Vencimento </th>
-              <th width="15%" style="text-align:center"> Pagamento </th>
-              <th width="20%" style="text-align:center"> Nº Recibo </th>
-              <th width="10%" style="text-align:center"> Valor Pago </th>
-              <th width="15%" style="text-align:center"> Conta </th>
+              <th width="7%" style="text-align:center"> Vencimento </th>
+              <th width="7%" style="text-align:center"> Pagamento </th>
+              <th width="7%" style="text-align:center"> Nº Recibo </th>
+              <th width="7%" style="text-align:center"> Valor Pago </th>
+              <th width="30%" style="text-align:center"> Conta </th>
+              <th width="7%" style="text-align:center"></th>
             </tr>
           </thead>
           <tbody>
@@ -109,6 +114,8 @@
                 <td class="td-center">{{ $registro->IMB_RLD_NUMERO}}</td>
                 <td class="td-rigth">{{ number_format( $registro->TOTAL,2,',','.')}}</td>
                 <td class="td-center">{{$registro->FIN_CCX_DESCRICAO}}</td>
+                <td class="td-center"><i title="O valor total para o vencimento {{date( 'd/m/Y', strtotime( $registro->IMB_RLD_DATAVENCIMENTO))}} foi de R$ {{ number_format( $registro->TOTALPROCESSO,2,',','.')}}, pago pela conta {{$registro->FIN_CCX_DESCRICAO}}" class="fa fa-exclamation-circle" aria-hidden="true"></i></td>
+
               </tr>
 
             @endforeach
@@ -132,6 +139,7 @@
 <script>
   $( document ).ready(function() 
   {
+    $("#sirius-menu").click();
 //    cabecalhoContrato( $("#IMB_CTR_ID").val() );
 
   });
@@ -186,7 +194,9 @@
             var datainativo   = moment( data[nI].IMB_RLD_DTHINATIVO).format('DD/MM/YYYY');
             
             var valor = parseFloat( data[nI].TOTAL );
+            var valorpro = parseFloat( data[nI].TOTALPROCESSO );
             valor = formatarBRSemSimbolo( valor );
+            valorpro = formatarBRSemSimbolo( valorpro );
             if( datainativo == 'Invalid date' )
               classe=''
             else
@@ -204,6 +214,7 @@
                     '<td class="td-center">'+data[nI].IMB_RLD_NUMERO+'</td>' +
                     '<td class="td-rigth">'+valor+' </td>' +
                     '<td class="td-center">'+data[nI].FIN_CCX_DESCRICAO+'</td>' +
+                    '<td class="td-rigth"><i title="O valor total para este contrato e para o vencimento '+datavencimento+' foi de R$ '+valorpro+'" class="fa fa-exclamation-circle" aria-hidden="true"></i></td>' +
                   '</tr>';
             $("#tblhistoricolocador").append( linha );
           } 

@@ -109,7 +109,7 @@ class ctrReciboLocatario extends Controller
                                     ->dataLimite( $idcontrato, $dados[0]['IMB_RLT_DATACOMPETENCIA'] );
             $recibo->FIN_LCX_DINHEIRO       = $dados[0]['FIN_LCX_DINHEIRO'];
             $recibo->FIN_LCX_CHEQUE         = $dados[0]['FIN_LCX_CHEQUE'];
-            //$recibo->IMB_RLT_PIX         = $dados[0]['IMB_RLT_PIX'];
+            $recibo->IMB_RLT_PIX         = $dados[0]['IMB_RLT_PIX'];
             $recibo->FIN_CFC_ID             = $idcfc;
             $recibo->IMB_CLT_ID_LOCATARIO   = $idlocatario;
             $recibo->IMB_CLT_ID_LOCADOR     = $idlocador;
@@ -218,7 +218,7 @@ class ctrReciboLocatario extends Controller
                                     ->dataLimite( $idcontrato, $d['IMB_RLT_DATACOMPETENCIA'] );
             $recibo->FIN_LCX_DINHEIRO       = $d['FIN_LCX_DINHEIRO'];
             $recibo->FIN_LCX_CHEQUE         = $d['FIN_LCX_CHEQUE'];
-            //$recibo->IMB_RLT_PIX            = $d['IMB_RLT_PIX'];
+            $recibo->IMB_RLT_PIX            = $d['IMB_RLT_PIX'];
             $recibo->FIN_CFC_ID             = $idcfc;
             $recibo->IMB_CLT_ID_LOCATARIO   = $idlocatario;
             $recibo->IMB_CLT_ID_LOCADOR     = $idlocador;
@@ -508,7 +508,7 @@ class ctrReciboLocatario extends Controller
                 'IMB_RLT_TOTALRECIBO',
                 'FIN_LCX_DINHEIRO',
                 'IMB_RLT_TROCO',
-//                'IMB_RLT_PIX',
+                'IMB_RLT_PIX',
                 'FIN_LCX_CHEQUE',
                 'FIN_PCT_NOSSONUMERO',
                 'IMB_RECIBOLOCATARIO.IMB_IMV_ID',
@@ -656,9 +656,8 @@ class ctrReciboLocatario extends Controller
         $conta = $request->conta;
         $dimob =  $request->dimob;
         $destino = $request->destino;
-     
-        Log::info( "*********************************************" );
-        Log::info( "destino ".$destino );
+        $metodologia = $request->metodologia;
+
 
         if( $datainicio=='') $datainicio = date( 'Y/m/d');
         if( $datafim=='') $datafim = date( 'Y/m/d');
@@ -736,7 +735,7 @@ class ctrReciboLocatario extends Controller
                 ->whereNull('IMB_RLT_DTHINATIVO');
 
 
-            if( $dimob == 'S' )
+            if( $dimob == 'D' )
                 $rec = $rec->where('IMB_IMV_RELIRRF','=','S' );
 
             if( $empresa)
@@ -844,6 +843,15 @@ class ctrReciboLocatario extends Controller
     public function estornar( Request $request )
     {
         $numero = $request->IMB_RLT_NUMERO;
+        $cx = mdlLanctoCaixa::where('FIN_LCX_ORIGEM','=','RT')
+                                ->where( 'FIN_LCX_RECIBO','=', $numero )->first();
+        if( $cx <> '' )
+        {
+            if( $cx->FIN_LCX_CONCILIADO == 'S')
+            {
+                return response()->json('Permissão Negada! Já tem um lancamento no caixa como conciliado!',404);
+            }
+        }
 
         $items = mdlReciboLocatario::where('IMB_RLT_NUMERO','=', $numero )->get();
 
@@ -983,6 +991,7 @@ class ctrReciboLocatario extends Controller
                 DB::raw( "( select RECEBIDOOUTROSEVENTO(IMB_RECIBOLOCATARIO.IMB_RLT_NUMERO,'1,24,8,5,17,18,2,36,3,37,4,38' ) ) AS OUTROS")
             ])
             ->leftJoin( 'IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID', 'IMB_RECIBOLOCATARIO.IMB_CTR_ID')
+            ->leftJoin( 'IMB_IMOVEL','IMB_IMOVEL.IMB_IMV_ID', 'IMB_CONTRATO.IMB_IMV_ID')
             ->where( 'IMB_RECIBOLOCATARIO.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
             ->where( 'IMB_RLT_DATAPAGAMENTO','>=', $datainicio)
             ->where( 'IMB_RLT_DATAPAGAMENTO','<=', $datafim)
@@ -1204,14 +1213,14 @@ class ctrReciboLocatario extends Controller
         ->leftJoin( 'IMB_RECIBOLOCATARIO', 'IMB_RECIBOLOCATARIO.IMB_LCF_ID', 'IMB_COBRANCAGERADAITEMPERM.IMB_LCF_ID')
         ->first();
 
-        Log::info('************************************************');
-        Log::info( 'recibo '.$cgi->IMB_RLT_NUMERO);
-        
         $retorno = 0;
 
         if( $cgi <> '' )
         {
-
+            Log::info('************************************************');
+            Log::info( 'recibo '.$cgi->IMB_RLT_NUMERO);
+            
+    
             if( $cgi->IMB_RLT_NUMERO <> '' )
             {
                 $rlt = collect( DB::select("select RECEBIDOTOTALRECIBO($cgi->IMB_RLT_NUMERO) as rlt "))->first();
@@ -1274,7 +1283,28 @@ class ctrReciboLocatario extends Controller
 
     }
 
-    
+    public function alterarDataPagto( Request $request )
+    {
+
+       $data = $request->novadata;
+       $recibo = $request->recibo;
+
+       $rlt = mdlRecibolocatario::where( 'IMB_RLT_NUMERO','=', $request->recibo)->first();
+       if( $rlt <> ' ')
+       {
+
+           app('App\Http\Controllers\ctrRotinas')  
+           ->gravarObs( $rlt->IMB_IMV_ID, $rlt->IMB_CTR_ID, 0, $recibo,0 , 'Alterado a data de pagamento do recibo '.$recibo.
+           ' vencimento '.date('d/m/Y', strtotime($rlt->IMB_RLT_DATACOMPETENCIA) ).', de '.date('d/m/Y', strtotime( $rlt->IMB_RLT_DATACOMPETENCIA) ).
+           " para data('d/m/Y', strtodate( $rlt->IMB_RLT_DATACOMPETENCIA) )");
+            $sql = "UPDATE IMB_RECIBOLOCATARIO SET IMB_RLT_DATAPAGAMENTO = '$data' where IMB_RLT_NUMERO = $recibo";
+            DB::statement("$sql");
+       }
+
+       return response()->json('ok',200);
+
+    }
+
 
 
 }

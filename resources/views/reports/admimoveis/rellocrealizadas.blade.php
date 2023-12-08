@@ -171,6 +171,8 @@
                             <th class="div-left"></th>
                             <th class="div-left"></th>
                             <th class="div-left"></th>
+                            <th class="div-left"></th>
+                            <th class="div-left"></th>
                         </tr>
                     </tfoot>
 
@@ -365,6 +367,7 @@
     }
     function formatarValor( data )
     {
+        if( data === null ) return  '<div class="div-right">0,00</div>';
         var valor = formatarBRSemSimbolo( parseFloat(data));
         return  '<div class="div-right">'+valor+'</div>';
 

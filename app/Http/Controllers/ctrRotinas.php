@@ -4128,9 +4128,9 @@ public function verificarReajustes( $idcontrato, $vencimento, $json)
            
             $dirace = new mdlAtendenteDireitoAcesso;
             $dirace->IMB_ATD_ID        = $atd->IMB_ATD_ID;
-            $dirace->IMB_DIRACE_INCLUSAO        = 'S';
-            $dirace->IMB_DIRACE_ALTERACAO        = 'S';
-            $dirace->IMB_DIRACE_EXCLUSAO        = 'S';
+            $dirace->IMB_DIRACE_INCLUSAO        = $acessodefault;
+            $dirace->IMB_DIRACE_ALTERACAO        = $acessodefault;
+            $dirace->IMB_DIRACE_EXCLUSAO        = $acessodefault;
             $dirace->IMB_DIRACE_ACESSO        = $acessodefault;
             $dirace->IMB_RSC_ID                = $recurso->IMB_RSC_ID;
             $dirace->save();

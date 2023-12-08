@@ -1240,10 +1240,9 @@ public function storeArray(Request $request)
     foreach( $lfs as $lfreq )
     {
 
-        //$lfreq = json_encode( $lfreq );
-        //dd( $lfreq );
         $idevento = $lfreq["IMB_TBE_ID"];
-        Log::info( "ctrLancamentoFuturo - Contrato: '.$request->IMB_CTR_ID ).' - '.$idevento");
+
+        //Log::info( "ctrLancamentoFuturo - Contrato: '.$request->IMB_CTR_ID ).' - '.$idevento");
         $tabelaevento = mdlEvento::find( $idevento );
 
         $gravarirrf = $lfreq["IMB_LCF_INCIRRF"];
@@ -1252,7 +1251,8 @@ public function storeArray(Request $request)
         $gravarjuros =  $lfreq["IMB_LCF_INCJUROS"];
         $gravarcorrecao = $lfreq["IMB_LCF_INCCORRECAO"] ;
         $gravariss =  $lfreq["IMB_LCF_INCISS"] ;
-    
+        
+        Log::info('antes: '.$gravariss);
         if( $gravarirrf == '' )
             $gravarirrf = $tabelaevento->IMB_TBE_IRRF;
 
@@ -1266,7 +1266,11 @@ public function storeArray(Request $request)
             $gravarjuros = $tabelaevento->IMB_TBE_JUROS;
 
         if( $gravariss == '' )
-            $gravariss = $tabelaevento->IMB_LCF_INCISS;
+        $gravariss = $tabelaevento->IMB_TBE_INCISS;
+    
+            Log::info(  "tabelaevento->IMB_TBE_INCISS:  $tabelaevento->IMB_TBE_INCISS");
+            Log::info(  "gravariss depois $gravariss");
+        
 
         
         $id = Auth::user()->IMB_IMB_ID;

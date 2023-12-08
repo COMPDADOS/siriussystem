@@ -61,6 +61,13 @@
 
             }
 
+            .font-14px-blue {
+                color: blue;
+                font-size: 14px;
+                font-weight: bold;
+
+            }
+
             .font-bold {
                 font-weight: bold;
 
@@ -85,6 +92,7 @@
                 font-size: 10px;
 
             }
+
         </style>
     @endsection
 
@@ -140,8 +148,8 @@
                                 </div> <!--row-->
 
 
-                                
-                                  <div class="portlet box blue">
+                                <div class="col-md-8">
+                                    <div class="portlet box blue">
                                     <div class="portlet-title">
                                       <div class="caption">
                                         <i class="fa fa-gift"></i>Dados do Cliente
@@ -196,7 +204,13 @@
                                             </div>
                                           </div>
 
-                                          <div class="col-md-2" id="i-div-estado-civil">
+                                          @php
+                                            $mostra='';  //classe pra mostrar ou não fisicas
+                                            if( $cadcli->IMB_CLT_PESSOA == 'J')
+                                                $mostra = 'escondido';
+
+                                          @endphp
+                                          <div class="col-md-2 {{$mostra}} fisica" id="i-div-estado-civil">
                                             <div class="form-group">
                                               <label class="control-label">Estado Civil</label>
                                               <select id="I-IMB_CLT_ESTADOCIVIL" class="form-control" required
@@ -213,8 +227,11 @@
                                                   <option value="I"
                                                       @if ($cadcli->IMB_CLT_ESTADOCIVIL == 'I') selected @endif>
                                                       Divorcido(a)</option>
-                                                  <option value="V"
+                                                    <option value="V"
                                                       @if ($cadcli->IMB_CLT_ESTADOCIVIL == 'V') selected @endif>Viúvo(a)
+                                                  </option>
+                                                  <option value="P"
+                                                      @if ($cadcli->IMB_CLT_ESTADOCIVIL == 'P') selected @endif>Separado Jud.
                                                   </option>
                                               </select>
                                             </div>
@@ -247,7 +264,7 @@
 
                                         <div class="row" height="50%">
 
-                                          <div class="col-md-1" id="i-div-sexo">
+                                          <div class="col-md-1 {{$mostra}} fisica" id="i-div-sexo">
                                             <div class="form-group">
                                                 <label class="control-label">Sexo</label>
                                                 <select id="I-IMB_CLT_SEXO" class="form-control">
@@ -268,7 +285,7 @@
                                                 <label class="control-label"
                                                     id="i-lab-cpf">CPF/CNPJ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
                                                 </label>
-                                                <input type="checkbox" id="I-IMB_CLT_MEI">MEI
+                                                <input type="checkbox" id="I-IMB_CLT_MEI" @if( $cadcli->IMB_CLT_MEI =='S') Checked @endif>MEI
                                                 <input id="I-IMB_CLT_CPF" onkeydown="fMasc( this, mCNPJ )"
                                                     type="text" class="form-control"
                                                     placeholder="Somente números"
@@ -289,10 +306,12 @@
                                             </div>
                                           </div>
 
-                                          <div class="col-md-2">
+                                          <div class="col-md-2 {{$mostra}} fisica">
                                             <div class="form-group">
                                                 <label class="control-label">Orgão(UF)
                                                     <select class="form-control" id="I-IMB_CLT_RGORGAO">
+                                                        <option
+                                                            value="" selected ></option>
                                                         <option
                                                             value="AC"@if ($cadcli->IMB_CLT_RGORGAO == 'AC') selected @endif>
                                                             Acre</option>
@@ -381,16 +400,16 @@
                                                 </label>
                                             </div>
                                           </div>
-                                          <div class='col-md-2' id="i-div-data-nascimento">
+                                          <div class='col-md-2 {{$mostra}} fisica' id="i-div-data-nascimento">
                                             <div class="form-group">
-                                                <label class="control-label">Data Nascimento</label>
+                                                <label class="control-label">Data Nascto.</label>
                                                 <input type='date' class="form-control"
                                                     id="I-IMB_CLT_DATANASCIMENTO"
-                                                    value="{{ date('d/m/Y', strtotime($cadcli->IMB_CLT_DATANASCIMENTO)) }}">
+                                                    value="{{ date('Y-m-d', strtotime($cadcli->IMB_CLT_DATNAS)) }}">
                                             </div>
                                           </div>
 
-                                          <div class='col-md-2' id="i-div-nacionalidade">
+                                          <div class='col-md-2 {{$mostra}} fisica' id="i-div-nacionalidade">
                                             <div class="form-group">
                                                 <label class="control-label">Nacionalidade</label>
                                                 <input type='text' class="form-control"
@@ -422,7 +441,7 @@
                                           <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>Complemento</label>
-                                                <input maxlength="20" name="I-IMB_CLT_RESENDCOM" type="text"
+                                                <input maxlength="20" id="I-IMB_CLT_RESENDCOM" type="text"
                                                     class="form-control"
                                                     value="{{ $cadcli->IMB_CLT_RESENDCOM }}">
                                             </div>
@@ -434,7 +453,7 @@
                                                 <input maxlength="8" name="I-IMB_CLT_RESENDCEP"
                                                     autocomplete="off" type="text" id="cep"
                                                     class="form-control" max="99999999"
-                                                    onkeypress="return isNumber(event)" onpaste="return false;"
+                                                    onkeypress="return isNumber(event)"
                                                     value="{{ $cadcli->IMB_CLT_RESENDCEP }}" />
                                             </div>
                                           </div>
@@ -461,89 +480,92 @@
                                             <div class="form-group">
                                                 <label>UF</label>
                                                 <select class="form-control" id="I-CEP_UF_SIGLARES">
+                                                    <option value=""
+                                                        @if ($cadcli->CEP_UF_SIGLARES == '') selected @endif>AC
+                                                    </option>
                                                     <option value="AC"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'AC') selected @endif>AC
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'AC') selected @endif>AC
                                                     </option>
                                                     <option value="AL"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'AL') selected @endif>AL
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'AL') selected @endif>AL
                                                     </option>
                                                     <option value="AP"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'AP') selected @endif>AP
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'AP') selected @endif>AP
                                                     </option>
                                                     <option value="AM"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'AM') selected @endif>AM
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'AM') selected @endif>AM
                                                     </option>
                                                     <option value="BA"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'BA') selected @endif>BA
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'BA') selected @endif>BA
                                                     </option>
                                                     <option value="CE"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'CE') selected @endif>CE
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'CE') selected @endif>CE
                                                     </option>
                                                     <option value="DF"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'DF') selected @endif>DF
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'DF') selected @endif>DF
                                                     </option>
                                                     <option value="ES"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'ES') selected @endif>ES
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'ES') selected @endif>ES
                                                     </option>
                                                     <option value="GO"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'GO') selected @endif>GO
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'GO') selected @endif>GO
                                                     </option>
                                                     <option value="MA"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'MA') selected @endif>MA
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'MA') selected @endif>MA
                                                     </option>
                                                     <option value="MT"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'MT') selected @endif>MT
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'MT') selected @endif>MT
                                                     </option>
                                                     <option value="MS"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'MS') selected @endif>MS
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'MS') selected @endif>MS
                                                     </option>
                                                     <option value="MG"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'MG') selected @endif>MG
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'MG') selected @endif>MG
                                                     </option>
                                                     <option value="PA"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'PA') selected @endif>PA
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'PA') selected @endif>PA
                                                     </option>
                                                     <option value="PB"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'PB') selected @endif>PB
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'PB') selected @endif>PB
                                                     </option>
                                                     <option value="PR"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'PR') selected @endif>PR
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'PR') selected @endif>PR
                                                     </option>
                                                     <option value="PE"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'PE') selected @endif>PE
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'PE') selected @endif>PE
                                                     </option>
                                                     <option value="PI"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'PI') selected @endif>PI
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'PI') selected @endif>PI
                                                     </option>
                                                     <option value="RJ"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'RJ') selected @endif>RJ
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'RJ') selected @endif>RJ
                                                     </option>
                                                     <option value="RN"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'RN') selected @endif>RN
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'RN') selected @endif>RN
                                                     </option>
                                                     <option value="RS"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'RS') selected @endif>RS
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'RS') selected @endif>RS
                                                     </option>
                                                     <option value="RO"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'RO') selected @endif>RO
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'RO') selected @endif>RO
                                                     </option>
                                                     <option value="RR"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'RR') selected @endif>RR
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'RR') selected @endif>RR
                                                     </option>
                                                     <option value="SC"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'SC') selected @endif>SC
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'SC') selected @endif>SC
                                                     </option>
                                                     <option value="SP"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'SP') selected @endif>SP
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'SP') selected @endif>SP
                                                     </option>
                                                     <option value="SE"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'SE') selected @endif>SE
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'SE') selected @endif>SE
                                                     </option>
                                                     <option value="TO"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'TO') selected @endif>TO
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'TO') selected @endif>TO
                                                     </option>
                                                     <option value="EX"
-                                                        @if ($cadcli->IMB_CLT_RGORGAO == 'EX') selected @endif>EX
+                                                        @if ($cadcli->CEP_UF_SIGLARES == 'EX') selected @endif>EX
                                                     </option>
                                                 </select>
                                                 </label>
@@ -576,7 +598,7 @@
                                         </div> <!-- fim row -->
                                         <hr>
                                         <div class="row">
-                                          <div class="col-md-12">
+                                          <div class="col-md-10">
                                             <div class="input-group">
                                                 <span class="input-group-addon input-circle-left">
                                                     <i class="fa fa-envelope"></i>
@@ -587,46 +609,87 @@
                                                     value="{{ $cadcli->IMB_CLT_EMAIL }}">
                                             </div>
                                           </div>
+                                          <div class="col-md-2 div-center">
+                                            <label class="control-label">Não Enviar Demonstrativos Automaticamente/Lote</label>
+                                            <input type="checkbox" id="IMB_CLT_DEMONSTRATIVOSOMENTEMANUAL"
+                                            @if( $cadcli->IMB_CLT_DEMONSTRATIVOSOMENTEMANUAL =='S') Checked @endif>
+                                            
+                                          </div>
                                         </div>
                                       </div> <!--form-body-->
                                     </div><!--portlet-body form-->
                                   </div> <!--portlet box blue-->
-                                
-                                  <div class="portlet box green">
-                                    <div class="portlet-title">
-                                        <div class="caption">
-                                            <i class="fa fa-gift"></i> Telefones
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="portlet box blue">
+                                        <div class="portlet-title">
+                                            <div class="caption">
+                                                <i class="fa fa-gift"></i> Telefones
+                                            </div>
+    
+                                            <div class="tools">
+                                                <a href="javascript:;" class="collapse"> </a>
+                                            </div>
                                         </div>
+    
+                                        <div class="portlet-body form">
+                                            <div class="form-body">
+                                                <div class="row">
+                                                    @php
+                                                      $tls = app( 'App\Http\Controllers\ctrTelefone')->carga( $id );
+                                                    @endphp
+                                                    <input type="hidden" id="i-id-novostelefone" value="0">
+                                                    <table id="tbltelefone" style="width:100%">
 
-                                        <div class="tools">
-                                            <a href="javascript:;" class="collapse"> </a>
-                                        </div>
+                                                    @foreach( $tls as $tl )
+                                                    @php
+                                                        $tipotelefone = $tl->IMB_TLF_TIPOTELEFONE;
+                                                        if( $tipotelefone == '' )
+                                                            $tipotelefone='Não Informado';
+                                                    @endphp
+                                                    <tr id="trfone{{ $tl->IMB_TLF_ID}}">
+                                                        <td width="10%" class="font-14px-blue"><input class="form-control" id="i-ddi{{ $tl->IMB_TLF_ID}}" value="{{$tl->IMB_TLF_DDI}}" onkeypress="return isNumber(event)"></td>
+                                                        <td width="10%"  class="font-14px-blue"><input class="form-control" id="i-ddd{{ $tl->IMB_TLF_ID}}" value="{{$tl->IMB_TLF_DDD}}" onkeypress="return isNumber(event)"></td> 
+                                                        <td width="30%"  class="font-14px-blue"><input class="form-control" id="i-numero{{ $tl->IMB_TLF_ID}}" value="{{$tl->IMB_TLF_NUMERO}}" onkeypress="return isNumber(event)"></td>
+                                                        <td width="40%" class="font-14px-blue"><input class="form-control" id="i-tipotelefone{{ $tl->IMB_TLF_ID}}" value="{{$tipotelefone}}"></td>
+                                                        <td class="escondido" width="5px" class="font-14px-blue">{{$tl->IMB_TLF_ID}}</td>
+                                                        <td  width="10%" class="font-20px-blue" >
+                                                            <a title="Apagar o telefone" 
+                                                            href="javascript:apagarTelefone({{$tl->IMB_TLF_ID}})"><i class="fa fa-trash" aria-hidden="true" style="color:red;"></i></a> 
+                                                        </td>
+                                                            <td width="100px"></td>
+                                                    </tr>
+                                                    @endforeach
+                                                    </table>
+                                                </div>
+                                                <div class="table-footer">
+                                                    <a class="btn btn-sm btn-primary" role="button" onClick="adicionarTelefone(0)">Adicionar Telefone </a>
+                                                    <!--data-toggle="modal" data-target="#modalFormaPagamento"-->
+                                                </div> <!-- row -->
+                                            </div><!-- end form-body-->
+                                        </div> <!--FIM Portlet-body form">-->
+                                    </div> <!-- fimquadro -->
+    
+                                </div>
+                            
+                            <div class="portlet box light">
+                                <div class="portlet-title">
+                                    <div class="caption">
                                     </div>
 
-                                    <div class="portlet-body form">
-                                        <div class="form-body">
-                                            <div class="row">
-                                                @php
-                                                  $tls = app( 'App\Http\Controllers\ctrTelefone')->carga( $id );
-                                                @endphp
-                                                @foreach( $tls as $tl )
-                                                  <div class="col-md-4 font-20px-blue">
-                                                    <td>DDD: ({{$tl->IMB_TLF_DDD}}) Número: {{$tl->IMB_TLF_NUMERO}} Tipo: {{$tl->IMB_TLF_TIPOTELEFONE}}</td>
-                                                    <td>
-                                                      <a title="Alterar dados deste contato telefônico" 
-                                                      href="javascript:adicionarTelefone({{$tl->IMB_TLF_ID}},{{$tl->IMB_TLF_DDD}},{{$tl->IMB_TLF_NUMERO}},'{{$tl->IMB_TLF_TIPOTELEFONE}}')"><i class="fa fa-pencil" aria-hidden="true" style="color:black"></i></a> 
-                                                    </td>
-                                                  </div>
-                                                @endforeach
-                                            </div>
-                                            <div class="table-footer">
-                                                <a class="btn btn-sm btn-primary" role="button" onClick="adicionarTelefone(0)">Adicionar Telefone </a>
-                                                <!--data-toggle="modal" data-target="#modalFormaPagamento"-->
-                                            </div> <!-- row -->
-                                        </div><!-- end form-body-->
-                                    </div> <!--FIM Portlet-body form">-->
-                                </div> <!-- fimquadro -->
+                                    <div class="tools">
+                                        <a href="javascript:;" class="collapse"> </a>
+                                    </div>
+                                </div>
+                                <div class="portlet-body form">
+                                    <div class="form-body">
+                                    </div>
+                                </div>
+                            </div>
+                                    
+                                
 
+                            
                                   <div class="portlet box green">
                                     <div class="portlet-title">
                                         <div class="caption">
@@ -1060,8 +1123,8 @@
 
             <div class="modal fade" id="modaltelefones" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
+                <div class="modal-dialog" style="width:40%;">
+                    <div class="modal-content ">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Adicionar Telefone</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
@@ -1074,6 +1137,13 @@
 
                             <div class="row">
 
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="ddd" class="col-form-label">DDI</label>
+                                        <input name="IMB_TLF_DDI" type="text" class="form-control" id="i-ddi"
+                                            max="999" onkeypress="return isNumber(event)" onpaste="return false;" />
+                                    </div>
+                                </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="ddd" class="col-form-label">DDD</label>
@@ -1090,23 +1160,17 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-7">
+                                <div class="col-md-5">
                                     <div class="form-group">
                                         <label for="tipo" class="col-form-label">Tipo</label>
-                                        <select class="form-control  input-8" id="i-tipo">
-                                            <option value="Residencial">Residencial</option>
-                                            <option value="Comercial">Comercial</option>
-                                            <option value="Celular">Celular</option>
-                                            <option value="Whatsapp">Whatsapp</option>
-                                            <option value="Recado">Recado</option>
-                                        </select>
+                                        <input type="text" class="form-control"  id="i-tipo" placeholder="Whatsapp, recado, trabalho,etc...">
 
                                     </div>
                                 </div>
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" onClick="telefoneSalvar()">Gravar</button>
+                                <button type="button" class="btn btn-primary" onClick="telefoneIncluir()">Gravar Telefone</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                             </div>
                             <!--              </form>-->
@@ -1200,9 +1264,6 @@
 
 
 
-
-
-
                     $('.valor').inputmask('decimal', {
                         radixPoint: ",",
                         groupSeparator: ".",
@@ -1239,15 +1300,9 @@
 
                 $('#I-IMB_CLT_PESSOA').on('change', function() {
 
-                    var pessoa = $("#I-IMB_CLT_PESSOA").val();
-                    $("#i-div-estado-civil").show();
-                    $("#i-div-sexo").show();
-                    $("#i-lbl-datanasc").html('Data Nascimento');
-                    if (pessoa == 'J') {
-                        $("#i-div-estado-civil").hide();
-                        $("#i-div-sexo").hide();
-                        $("#i-lbl-datanasc").html('Data Abertura');
-                    }
+                    $(".fisica").show();
+                    if ($('#I-IMB_CLT_PESSOA').val() == 'J')                     
+                        $(".fisica").hide();
 
                     preencherTipoImovel();
                     preecherCondominio();
@@ -1270,16 +1325,6 @@
                 });
 
 
-                $('#I-IMB_CLT_CPF').on('blur', () => {
-                    var pessoa = $("#I-IMB_CLT_PESSOA").val();
-                    if (pessoa == 'F') {
-
-                        if (is_cpf($("#I-IMB_CLT_CPF").val())) {} else {
-                            alert('Informe corretamente o CPF');
-                            $('#I-IMB_CLT_CPF').val('');
-                        }
-                    }
-                });
 
                 // Método para consultar o CEP
                 $('#cep').on('blur', () => {
@@ -1422,6 +1467,7 @@
                 function telefoneModal() {
 
                     //    $("#i-numero-cliente").val('');
+                    $("#i-ddi").val('');
                     $("#i-ddd").val('');
                     $("#i-numero").val('');
                     $("#i-tipo").val('');
@@ -1527,6 +1573,23 @@
                 function onGravar() 
                 {
 
+                    var pessoa = $("#I-IMB_CLT_PESSOA").val();
+                    if (pessoa == 'F') {
+                        if ( ! is_cpf($("#I-IMB_CLT_CPF").val())) 
+                        {
+                            alert('Informe corretamente o CPF');
+                            return false;
+                        }
+                    }
+                    if (pessoa == 'J') {
+                        if ( ! is_cnpj($("#I-IMB_CLT_CPF").val())) 
+                        {
+                            alert('Informe corretamente o CNPJ');
+                            return false;
+                        }
+                    }
+
+
                     if (!$("#i-div-perfil").is(":hidden")) 
                     {
                         alert('Atençao! Você precisa finalizar as informações de perfil que ainda não gravou!')
@@ -1614,6 +1677,7 @@
                             IMB_CLT_IMOVELGARANTIA: $("#IMB_CLT_IMOVELGARANTIA").val(),
                             IMB_CLT_CIDADEIBGE: $("#I-IMB_CLT_CIDADEIBGE").val(),
                             IMB_CLT_MEI: $("#I-IMB_CLT_MEI").prop("checked") ? 'S' : 'N',
+                            IMB_CLT_DEMONSTRATIVOSOMENTEMANUAL: $("#IMB_CLT_DEMONSTRATIVOSOMENTEMANUAL").prop("checked") ? 'S' : 'N',
                             IMB_CLT_ESTADOCIVIL: $("#I-IMB_CLT_ESTADOCIVIL").val(),
                             IMB_CLT_SENHA: $("#I-IMB_CLT_SENHA").val(),
 
@@ -1622,9 +1686,13 @@
 
                         url = "{{ route('cliente.salvarajax') }}";
 
-                        $.post(url, cliente, function(data) {
+                        console.log( cliente);
+                        $.post(url, cliente, function(data) 
+                        {
+                            debugger;
                             telefonesSalvar($("#I-IMB_CLT_ID").val());
                             alert('Gravado com Sucesso');
+                            
                             window.close();
                         });
 
@@ -1740,7 +1808,6 @@
                         $("#I-IMB_CLT_NOME").val(data.IMB_CLT_NOME);
                         $("#I-IMB_CLT_RESEND").val(data.IMB_CLT_RESEND);
                         $("#I-IMB_CLT_RESENDNUM").val(data.IMB_CLT_RESENDNUM);
-                        $("#I-IMB_CLT_RESENDCOM").val(data.IMB_CLT_RESENDCOM);
                         $("#I-IMB_CLT_RESENDCOM").val(data.IMB_CLT_RESENDCOM);
                         $("#IMB_CLT_EMAIL").val(data.IMB_CLT_EMAIL);
                         $("#cep").val(data.IMB_CLT_RESENDCEP);
@@ -2048,51 +2115,25 @@
                     });
                 }
 
-                function telefonesSalvar(nId) {
-
+                function telefonesSalvar(nId) 
+                {
                     var telefones = [];
 
-                    if ($("#i-telefone1").val() != '') {
-                        // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
-                        var tel = $("#i-telefone1").val();
-                        tel = tel.replace("-", "");
+                    var table = document.getElementById('tbltelefone');
+                    for (var r = 0, n = table.rows.length; r < n; r++)
+                    {
 
-                        var ddd = $("#i-ddd1").val();
-                        var ddi = $("#i-ddi1").val();
-                        telefones.push([ddi, ddd, tel, $("#i-telefone1-tipo").val(), $("#i-telefone-id1").val()])
-                    }
+                        id =  table.rows[r].cells[4].innerHTML;
+                        ddi =  $("#i-ddi"+id).val();
+                        ddd =  $("#i-ddd"+id).val();
+                        numero =  $("#i-numero"+id).val();
+                        tipo =  $("#i-tipotelefone"+id).val();
+                        if( tipo == '' ) tipo='Não Informado';
+                        telefones.push([ddi, ddd, numero, tipo, id])
+                    }      
 
-                    if ($("#i-telefone2").val() != '') {
-                        // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
-                        var tel = $("#i-telefone2").val();
-                        tel = tel.replace("-", "");
-                        var ddd = $("#i-ddd2").val();
-                        var ddi = $("#i-ddi2").val();
-                        telefones.push([ddi, ddd, tel, $("#i-telefone2-tipo").val(), $("#i-telefone-id2").val()])
-                    }
-
-                    if ($("#i-telefone3").val() != '') {
-                        // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
-                        var tel = $("#i-telefone3").val();
-                        tel = tel.replace("-", "");
-                        var ddd = $("#i-ddd3").val();
-                        var ddi = $("#i-ddi3").val();
-                        telefones.push([ddi, ddd, tel, $("#i-telefone3-tipo").val(), $("#i-telefone-id3").val()])
-                    }
-
-                    if ($("#i-telefone4").val() != '') {
-                        // Criar objeto para armazenar os dados (com JSON essa tarefa fica mais simples)
-                        var tel = $("#i-telefone4").val();
-                        tel = tel.replace("-", "");
-                        var ddd = $("#i-ddd4").val();
-                        var ddi = $("#i-ddi4").val();
-                        telefones.push([ddi, ddd, tel, $("#i-telefone4-tipo").val(), $("#i-telefone-id4").val()])
-                    }
-
-                    console.log(telefones);
-
-
-
+                    console.log( telefones );
+                    
                     var dados = {
                         numeros: telefones,
                         IMB_CLT_ID: nId,
@@ -2122,7 +2163,6 @@
                     })
 
                     console.log(telefones);
-
                 }
 
 
@@ -2144,14 +2184,82 @@
 
                 }
 
-                function adicionarTelefone( id,ddd,numero,tipo)
+                function adicionarTelefone( id,ddi, ddd,numero,tipo)
                 {
-                  $("#i-id").val( id );
-                  $("#i-ddd").val( ddd );
-                  $("#i-numero").val( numero );
-                  $("#i-tipo").val( tipo );
+                    $("#i-id").val( id );
+                    $("#i-ddi").val( ddi );
+                    $("#i-ddd").val( ddd );
+                    $("#i-numero").val( numero );
+                    $("#i-tipo").val( tipo );
                   
+                    if( id == 0 )
+                    {
+                        $("#i-id").val('' );
+                        $("#i-ddi").val('55' );
+                        $("#i-ddd").val( '' );
+                        $("#i-numero").val( '' );
+                        $("#i-tipo").val( '' );
+                    }
                   $("#modaltelefones").modal('show');
+                }
+
+                function telefoneIncluir()
+                {
+                    if( $("#i-ddd").val() < 11 && $("#i-ddi").val() ==55 )
+                    {
+                        alert('DDD inválido');
+                        return false;
+                    }
+                    if( $("#i-ddd").val() >99 && $("#i-ddi").val() ==55 )
+                    {
+                        alert('DDD inválido');
+                        return false;
+
+                    }
+                    if( $("#i-numero").val()  == '' )
+                    {
+                        alert('Número de Telefone inválido!');
+                        return false;
+                    }
+
+                    if( $("#i-tipo").val()  == '' )
+                    {
+                        alert('Infome um tipo!');
+                        return false;
+                    }
+
+                    var qtfone =parseInt( $("#i-id-novostelefone").val() );
+                    qtfone = qtfone + 999999;
+                    tipotelefone = $("#i-tipo").val();
+                    if( tipotelefone == '' )
+                        tipotelefone = 'Não Informado';
+
+                    linha=  
+                            '<tr id="trfone'+$("#i-id-novostelefone").val()+'">'+
+                            '   <td width="10%" class="font-14px-blue" ><input class="form-control" id="i-ddi'+qtfone+'" value="'+$("#i-ddi").val()+'"></td>'+
+                            '   <td width="10%" class="font-14px-blue" ><input class="form-control" id="i-ddd'+qtfone+'" value="'+$("#i-ddd").val()+'"></td>'+
+                            '   <td width="30%" class="font-14px-blue" ><input class="form-control" id="i-numero'+qtfone+'" value="'+$("#i-numero").val()+'"></td>'+
+                            '   <td width="40%" class="font-14px-blue" ><input class="form-control" id="i-tipotelefone'+qtfone+'" value="'+tipotelefone+'"></td>'+
+                            '   <td class="escondido" width="5px" class="font-14px-blue">'+qtfone+'</td>'+
+                                '<td  width="10%" class="font-20px-blue" >'+
+                            '           <a title="Apagar o telefone" '+
+                            '               href="javascript:apagarTelefone('+$("#i-id-novostelefone").val()+')><i class="fa fa-trash" aria-hidden="true" style="color:red;"></i></a> '+
+                            '    </td>'+
+                            '   <td width="100px"></td>'+
+                            '</tr>';
+                    $("#tbltelefone").append( linha );
+
+                    telefonesSalvar( $("#I-IMB_CLT_ID").val());
+                    
+                }
+
+                function apagarTelefone(id)
+                {
+                    if( confirm( 'Confirma a exclusão deste telefone para este cliente?') == true )
+                    {
+                        $("#trfone"+id).remove();
+                        alert('Telefone Apagado!');
+                    }
                 }
             </script>
 

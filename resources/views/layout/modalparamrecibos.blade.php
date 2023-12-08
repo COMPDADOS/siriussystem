@@ -50,58 +50,62 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Receber e já realizar o repasse</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_REPASSENORECTO">
                                 </div>
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Visualizar Número da Parcela</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_USARPARCELAS">
                                 </div>
 
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">No repasse aparecer data de previsão de pagamento</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_REPASSEDIACERTO">
                                 </div>
 
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Resumo repasse recibo locatário(2a. via)</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_RESUMOREPNORECTO">
                                 </div>
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Desconto de Pontualidade Destacado</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_RECLDDESCPONT">
                                 </div>
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Endereço do Locador no Recibo de Repasse</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_RECLDENDLD">
                                 </div>
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Não Descatar Taxa Adm. do IPTU</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_NAODESTACARTA_IPTU">
                                 </div>
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">                                    <label class="control-label">Dados Conta Corrente no Recibo de Repasse</label>
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">                                    <label class="control-label">Dados Conta Corrente no Recibo de Repasse</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_CONTAPROPNORECIBO">
                                 </div>
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Enviar email ao gerar o recibo repasse</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_REPASSEEMAIL">
                                 </div>
                                                                 
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Nome do Locador na Via do Locatário</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_RECLTDADOSLOCADOR">
                                 </div>
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Dt  Pagto em Branco na Assinatura Repasse</label>
                                     <input type="checkbox" class="form-control" id="imb_prm_reclddatabranco">
                                 </div>
-                                <div class="col-md-6 div-center dark-soft-plus-dotted-1">
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
                                     <label class="control-label">Código Imóvel Recibos</label>
                                     <input type="checkbox" class="form-control" id="IMB_PRM_CODIGOIMOVELRECIBOS">
                                 </div>
+                                <div class="col-md-4 div-center dark-soft-plus-dotted-1">
+                                    <label class="control-label">Imprimir Recibo Locatário na Baixa Retorno Bancário</label>
+                                    <input type="checkbox" class="form-control" id="IMB_PRM_RECIBOLTRETORNO">
+                                </div>
                                                                                                 
-                                                                
+                                                                                                
                             </div>
 
                         </div>

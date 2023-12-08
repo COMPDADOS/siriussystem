@@ -2,6 +2,17 @@
 @section('scripttop')
 <style>
 
+.rounded-pill-left {
+  border-top-left-radius: 5rem !important;
+  border-bottom-left-radius: 5rem !important;
+  border-color:darkgray;
+}
+.rounded-pill-right {
+  border-top-right-radius: 10rem !important;
+  border-bottom-right-radius: 10rem !important;
+  border-color:darkgray;
+}
+
 input {
   border-style: solid;
   border-width: 2px;
@@ -631,21 +642,21 @@ color: #999999;
                     <div class="col-md-12">
                         <div class="col-md-2 escondido row-top-menor">
                             <div class="form-group">
-                                <label for="js-select-unidade" class="control-label"><b>Unidade</b></label>
+                                <label for="js-select-unidade" class="control-label rounded-pill-left rounded-pill-right"><b>Unidade</b></label>
                                 <select class="form-control" id="js-select-unidade">
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-4 lbl-medidas-outrositens row-top-menor">
                             <label class="control-label">Campo de Busca Genérica por: Referência, Endereço ou Bairro</label>
-                            <input class="form-control" type="text" id="i-pesquisagenerica"
+                            <input class="form-control rounded-pill-left rounded-pill-right" type="text" id="i-pesquisagenerica"
                                     name="pesquisagenerica" value="{{session()->pull('imovelpesquisa')}}"
                                     placeholder="Busca rápida - Referência, bairro ou endereço">
 
                         </div>
                         <div class="col-md-2 row-top-menor">
                             <div class="form-group">
-                                <label for="sel-tipo-locacao" class="control-label"><b>Tipo de Locação</b></label>
+                                <label for="sel-tipo-locacao" class="control-label rounded-pill-left rounded-pill-right"><b>Tipo de Locação</b></label>
                                 <select class="form-control" id="sel-tipo-locacao">
                                     <option value=""></option>
                                     <option value="Residencial">Residencial</option>
@@ -658,21 +669,21 @@ color: #999999;
                         <div class="col-md-2 row-top-menor">
                             <div class="form-group">
                                 <label for="referencia" class="control-label"><b>Referência</b></label>
-                                <input type="text" class="form-control" name="referencia" value="{{session()->pull('imovelpesquisa')}}"
+                                <input type="text" class="form-control rounded-pill-left rounded-pill-right" name="referencia" value="{{session()->pull('imovelpesquisa')}}"
                                     placeholder="Ex.: CA0003" id="i-referencia">
                             </div>
                         </div>
                         <div class="col-md-1 row-top-menor">
                             <div class="form-group">
                                 <label for="id_completus"><b>Cód Interno</b></label>
-                                <input type="text" class="form-control" name="id_completus" id="i-idcompletus">
+                                <input type="text" class="form-control rounded-pill-left rounded-pill-right" name="id_completus" id="i-idcompletus">
                             </div>
                         </div>
                         <div class="col-md-3 row-top-menor">
                             <div class="form-group">
                                 <label class="control-label"><b>Selecione o Tipo</b></label>
                                 <p>
-                                <select id="i-select-tipo" multiple class="form-control escondido" placeholder="Pesquise" >
+                                <select id="i-select-tipo" multiple class="form-control escondido rounded-pill-left rounded-pill-right" placeholder="Pesquise" >
                                     @foreach( $tipos as $tipo)
                                     <option value="{{$tipo->IMB_TIM_ID}}">{{$tipo->IMB_TIM_DESCRICAO}}</option>
                                     @endforeach
@@ -691,7 +702,7 @@ color: #999999;
                         <div class="col-md-2 row-top-menor">
                             <div class="form-group">
                                 <label  class="control-label"><b>Finalidade</b></label>
-                                <select class="form-control" id='i-select-finalidade'>
+                                <select class="form-control rounded-pill-left rounded-pill-right" id='i-select-finalidade'>
                                 </select>
                             </div>
                         </div>
@@ -699,7 +710,7 @@ color: #999999;
                         <div class="col-md-2 row-top-menor">
                             <div class="form-group">
                                 <label class="control-label " for="pre-faixainicial"><b>Faixa de</b></label>
-                                <input type="text" class="form-control input-class valor valores-direita" name="pre-faixainicial"
+                                <input type="text" class="form-control input-class valor valores-direita rounded-pill-left rounded-pill-right" name="pre-faixainicial"
                                 placeholder="De R$" id="i-pre-faixainicial"
                                 onkeypress="return isNumber(event)" onpaste="return false;">
                             </div>
@@ -708,7 +719,7 @@ color: #999999;
                         <div class="col-md-2 row-top-menor">
                             <div class="form-group">
                                 <label class="control-label" for="pre-faixafinal"><b>Até</b></label>
-                                <input type="text" class="form-control input-class   valor   valores-direita" name="pre-faixafinal"
+                                <input type="text" class="form-control input-class   valor   valores-direita rounded-pill-left rounded-pill-right" name="pre-faixafinal"
                                 placeholder="De R$" id="i-pre-faixafinal"
                                 onkeypress="return isNumber(event)" onpaste="return false;">
                             </div>
@@ -717,7 +728,7 @@ color: #999999;
                         <div class="col-md-3 row-top-menor">
                             <div class="form-group">
                                 <label class="control-label" for="endereco"><b>Endereco</b></label>
-                                <input type="text" class="form-control" name="endereco"
+                                <input type="text" class="form-control rounded-pill-left rounded-pill-right" name="endereco"
                                 placeholder="Sugestão: coloque parte do endereço" id="i-endereco">
                             </div>
                         </div>
@@ -725,7 +736,7 @@ color: #999999;
                             <div class="form-group">
                                 <label class="control-label"><b>Selecione o Bairro</b></label>
                                 <p>
-                                <select id="i-select-bairro" multiple class="form-control escondido" placeholder="Pesquise" >
+                                <select id="i-select-bairro" multiple class="form-control escondido rounded-pill-left rounded-pill-right" placeholder="Pesquise" >
                                     @foreach( $bairros as $bairro)
                                     <option value="{{$bairro->CEP_BAI_NOME}}">{{$bairro->CEP_BAI_NOME}}({{$bairro->IMB_IMV_CIDADE}})</option>
                                     @endforeach
@@ -737,17 +748,17 @@ color: #999999;
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                    <div class="col-md-12">
+                    
                         <div class="col-md-2 row-top-menor">
                             <div class="form-group">
                                 <label class="control-label"><b>Condomínio</b></label>
-                                <input type="text" class="form-control"  name="condominio" id="i-nome-condominio">
+                                <input type="text" class="form-control rounded-pill-left rounded-pill-right"  name="condominio" id="i-nome-condominio">
                             </div>
                         </div>
                         <div class="col-md-2 row-top-menor">
                             <div class="form-group">
                                 <label for="cidade"><b>Cidade</b></label>
-                                <input type="text" class="form-control"
+                                <input type="text" class="form-control rounded-pill-left rounded-pill-right"
                                 name="cidade" id="i-cidade" placeholder="Sugestão: parte do nome">
                             </div>
                         </div>
@@ -755,15 +766,16 @@ color: #999999;
                         <div class="col-md-1 row-top-menor">
                             <div class="form-group">
                                 <label class="control-label" for="dormitorio"><b>Dorm.</b></label>
-                                <input type="text" class="form-control" name="dormitorio"
+
+                                <input type="text" class="form-control rounded-pill-left rounded-pill-right" name="dormitorio"
                                     id="i-dormitorio"
                                     onkeypress="return isNumber(event)" onpaste="return false;">
                             </div>
                         </div>
                         <div class="col-md-1 row-top-menor">
                             <div class="form-group">
-                                <label class="control-label" for="suite"><b>Suítes</b></label>
-                                <input type="text" class="form-control"
+                                <label class="control-label " for="suite"><b>Suítes</b></label>
+                                <input type="text" class="form-control rounded-pill-left rounded-pill-right"
                                     id="i-suite" name="suite"
                                     onkeypress="return isNumber(event)" onpaste="return false;">
                             </div>
@@ -772,7 +784,7 @@ color: #999999;
                             <div class="form-group">
                                 <label class="control-label"><b>Status</b></label>
                                 <p>
-                                <select id="i-select-status" multiple class="form-control escondido" placeholder="Pesquise" >
+                                <select id="i-select-status" multiple class="form-control escondido rounded-pill-left rounded-pill-right" placeholder="Pesquise" >
                                     @foreach( $status as $statu)
                                     <option value="{{$statu->VIS_STA_ID}}">{{$statu->VIS_STA_NOME}}</option>
                                     @endforeach
@@ -782,11 +794,13 @@ color: #999999;
                         </div>
 
                         <div class="col-md-1 div-center">
-                            <label class="control-label">Em Destaque</label>
                             <input  type="checkbox" id="i-destaque">
+                            <label class="control-label">Destaque</label>
+
                             <p></p>
-                            <label class="control-label">Em Super Destaque</label>
                             <input  type="checkbox" id="i-superdestaque">
+                            <label class="control-label">Super Destaque</label>
+
                         </div>
 
                         <div class="col-md-1 row-top-menor div-right">
@@ -801,7 +815,7 @@ color: #999999;
                         </div>
 
                     </div>
-                    </div>
+                    
                 </div>
 
                 <div class="portlet box blue" >

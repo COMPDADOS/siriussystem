@@ -12,8 +12,11 @@
                         </div>
                     </div>
                 </div>
-                        <input type="hidden" id="i-idcorctr" name="IMB_CAPCTR_ID-CORCTR">
-                        <input type="hidden" id="i-idcontrato-cor" name="IMB_CTR_ID-CORCTR">
+                        <input type="hidden" id="i-idcorctr" name="IMB_CAPCTR_ID-CORCTR" >
+
+                        @if(isset($idcontratopesquisa))
+                            <input type="hidden" id="i-idcontrato-cor" name="IMB_CTR_ID-CORCTR"value = "{{$idcontratopesquisa}}">
+                        @endif
 
                         <div class="portlet-body form">
                             <div class="form-body" >
@@ -57,6 +60,7 @@ function adicionarCorCtr()
 
 function salvarCorCtrBD( id )
 {
+    debugger;
     $.ajaxSetup(
     {
         headers:
@@ -68,9 +72,7 @@ function salvarCorCtrBD( id )
     corimo =
     {
         IMB_ATD_ID : $("#i-select-corretores-ctr").val(),
-        IMB_CORCTR_PERCENTUAL : realToDola( $("#i-percentual-cor-ctr").val()),
-        IMB_CORCTR_ID : id ,
-        IMB_IMB_ID : $("#IMB_IMB_ID2").val(),
+        IMB_CORCTR_PERCENTUAL : realToDolar( $("#i-percentual-cor-ctr").val()),
         IMB_CTR_ID : id,
     };
 
@@ -86,12 +88,14 @@ function salvarCorCtrBD( id )
             data: corimo,
             success:function( data)
             {
+                $("#modalcorctr").modal('hide');
+                CarregarCorCtr( id )
+                                
             },
             error: function( erro)
             {
-                alert('Erro na gravação do captador do contrato '+
-                table.rows[r].cells[1].innerHTML+' - erro:'+erro);
-
+                alert('Erro na gravação do corretor no contrato');
+                $("#modalcorctr").modal('hide');
             }
         });
 
@@ -103,9 +107,8 @@ function salvarCorCtrBD( id )
 
     function preencherCBCorretoresCtr( nidcorretor )
     {
-        var empresa = $("#I-IMB_IMB_IDMASTER").val();
+        var empresa = "{{Auth::user()->IMB_IMB_ID}}"
         var url = "{{ route('atendente.carga')}}/"+empresa;
-        console.log( url );
         debugger;
 
         $.ajax(
@@ -139,17 +142,26 @@ function salvarCorCtrBD( id )
 
     function adicionarTabCorCtr()
     {
-        var atdid = $("#i-select-corretores-ctr" ).val();
-        linha =
+        debugger;
+        if( $("#i-idcontrato-cor").val() == '' ) 
+        {
+            var atdid = $("#i-select-corretores-ctr" ).val();
+            linha =
             '<tr id="l-cor'+atdid+'">'+
-            '   <td class="div-center">'+atdid+'</td>'+
+            '   <td class="div-center escondido">'+atdid+'</td>'+
             '   <td class="div-center">'+$("#i-select-corretores-ctr option:selected" ).text()+'</td>'+
             '   <td class="div-center">'+$("#i-percentual-cor-ctr").val()+'</td>'+
             '   <td style="text-align:center"> '+
             '<a  class="btn btn-sm btn-danger" href="javascript:apagarLinha( \'l-cor'+atdid+'\')">Apagar</a>'+
             '   </td>'+
             '</tr>';
-        $("#tbcorctr").append( linha );
+            $("#tbcorctr").append( linha );
+        }
+        else
+        {
+            salvarCorCtrBD( $("#i-idcontrato-cor").val() );
+        }
+        
 
     }
 

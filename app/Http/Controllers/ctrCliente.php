@@ -236,6 +236,9 @@
                 return $rData;
             }
 
+                $cep = $request->IMB_CLT_RESENDCEP;
+                $cep = str_replace( $cep,'-','');
+                $cep = trim( $cep);
     //           dd( $request );
                 $cliente = new mdlCliente;
 
@@ -260,7 +263,7 @@
                 $cliente->IMB_CLT_RESEND = $request->input( 'IMB_CLT_RESEND');
                 $cliente->IMB_CLT_RESENDNUM = $request->input( 'IMB_CLT_RESENDNUM');
                 $cliente->IMB_CLT_RESENDCOM = $request->input( 'IMB_CLT_RESENDCOM');
-                $cliente->IMB_CLT_RESENDCEP = $request->input( 'IMB_CLT_RESENDCEP');
+                $cliente->IMB_CLT_RESENDCEP = $cep;
                 $cliente->CEP_BAI_NOMERES = $request->input( 'CEP_BAI_NOMERES');
                 $cliente->CEP_CID_NOMERES = $request->input( 'CEP_CID_NOMERES');
                 $cliente->CEP_UF_SIGLARES = $request->input( 'CEP_UF_SIGLARES');
@@ -357,7 +360,7 @@
          * @param  int  $id
          * @return \Illuminate\Http\Response
          */
-        public function update(Request $request)
+        /*public function update(Request $request)
         {
             function formatarData($data){
                 $rData = implode("-", array_reverse(explode("/", trim($data))));
@@ -426,7 +429,7 @@
             };
             return redirect('/cliente');
         }
-
+*/
         /**
          * Remove the specified resource from storage.
          *
@@ -591,12 +594,18 @@
                 $rData = implode("-", array_reverse(explode("/", trim($data))));
             }
 
+            
 
                //dd( $request->input( 'IMB_CLT_OBSERVACAO') );
             $codigo =  $request->input('IMB_CLT_ID') ;
 
+            $cep = $request->IMB_CLT_RESENDCEP;
+            $cep = str_replace( '-','',$cep);
+            $cep = trim( $cep);
 
 
+
+            Log::info(  'CEP_UF_SIGLARES'.$request->CEP_UF_SIGLARES);
 //            return $request->input( 'IMB_CLT_RESENDCEP');
 
             $cliente = mdlCliente::find($codigo );
@@ -646,10 +655,10 @@
                 $cliente->IMB_CLT_RESEND = $request->input( 'IMB_CLT_RESEND');
                 $cliente->IMB_CLT_RESENDNUM = $request->input( 'IMB_CLT_RESENDNUM');
                 $cliente->IMB_CLT_RESENDCOM = $request->input( 'IMB_CLT_RESENDCOM');
-                $cliente->IMB_CLT_RESENDCEP = $request->input( 'IMB_CLT_RESENDCEP');
+                $cliente->IMB_CLT_RESENDCEP = $cep;
                 $cliente->CEP_BAI_NOMERES = $request->input( 'CEP_BAI_NOMERES');
                 $cliente->CEP_CID_NOMERES = $request->input( 'CEP_CID_NOMERES');
-                $cliente->CEP_UF_SIGLARES = $request->input( 'CEP_UF_SIGLARES');
+                $cliente->CEP_UF_SIGLARES = $request->CEP_UF_SIGLARES;
                 $cliente->IMB_CLT_EMAIL = $request->input( 'IMB_CLT_EMAIL');
                 $cliente->IMB_CLT_COMCOM = $request->input( 'IMB_CLT_COMCOM');
                 $cliente->IMB_CLT_PROFISSAO = $request->input( 'IMB_CLT_PROFISSAO');
@@ -671,6 +680,9 @@
                 $cliente->IMB_CLT_CIDADEIBGE = $request->IMB_CLT_CIDADEIBGE;
                 $cliente->IMB_CLT_MEI = $request->IMB_CLT_MEI;
                 $cliente->IMB_CLT_SENHA = $request->IMB_CLT_SENHA;
+                $cliente->IMB_CLT_DEMONSTRATIVOSOMENTEMANUAL = $request->IMB_CLT_DEMONSTRATIVOSOMENTEMANUAL;
+                
+
                 $cliente->save();
 
 

@@ -528,6 +528,9 @@ class ctrRecebimento extends Controller
 
         //dd( $baseirrf );
 
+        Log::info( '$ctr->IMB_CTR_NUNCARETEIRRF '.$ctr->IMB_CTR_NUNCARETEIRRF );
+        Log::info( '$irrflancado '.$irrflancado );
+        
         if(  $ctr->IMB_CTR_NUNCARETEIRRF <> 'S' and $irrflancado == 0 )
             $this->lancarIRRF( $idcontrato, $idimovel, $datavencimento, $datapagamento,$baseirrf );
 
@@ -539,8 +542,11 @@ class ctrRecebimento extends Controller
     public function lancarIRRF( $idcontrato, $idimovel, $datavencimento, $datapagamento,$baseirrf )
     {
 
-        $irrf=$valorirrf = app('App\Http\Controllers\ctrTabelaIRRF')
+        Log::info( 'base irrf '.$baseirrf);
+        $irrf= app('App\Http\Controllers\ctrTabelaIRRF')
         ->calcularIRRF( $idcontrato, $baseirrf );
+        
+
 
         foreach ($irrf as $irrfcal)
         {

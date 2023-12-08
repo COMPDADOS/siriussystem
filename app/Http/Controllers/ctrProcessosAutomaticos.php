@@ -184,27 +184,39 @@ class ctrProcessosAutomaticos extends Controller
             $logged = 'N';
         }
 
+        Log::info('entrande em processos automaticos ');
 
         $datainicial =$request->datainicial;
         $datafinal = $request->datafinal;
-        $email = $request->email;
+        $voltardados = $request->voltardados;
 
+        Log::info('entrande em processos automaticos ');
+        Log::info("datainicial $datainicial");
+        Log::info("datafinal $datafinal");
+        
         if( $datainicial == '' or $datainicial == null  )
             $datainicial = date('Y/m/d');
         if( $datafinal == '' or $datafinal == null )
             $datafinal = date('Y/m/d');
 
-        $recs = mdlReciboLocador::select( [ 'IMB_CLT_ID'])->distinct( 'IMB_CLT_ID')
+        $recs = mdlReciboLocador::select( [ 'IMB_CLIENTE.IMB_CLT_ID'])->distinct( 'IMB_CLIENTE.IMB_CLT_ID')
+            ->leftJoin( 'IMB_CLIENTE', 'IMB_CLIENTE.IMB_CLT_ID', 'IMB_RECIBOLOCADOR.IMB_CLT_ID')
             ->where( 'IMB_RECIBOLOCADOR.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
             ->where( 'IMB_RECIBOLOCADOR.IMB_RLD_DATAPAGAMENTO','>=',$datainicial )
             ->where( 'IMB_RECIBOLOCADOR.IMB_RLD_DATAPAGAMENTO','<=',$datafinal )
+            ->whereRaw( "COALESCE(IMB_CLT_DEMONSTRATIVOSOMENTEMANUAL,'N') <> 'S' ")
             ->get();
+
+        if( $voltardados =='S' )
+            return response()->json( $recs,200);
 
         foreach( $recs as $rec )
         {
             $idclientepublico = $rec->IMB_CLT_ID;
             $request->IMB_CLT_ID = $rec->IMB_CLT_ID;
             $request->email ='S';
+            $request->origem = 'automatico';
+            Log::info( 'request -> idcliente = '.$request->IMB_CLT_ID);
             try
             {
                 app('App\Http\Controllers\ctrReciboLocador')

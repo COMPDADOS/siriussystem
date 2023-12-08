@@ -76,7 +76,7 @@ class ctrImobiliaria extends Controller
             $param = new mdlParametros;
             $param->IMB_IMB_ID = $imob->IMB_IMB_ID;
 
-            $param2 = new mdlParametro2;
+            $param2 = new mdlParametros2;
             $param2->IMB_IMB_ID = $imob->IMB_IMB_ID;
         }
         else
@@ -116,10 +116,12 @@ class ctrImobiliaria extends Controller
         $param2->IMB_PRM_BAIXAAUTOMTOTAL                 = $request->IMB_PRM_BAIXAAUTOMTOTAL;
         $param2->IMB_PRM_COBIMPRECRETORNO                 = $request->IMB_PRM_COBIMPRECRETORNO;
         $param2->IMB_PRM_DIADMAIS                 = $request->IMB_PRM_DIADMAIS;
-        $param2->IMB_PRM_TOLERANCIABOLETO                 = $request->IMB_PRM_TOLERANCIABOLETO;
+        //$param2->IMB_PRM_TOLERANCIABOLETO                 = $request->IMB_PRM_TOLERANCIABOLETO;
         $param->IMB_PRM_COBMULTANDIASPER                 = $request->IMB_PRM_COBMULTANDIASPER;
         $param->IMB_PRM_COBMULTANDIAS                 = $request->IMB_PRM_COBMULTANDIAS;
         $param->IMB_PRM_MODRECLOCATARIO                 = $request->IMB_PRM_MODRECLOCATARIO;
+        $param->IMB_PRM_COBBANTOLERANCIA                 = $request->IMB_PRM_COBBANTOLERANCIA;
+        
         
         //IMPOSTOS
         $param->IMB_PRM_ISSALIQUOTA                 = $request->IMB_PRM_ISSALIQUOTA;
@@ -190,7 +192,9 @@ class ctrImobiliaria extends Controller
         $param2->IMB_TBE_IDSEGINC                 = $request->IMB_TBE_IDSEGINC;
         $param2->IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA                 = $request->IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA;
         $param2->IMB_PRM_REAJUSTARMESSEGUINTE                 = $request->IMB_PRM_REAJUSTARMESSEGUINTE;
-       
+        $param2->IMB_PRM_RECIBOLTRETORNO                 = $request->IMB_PRM_RECIBOLTRETORNO;
+        $param2->IMB_PRM_RELREPASSEAGRUFORMA                 = $request->IMB_PRM_RELREPASSEAGRUFORMA;
+        
         $param->save();
 
         $param2->save();

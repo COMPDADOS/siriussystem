@@ -25,6 +25,11 @@ td { font-size: 12px; }
     color: blue;
   }
 
+  .td-rigth
+  {
+    text-align:right;
+}
+
 .div-right
 {
     text-align:right;
@@ -80,7 +85,7 @@ div .half-size-line
     line-height: 92%;
 }
 
-td, th
+th
 {
     text-align:center;
 }
@@ -96,14 +101,27 @@ td, th
 @endsection
 @section('content')
 <div class="row">
-  <div>
-  <button class="btn btn-danger pull-right" type="button" id="btn-baixar"
+    <div class="col-md-4">
+      <a class="btn btn-success" href="{{route('cobrancabancaria.retornorelatliquidacoes')}}">Relatório de Liquidações</a>
+      <a class="btn btn-primary" href="{{route('cobrancabancaria.relatorioretonototal')}}">Relatório de Retorno Geral</a>
+    </div>
+    <div class="col-md-2">
+
+    </div>
+    <div class="col-md-2">
+      <label class="control-label">Ordem de Visualização</label>
+      <select id="i-ordem" class="form-control">
+        <option value="D">Data Vencimento</option>
+        <option value="P" selected>Pasta</option>
+        <option value="L">Nome Locatário</option>
+
+      </select>
+
+    </div>
+    <button class="btn btn-danger pull-right" type="button" id="btn-baixar"
           onClick="baixaAutomatica()">Baixa Automática</button>
-  <a class="btn btn-success" href="{{route('cobrancabancaria.retornorelatliquidacoes')}}">Relatório de Liquidações</a>
-  <a class="btn btn-primary" href="{{route('cobrancabancaria.relatorioretonototal')}}">Relatório de Retorno Geral</a>
   </div>
 
-</div>
   <div classs="back-blue">
     <input type="hidden" id="dados" >
 
@@ -151,6 +169,12 @@ $( document ).ready(function()
 {
     $("#sirius-menu").click();
     cargaTmpRetorno();
+
+    $("#i-ordem").change( function()
+    {
+      $('#tbretorno').DataTable().ajax.reload();
+
+    })
 });
 
 function gerarExcel()
@@ -222,6 +246,7 @@ function cargaTmpRetorno ()
         url:"{{route('cobrancabancaria.cargatmpretorno')}}",
         data: function (d)
         {
+          d.ordem = $("#i-ordem").val()
         }
       },
       columns:
@@ -319,10 +344,10 @@ function cargaTmpRetornoold()
                     '<td class="td-center">'+pasta+'</td>' +
                     '<td class="td-center">'+data[nI].nomeocorrencia+'</td>' +
                     '<td class="td-rigth">'+data[nI].nossonumero+' </td>' +
-                    '<td class="td-rigth">'+valorpago+' </td>' +
-                    '<td class="td-rigth">'+valorcobranca+' </td>' +
+                    '<td class="div-right">'+valorpago+' </td>' +
+                    '<td class="div-right">'+valorcobranca+' </td>' +
                     '<td class="td-center">'+datacredito+'</td>' +
-                    '<td class="td-center">'+encargos+'</td>' +
+                    '<td class="div-right">'+encargos+'</td>' +
                     '<td class="td-center">'+data[nI].observacoes+'</td>' +
                     '<td class="td-center">'+data[nI].endereco+'</td>' +
                     '<td class="td-center">'+data[nI].locatario+'</td>' +
@@ -392,8 +417,8 @@ function selecionar( id )
         classe="vermelho";
 
 
-    var formatada = formatarBRSemSimbolo( parseFloat(data));
-    return '<div class="'+classe+'">'+formatada+'</div>';
+    var formatada = data;
+    return '<div class="'+classe+' div-right">'+formatada+'</div>';
 
   }
 

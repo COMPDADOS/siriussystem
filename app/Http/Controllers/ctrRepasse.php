@@ -258,7 +258,7 @@ class ctrRepasse extends Controller
                 
             $IPTUDestaque = $this->destacarIPTUAdministracao( $idcontrato, $datavencimento );
 
-            if( $IPTUDestaque <> 0 )
+            if( $IPTUDestaque <> '' )
             {
                 $IPTUTaxa =$this->calcularTaxaPadraoContrato( $idcontrato, $IPTUDestaque, 'N' );
                 $this->gravarTaxaAdm( $idcontrato, $datavencimento, $datapagamento, $IPTUTaxa,'Taxa Administrativa sobre IPTU');
@@ -649,7 +649,7 @@ class ctrRepasse extends Controller
 
         
 
-//        dd( 'pessoa: '.$imob->IMB_IMB_PESSOA.' - respeitar: '.$par2->imb_prm_ISSRESPEITARUSUARIO
+//        dd( 'pessoa: '.$imob->IMB_IMB_PESSOA.' - respeitar: '.$par2->IMB_PRM_ISSRESPEITARUSUARIO
         //.' - caliss: '.$ctr->IMB_CTR_CALISS);
 
         $cidadeimobiliaria = strtoupper($imob->CEP_CID_NOME);
@@ -670,7 +670,7 @@ class ctrRepasse extends Controller
         if( $imob->IMB_IMB_PESSOA <> 'J' )
             return [];
 
-        if( $par2->imb_prm_ISSRESPEITARUSUARIO == 'S'and $ctr->IMB_CTR_CALISS <> 'S' )
+        if( $par2->IMB_PRM_ISSRESPEITARUSUARIO == 'S'and $ctr->IMB_CTR_CALISS <> 'S' )
             return [];
 
         $idimovel = $ctr->IMB_IMV_ID;
@@ -1698,27 +1698,46 @@ class ctrRepasse extends Controller
     public function distinctBaseGeradaFormaCliente( $forma)
     {
 
-        $dados = mdlTmpPrevisaoRepasse::
+        $par2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID );
+        if( $par2->IMB_PRM_RELREPASSEAGRUFORMA =='S' )
+        {
+            $dados = mdlTmpPrevisaoRepasse::
                 distinct()
                 ->where( 'IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID)
                 ->where( 'IMB_FORPAG_ID','=',$forma );
         
-        $dados =  $dados->orderBy('DATAPREVISAOPAGAMENTO')->orderBy('IMB_CLT_NOMELOCADOR')
-         ->get(['IMB_CLT_NOMELOCADOR', 'IMB_CLT_IDLOCADOR']);
+            $dados =  $dados->orderBy('DATAPREVISAOPAGAMENTO')->orderBy('IMB_CLT_NOMELOCADOR')
+             ->get(['IMB_CLT_NOMELOCADOR', 'IMB_CLT_IDLOCADOR']);
+        }
+        else
+        {
+            $dados = mdlTmpPrevisaoRepasse::
+                distinct()
+                ->where( 'IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID);
+        
+            $dados =  $dados->orderBy('DATAPREVISAOPAGAMENTO')->orderBy('IMB_CLT_NOMELOCADOR')
+            ->get(['IMB_CLT_NOMELOCADOR', 'IMB_CLT_IDLOCADOR']);
 
+        }
+
+        //dd( $dados );
+        
          return  $dados;
 
     }
 
     public function distinctBaseGeradaRepassesClienteForma( $forma, $cliente)
     {
+        $par2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID );
 
         $dados = mdlTmpPrevisaoRepasse::
                 distinct()
                 ->where( 'IMB_ATD_ID','=',Auth::user()->IMB_ATD_ID)
-                ->where( 'IMB_FORPAG_ID','=', $forma)
                 ->where( 'IMB_CLT_IDLOCADOR', '=', $cliente);
+        if( $par2->IMB_PRM_RELREPASSEAGRUFORMA =='S' )
+            $dados = $dados->where( 'IMB_FORPAG_ID','=', $forma);
         
+                
         $dados =  $dados
         ->orderBy('DATAPREVISAOPAGAMENTO')
          ->get(
@@ -1756,7 +1775,11 @@ class ctrRepasse extends Controller
 
     public function relPrevisaoRepasseRelatorio()
     {
-        return view( 'reports.admimoveis.relprevisaopagamentonovo');
+        $par2 = mdlParametros2::find( Auth::user()->IMB_IMB_ID );
+        if( $par2->IMB_PRM_RELREPASSEAGRUFORMA =='S' )
+            return view( 'reports.admimoveis.relprevisaopagamentonovo');
+        else
+            return view( 'reports.admimoveis.relprevisaopagamentonovosemagruparforma');
 
     }
 
@@ -1778,7 +1801,7 @@ class ctrRepasse extends Controller
 
     public function lancar13( $idcontrato, $idimovel, $datavencimento, $datapagamento, $valortaxaadm)
     {
-        $mes = date( 'm',strtotime( $datavencimento) );
+            $mes = date( 'm',strtotime( $datavencimento) );
 
         $imovel = mdlImovel::find( $idimovel);
 

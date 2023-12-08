@@ -16,6 +16,7 @@ use App\mdlCorImo;
 use App\mdlLog;
 use App\mdlHistoricoImovel;
 use App\mdlImoveisNotificacoes;
+use App\mdlPortais;
 
 use DataTables;
 use App\User;
@@ -810,7 +811,13 @@ class ctrImovel extends Controller
     public function carga( $id )
     {
 
-        $imovel = mdlImovel::find($id);
+        $imovel = mdlImovel::select( 
+            [
+                '*',
+                DB::Raw( '( SELECT CEP_BAI_NOME FROM CEP_BAIRRO WHERE CEP_BAIRRO.CEP_BAI_ID = IMB_IMOVEIS.CEP_BAI_ID ) as CEP_BAI_NOME' ),
+                DB::Raw( '( SELECT IMB_CND_NOME FROM IMB_CONDOMINIO WHERE IMB_CONDOMINIO.IMB_CND_ID = IMB_IMOVEIS.IMB_CND_ID ) as IMB_CND_NOME' )
+            ]
+        )->where( 'IMB_IMV_ID','=', $id )->first();
         return $imovel;
         //
     }
@@ -2411,5 +2418,109 @@ return redirect('imovel');
 
  }
 
+ public function portaisdoImovel( $id )
+ {
+    $portais = mdlPortais::select( 
+        [
+            DB::Raw( "CASE ".
+	        "WHEN EXISTS( SELECT IP.IMB_IMV_ID FROM IMB_IMOVELPORTAL IP WHERE IP.IMB_POR_ID = VIS_PORTAIS.IMB_POR_ID ".
+		            "AND IP.IMB_IMV_ID = $id) THEN		'S' ELSE 'N' END NOPORTAL"),
+	        'VIS_PORTAIS.IMB_POR_NOME'
+        ]
+    )->orderBy( 'IMB_POR_NOME')
+    ->get();
+
+    return $portais;
+
+ }
+
+ public function dadosMinimosPorID( $id)
+ {
+
+
+     $imoveis = mdlImovel::select(
+         [
+             'IMB_IMOVEIS.IMB_IMV_ID',
+
+             DB::raw('( SELECT PEGACAPIMO( IMB_IMOVEIS.IMB_IMV_ID ) ) AS IMB_ATD_NOMECAPTADOR'),
+             DB::raw('( SELECT PEGACORIMO( IMB_IMOVEIS.IMB_IMV_ID ) ) AS IMB_ATD_NOMECORRETOR'),
+             DB::raw('( SELECT IMB_IMB_NOME
+                     FROM IMB_IMOBILIARIA WHERE IMB_IMOVEIS.IMB_IMB_ID =
+                     IMB_IMOBILIARIA.IMB_IMB_ID) AS UNIDADE'),
+                 DB::raw('( SELECT IMB_ATD_NOME
+                     FROM IMB_ATENDENTE WHERE IMB_IMOVEIS.IMB_ATD_ID =
+                     IMB_ATENDENTE.IMB_ATD_ID) AS CADASTRADOPOR'),
+                 DB::raw('( SELECT IMB_ATD_NOME
+                     FROM IMB_ATENDENTE WHERE IMB_IMOVEIS.IMB_ATD_IDALTERACAO =
+                     IMB_ATENDENTE.IMB_ATD_ID) AS ALTERADOPOR'),
+
+                 DB::raw('( SELECT IMB_IMB_URLIMOVELSITE
+                     FROM IMB_IMOBILIARIA WHERE IMB_IMOVEIS.IMB_IMB_ID =
+                     IMB_IMOBILIARIA.IMB_IMB_ID) AS URLIMOVELSITE'),
+                     DB::raw('( SELECT COALESCE(IMB_CND_NOME,"")
+                     FROM IMB_CONDOMINIO WHERE IMB_IMOVEIS.IMB_CND_ID =
+                     IMB_CONDOMINIO.IMB_CND_ID) AS CONDOMINIO'),
+                     DB::raw('( SELECT VIS_STA_NOME
+                     FROM VIS_STATUSIMOVEL WHERE IMB_IMOVEIS.VIS_STA_ID =
+                     VIS_STATUSIMOVEL.VIS_STA_ID) AS VIS_STA_NOME'),
+                     DB::raw('( SELECT VIS_STA_SITUACAO
+                     FROM VIS_STATUSIMOVEL WHERE IMB_IMOVEIS.VIS_STA_ID =
+                     VIS_STATUSIMOVEL.VIS_STA_ID) AS VIS_STA_SITUACAO'),
+             DB::raw("CONCAT( COALESCE(IMB_IMV_ENDERECO,''), ' ',
+              COALESCE( IMB_IMV_ENDERECONUMERO,''), ' ',
+              COALESCE( IMB_IMV_ENDERECOCOMPLEMENTO), ' ',
+              COALESCE( IMB_IMV_NUMAPT,'') ) AS ENDERECOCOMPLETO"),
+             'IMB_IMOVEIS.IMB_IMV_REFERE',
+             DB::raw('( SELECT CEP_BAIRRO.CEP_BAI_NOME FROM CEP_BAIRRO WHERE CEP_BAIRRO.CEP_BAI_ID = IMB_IMOVEL.CEP_BAI_ID ) AS CEP_BAI_NOME'),
+             'IMB_IMOVEIS.CEP_BAI_NOME',
+             'IMB_IMOVEIS.IMB_IMV_CIDADE',
+             'IMB_IMOVEIS.IMB_TIM_ID',
+             'IMB_IMOVEIS.IMB_IMV_DORQUA',
+             'IMB_IMOVEIS.IMB_IMV_DORAE',
+             'IMB_IMOVEIS.IMB_IMV_ARECON',
+             'IMB_IMOVEIS.IMB_IMV_AREUTI',
+             'IMB_IMOVEIS.IMB_IMV_MEDTER',
+             'IMB_IMOVEIS.IMB_IMV_PISCIN',
+             'IMB_IMOVEIS.IMB_IMV_CHURRA',
+             'IMB_IMOVEIS.IMB_IMV_SUIQUA',
+             'IMB_IMOVEIS.IMB_IMV_VALLOC',
+             'IMB_IMOVEIS.IMB_IMV_VALVEN',
+             'IMB_IMOVEIS.IMB_IMV_TITULO',
+             'IMB_IMOVEIS.VIS_STA_ID',
+             'IMB_IMOVEIS.IMB_IMV_ENDERECOCEP',
+             'IMB_IMV_DATAATUALIZACAO',
+             'IMB_IMV_DATACADASTRO',
+             'IMB_IMOVEIS.IMB_IMB_ID',
+             'IMB_IMV_OBSWEB',
+             'IMB_IMV_CHABOX',
+             'IMB_IMV_CHAVES',
+             'IMB_CLIENTE.IMB_CLT_NOME',
+             DB::Raw(' CASE
+                     WHEN EXISTS( SELECT IMB_CCH_ID FROM IMB_CONTROLECHAVE
+                     WHERE IMB_CONTROLECHAVE.IMB_IMV_ID = IMB_IMOVEIS.IMB_IMV_ID
+                     AND IMB_CONTROLECHAVE.IMB_CCH_DTHSAIDA IS NOT NULL
+                     AND IMB_CONTROLECHAVE.IMB_CCH_DTHDEVOLUCAOEFETIVA IS NULL ) THEN "Em Visita/Manutenção"
+                     ELSE ""
+                     END AS SITUACAOCHAVE'),
+             DB::Raw('( SELECT IMB_CCH_DTHDEVOLUCAOESPERADA FROM IMB_CONTROLECHAVE
+                     WHERE IMB_CONTROLECHAVE.IMB_IMV_ID = IMB_IMOVEIS.IMB_IMV_ID
+                     AND IMB_CONTROLECHAVE.IMB_CCH_DTHSAIDA IS NOT NULL
+                     AND IMB_CONTROLECHAVE.IMB_CCH_DTHDEVOLUCAOEFETIVA IS NULL ) AS IMB_CCH_DTHDEVOLUCAOESPERADA'),
+
+             DB::raw('( SELECT COALESCE(IMB_IMG_ARQUIVO,"logo.jpg")
+             FROM IMB_IMAGEM WHERE IMB_IMOVEIS.IMB_IMV_ID =
+             IMB_IMAGEM.IMB_IMV_ID ORDER BY IMB_IMG_PRINCIPAL DESC LIMIT 1) AS IMAGEM'),
+             DB::raw('( SELECT IMB_TIM_DESCRICAO FROM IMB_TIPOIMOVEL
+             WHERE IMB_IMOVEIS.IMB_TIM_ID =
+             IMB_TIPOIMOVEL.IMB_TIM_ID) AS IMB_TIM_DESCRICAO')
+
+         ])
+         ->where( 'IMB_IMOVEIS.IMB_IMV_ID','=', $id)
+         ->leftJoin('IMB_CLIENTE', 'IMB_CLIENTE.IMB_CLT_ID', 'IMB_IMOVEIS.IMB_CLT_ID')
+         ->first();
+
+      return $imoveis;
+
+ }
 
 }

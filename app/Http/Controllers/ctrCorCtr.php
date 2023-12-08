@@ -15,6 +15,7 @@ class ctrCorCtr extends Controller
     {
         $capimo = mdlCorCtr::select(
             [
+            	'IMB_CORCTR.IMB_CORCTR_ID',
             	'IMB_CORCTR.IMB_ATD_ID',
                 'IMB_CORIMO_PERCENTUAL',
             	'IMB_CTR_ID',
@@ -50,16 +51,13 @@ class ctrCorCtr extends Controller
         if( $atd <> '' )
         {
 
-            if( $request->input( 'IMB_CORCTR_ID') == '' )
-                $capctr = new mdlCorCtr();
-            else
-                $capctr = mdlCorCtr::find( $request->input( 'IMB_CORCTR_ID') );
+            $capctr = new mdlCorCtr();
 
             //$capimo = new mdlCapImo();
             $capctr->IMB_IMB_ID = Auth::user()->IMB_IMB_ID;
-            $capctr->IMB_CTR_ID = $request->input( 'IMB_CTR_ID');
+            $capctr->IMB_CTR_ID = $request->IMB_CTR_ID;
             $capctr->IMB_ATD_ID = $request->IMB_ATD_ID;
-            $capctr->IMB_CORCTR_PERCENTUAL = $request->input( 'IMB_CORCTR_PERCENTUAL');
+            $capctr->IMB_CORIMO_PERCENTUAL = $request->input( 'IMB_CORCTR_PERCENTUAL');
             $capctr->save();
         }
         //return dd( $capimo );

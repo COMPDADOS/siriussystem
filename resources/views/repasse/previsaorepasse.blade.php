@@ -284,7 +284,7 @@ function previsaoRecebidos()
 
     titregra = 'Recebidos e Ainda Não Repassados';
        
-
+    $("#preloader").show();
     var dados =
     {
         inicio  :$("#i-inicio").val(),
@@ -315,6 +315,12 @@ function previsaoRecebidos()
             error   : function( data )
             {
                 alert( 'Nenhum registro encontrado para processamento' );
+                $("#preloader").hide();
+            },
+            complete:function()
+            {
+                $("#preloader").hide();
+
             }
         }
     )
@@ -329,6 +335,8 @@ function previsaoGarantidos()
 
     titregra = 'Somente Contratos Garantidos'
        
+    debugger;
+    $("#preloader").show();
 
     var dados =
     {
@@ -358,6 +366,13 @@ function previsaoGarantidos()
             error   : function( data )
             {
                 alert( 'Nenhum registro encontrado para processamento' );
+                $("#preloader").hide();
+
+            },
+            complete:function()
+            {
+                $("#preloader").hide();
+
             }
         }
     )
@@ -372,6 +387,7 @@ function previsaoTodos()
 
     titregra = 'Todos os Contratos Ativos'
        
+    $("#preloader").show();
 
     var dados =
     {
@@ -400,6 +416,13 @@ function previsaoTodos()
             error   : function( data )
             {
                 alert( 'Nenhum registro encontrado para processamento' );
+                $("#preloader").hide();
+
+            },
+            complete:function()
+            {
+                $("#preloader").hide();
+
             }
         }
     )
@@ -411,6 +434,7 @@ function previsaoTodos()
 function cargaLocadores()
 {
 
+    $("#preloader").show();
     $.ajax(
         {
             url : "{{ route('locadores.carga')}}",
@@ -432,6 +456,8 @@ function cargaLocadores()
                 }
             }
         });
+        $("#preloader").hide();
+
 }
 
 

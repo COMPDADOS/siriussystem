@@ -117,7 +117,7 @@ class ctrIntegraNota extends Controller
         if( $cli->IMB_CLT_PESSOA == 'J' )
         { 
             $clicnpj = $cli->IMB_CLT_CPF;
-            $temretencao = true;
+            
             if( $valorretencao = 0 ) 
               $aliquota = 0;
         }

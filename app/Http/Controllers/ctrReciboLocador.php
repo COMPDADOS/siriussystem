@@ -100,7 +100,7 @@ class ctrReciboLocador extends Controller
                 $lcx->FIN_LCX_CHEQUE         = 0;
             else
                 $lcx->FIN_LCX_CHEQUE         = $dados[0]['FIN_LCX_CHEQUE'];            
-            $lcx->imb_imb_id2                       = Auth::user()->IMB_IMB_ID;
+            $lcx->imb_imb_id2                       = $idimb2;
             $lcx->FIN_LCX_CONCILIADO                = 'N';
             $lcx->save();
 
@@ -142,7 +142,7 @@ class ctrReciboLocador extends Controller
                 $recibo->IMB_RLD_NUMERO         = $numerorecibo;
                 $recibo->IMB_RLD_DATAPAGAMENTO  = formatarData($d['IMB_RLD_DATAPAGAMENTO']);
                 $recibo->IMB_IMB_ID             = Auth::user()->IMB_IMB_ID;
-                $recibo->IMB_IMB_ID2            = Auth::user()->IMB_IMB_ID;
+                $recibo->IMB_IMB_ID2            = $idimb2;
                 $recibo->IMB_RLD_DATAVENCIMENTO = formatarData($d['IMB_RLD_DATAVENCIMENTO']);
                 $recibo->IMB_RLD_LOCATARIOCREDEB= $d['IMB_RLD_LOCATARIOCREDEB'];
                 $recibo->IMB_RLD_LOCADORCREDEB  = $d['IMB_RLD_LOCADORCREDEB'];
@@ -374,6 +374,7 @@ class ctrReciboLocador extends Controller
             'IMB_RLD_DATAVENCIMENTO',
             'IMB_RLD_DTHINATIVO',
             'IMB_CLT_NOME',
+            DB::Raw( '( select REPASSADOTOTALPROCESSO( IMB_PRM_NUMEROPROCESSO ) ) as TOTALPROCESSO'),
             DB::raw( ' (select COALESCE(sum( IMB_RLD_VALOR), 0) from IMB_RECIBOLOCADOR rd
             where rd.IMB_RLD_NUMERO = IMB_RECIBOLOCADOR.IMB_RLD_NUMERO
             and rd.IMB_RLD_LOCADORCREDEB = "C" ) -
@@ -388,6 +389,7 @@ class ctrReciboLocador extends Controller
             ->where( 'IMB_RLD_LOCADORCREDEB','<>','N')
             ->orderBy( 'IMB_RLD_DATAVENCIMENTO','desc')
             ->orderBy( 'IMB_RLD_NUMERO','ASC')
+            //dd( $header->toSql());
             ->get();
 
 
@@ -402,6 +404,9 @@ class ctrReciboLocador extends Controller
                 $recibo = $reg->IMB_RLD_NUMERO;
 
             }
+            
+
+
 
 
 
@@ -480,9 +485,9 @@ class ctrReciboLocador extends Controller
                 'IMB_CTR_DATALOCACAO',
                 'IMB_CTR_DATAREAJUSTE',
                 'IMB_IMB_NOME',
-                'CEP_BAI_NOME',
                 'CEP_UF_SIGLA',
                 'CEP_CID_NOME',
+                DB::raw( '( select CEP_BAI_NOME FROM CEP_BAIRRO WHERE CEP_BAIRRO.CEP_BAI_ID = IMB_IMOVEIS.CEP_BAI_ID ) AS CEP_BAI_NOME'),
                 'IMB_IMB_CRECI',
                 'IMB_IMB_URL',
                 'IMB_CTR_REFERENCIA',
@@ -492,6 +497,7 @@ class ctrReciboLocador extends Controller
                 ])
             ->leftJoin('IMB_TABELAEVENTOS','IMB_TABELAEVENTOS.IMB_TBE_ID','IMB_RECIBOLOCADOR.IMB_TBE_ID')
             ->leftJoin('IMB_CONTRATO','IMB_CONTRATO.IMB_CTR_ID','IMB_RECIBOLOCADOR.IMB_CTR_ID')
+            ->leftJoin('IMB_IMOVEIS','IMB_IMOVEIS.IMB_IMV_ID','IMB_CONTRATO.IMB_IMV_ID')
             ->leftJoin('IMB_IMOBILIARIA','IMB_IMOBILIARIA.IMB_IMB_ID','IMB_RECIBOLOCADOR.IMB_IMB_ID')
             ->where( 'IMB_RECIBOLOCADOR.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
             ->where( 'IMB_TABELAEVENTOS.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
@@ -709,6 +715,18 @@ class ctrReciboLocador extends Controller
     public function estornar( Request $request )
     {
         $numero = $request->IMB_RLD_NUMERO;
+
+        $cx = mdlLanctoCaixa::where('FIN_LCX_ORIGEM','=','RD')
+                            ->where( 'FIN_LCX_RECIBO','=', $numero )->first();
+        if( $cx <> '' )
+        {
+            if( $cx->FIN_LCX_CONCILIADO == 'S')
+            {
+                return response()->json('Permissão Negada! Já tem um lancamento no caixa como conciliado!',404);
+            }
+        }
+
+
         $processo = mdlReciboLocador::where('IMB_RLD_NUMERO','=', $numero )->first();
 //        //Log::info( 'processo: '.$processo->IMB_PRM_NUMEROPROCESSO );
         if( $processo->IMB_PRM_NUMEROPROCESSO <> '' )
@@ -1066,6 +1084,7 @@ class ctrReciboLocador extends Controller
 
             ]
         )->where( 'IMB_RLD_NUMERO','=', $recibo)
+        ->where( 'IMB_RLD_LOCADORCREDEB','<>','N' )
         ->leftJoin( 'IMB_TABELAEVENTOS','IMB_TABELAEVENTOS.IMB_TBE_ID', 'IMB_RECIBOLOCADOR.IMB_TBE_ID')
         ->get();
 
@@ -1303,6 +1322,12 @@ class ctrReciboLocador extends Controller
             $email = $request->email;
             $idimovel = $request->IMB_IMV_ID;
             $pasta = $request->IMB_CTR_REFERENCIA;
+            $origem = $request->origem;
+            $imprimir = 'N';
+            if( $origem = 'automatico')
+                $imprimir = 'S';
+
+            Log::info('recebendo no dem,onstrarivonew idcliente '.$idcliente );
 
             $retornajson =$request->retornajson;
     
@@ -1316,10 +1341,12 @@ class ctrReciboLocador extends Controller
                 'IMB_RLD_NUMERO'
             ])
             ->where( 'IMB_RECIBOLOCADOR.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
-            ->where( 'IMB_RECIBOLOCADOR.IMB_CLT_ID','=',$idcliente )
             ->whereNull( 'IMB_RLD_DTHINATIVO')
             ->where( 'IMB_RECIBOLOCADOR.IMB_RLD_DATAPAGAMENTO','>=',$datainicial )
             ->where( 'IMB_RECIBOLOCADOR.IMB_RLD_DATAPAGAMENTO','<=',$datafinal );
+
+            if( $idcliente <> '' )
+                $recs  = $recs ->where( 'IMB_RECIBOLOCADOR.IMB_CLT_ID','=',$idcliente );
 
             if( $pasta <> '' )
             {
@@ -1327,12 +1354,7 @@ class ctrReciboLocador extends Controller
                 ->where( 'IMB_CTR_REFERENCIA','=',$pasta );
             }
             if( $idimovel <> '' )
-            $recs = $recs->where( 'IMB_RECIBOLOCADOR.IMB_IMV_ID','=',$idimovel );
-
-
-
-            if( $idimovel <> '' )
-                $recs = $recs->where( 'IMB_IMV_ID','=', $idimovel );
+                $recs = $recs->where( 'IMB_RECIBOLOCADOR.IMB_IMV_ID','=',$idimovel );
 
             $recs = $recs->distinct('IMB_RLD_NUMERO');
             $recs = $recs->orderBy( 'IMB_RLD_NUMERO','ASC')
@@ -1362,6 +1384,7 @@ class ctrReciboLocador extends Controller
                 
                     $cliente = mdlCliente::find( $idcliente );
                     $enderecoemail = $cliente->IMB_CLT_EMAIL;
+                    
                         
                     $enderecoemail = $enderecoemail.';'.env('APP_MAILDEMOCOPIA');
 
@@ -1385,7 +1408,6 @@ class ctrReciboLocador extends Controller
                     //return $recs;                
                     $nomearquivopdf='extratoderecebimento';
 
-                    $imprimir = 'N';
                     $pasta="demonstrativos";
                     $html = view( 'reports.locador.demonstrativonovaversao', compact( 'recs', 'idcliente', 'datainicial', 'datafinal','nomecliente','imprimir'));
                     $contents = (string) $html;

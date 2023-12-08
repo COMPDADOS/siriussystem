@@ -101,10 +101,26 @@
     <div id="tab-imovel">
       <div class="row">
           <div class="col-md-2">
+            <label class="control-label">Unidade</label>
+            @php
+              $imobs = app('App\Http\Controllers\ctrImobiliaria')->carga(1);
+            @endphp
+
+
+            <select class="form-control" id="IMB_IMB_ID2">
+              @foreach( $imobs as $imob)
+                <option value="{{$imob->IMB_IMB_ID}}">{{$imob->IMB_IMB_NOME}}</option>
+              @endforeach
+
+
+            </select>
+
+          </div>
+          <div class="col-md-1">
             <label class="label-control">Código</label>
             <input class="form-control" type="text" id="IMB_IMV_ID" readonly>
           </div>
-          <div class="col-md-2">
+          <div class="col-md-1">
             <label class="label-control">Refer.</label>
             <input class="form-control" type="text" id="IMB_IMV_REFERE" readonly>
           </div>
@@ -1510,7 +1526,6 @@
           nValorAluguel = nValorAluguel.toLocaleString('pt-BR');
           $("#IMB_CTR_VALORALUGUEL").val( nValorAluguel );
           console.log( 'valoraluguel: '+nValorAluguel );
-          buscarCondominio( data.IMB_CND_ID );
 
           $("#IMB_IMV_ID").val( data.IMB_IMV_ID );
           $("#IMB_CLT_ID").val( data.IMB_CLT_ID );
@@ -1537,7 +1552,10 @@
           $("#IMB_IMV_ALUGUELAGREGAR").val( dolarToReal( data.IMB_IMV_ALUGUELAGREGAR ));
           $("#IMB_IMV_AGREGADOLDCREDEB").val(  data.IMB_IMV_AGREGADOLDCREDEB );
           $("#IMB_IMV_AGREGADOLTCREDEB").val(  data.IMB_IMV_AGREGADOLTCREDEB );
-
+          $("#IMB_CND_NOME").val(  data.IMB_CND_NOME );
+          $("#CEP_BAI_NOME").val(  data.CEP_BAI_NOME );
+          
+          
         }
 
       });
@@ -1760,7 +1778,7 @@
                 $("#IMB_IRJ_ID").empty();
 
                 linha =  '<option value="-1">Índice de Reajuste</option>';
-                $("#js-select-unidade").append( linha );
+                $("#IMB_IRJ_ID").append( linha );
                 for( nI=0;nI < data.length;nI++)
                 {
                     linha =
@@ -1888,13 +1906,49 @@
           if( nParcelas == 0 )
           {
 
+
+            var difdias = realToDolar( $("#IMB_CTR_DIASVALOR").val() );      
+            if( difdias != 0 )
+            {
+              var cdld = 'Crédito';
+              var cdlt = 'Débito';
+              if( difdias < 0 )
+              {
+                var cdld = 'Débito';
+                var cdlt = 'Crédito';
+                difdias = parseFloat( difdias );
+                difdias = difdias * -1;
+              }
+              var datasort = moment( $("#IMB_CTR_PRIMEIROVENCIMENTO").val()).format('YYYYMMDD');
+              linha =
+                  '<tr>'+
+                  '<td style="display: none">'+datasort+'</td>' +
+                  '<td style="text-align:center valign="center">24</td>' +
+                  '<td style="text-align:center valign="center">Diferença Dias</td>' +
+                  '<td style="text-align:center valign="center">'+cdld+'</td>' +
+                  '<td style="text-align:center valign="center">'+cdlt+'</td>' +
+                  '<td style="text-align:center valign="center">'+moment(datainicial).format('DD/MM/YYYY')+'</td>' +
+                  '<td style="text-align:center valign="center">'+formatarBRSemSimbolo( difdias )+'</td>' +
+                  '<td style="text-align:center valign="center"></td>'+
+                  '<td style="display: none"></td>'+
+                  '<td style="display: none">'+numpar+'</td>'+
+                  '<td style="text-align:center valign="center">'+columnreajustar+'</td>'+
+                  '<td style="display: none"></td>';
+
+                linha = linha +
+                                '</tr>';
+
+                $("#tblparcelas").append( linha );
+            }
+
             dPerInicial = $("#IMB_CTR_INICIO").val();
             dPerFinal = adicionarMes( $("#IMB_CTR_DIAVENCIMENTO").val(),
                         moment( dPerInicial).format('MM-DD-YYYY') ,1 );
             dPerFinal = dPerFinal -1;
             descricao = 'Periodo entre '+moment( dPerInicial ).format('DD/MM/YYYY')+' a '+
             moment(dPerFinal).format('DD/MM/YYYY') ;
-            valordoaluguel = $("#IMB_CTR_VALORPRIMVEN").val();
+//            valordoaluguel = $("#IMB_CTR_VALORPRIMVEN").val();
+            valordoaluguel = $("#IMB_CTR_VALORALUGUEL").val();
 
           }
           else
@@ -2576,7 +2630,7 @@
               IMB_CTR_IPTUINCLUSO : $("#IMB_CTR_IPTUINCLUSO").prop( "checked" )   ? 'S' : 'N',
               IMB_ATD_ID : $("#I-IMB_ATD_ID").val(),
               IMB_CTR_FINALIDADEDESCRICAO : $("#IMB_CTR_FINALIDADEDESCRICAO").val(),
-              IMB_IMB_ID2 : $("#I-IMB_IMB_IDMASTER").val(),
+              IMB_IMB_ID2 : $("#IMB_IMB_ID2").val(),
               IMB_CTR_REFERENCIA : sequencia,
               IMB_CTR_JUROSDIARIO : realToDolar($("#IMB_CTR_JUROSDIARIO").val()),
               IMB_CTR_PERMANDIARIA : realToDolar($("#IMB_CTR_PERMANDIARIA").val()),
@@ -2737,7 +2791,7 @@
           IMB_LCF_INCMUL            : '',
           IMB_LCF_INCJUROS          : '',
           IMB_LCF_INCCORRECAO       : '',
-          IMB_LCF_INCISS            : 'S',
+          IMB_LCF_INCISS            : '',
           IMB_LCF_FIXO              : 'N',
           IMB_LCF_GARANTIDO         : 'X',
           IMB_LCF_COBRARTAXADMMES    : table.rows[r].cells[8].innerHTML,

@@ -4,6 +4,7 @@
 <link href="{{asset('/global/plugins/select2/css/select2-bootstrap.min.css')}}" rel="stylesheet" type="text/css" />
 
 <style>
+
 select[readonly].select2 + .select2-container {
   pointer-events: none;
   touch-action: none;
@@ -483,7 +484,13 @@ td
                             <button class="btn btn-danger pull-right btn-md btn-outline " type="button" id="btn-limpar"
                                     onClick="abrirModalSenha()">Alterar Senha
                                 </button>
-                                <button class="btn btn-warning pull-right btn-md btn-outline " type="button" 
+                                @php
+                                    $acessopermissoes = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'PermissoesAcesso', 'Permissões de Acesso aos Usuarios', 'ADM', 'Usuarios','N', 'X', 'Botão');
+                                    if( Auth::user()->IMB_ATD_ID == 1 )
+                                      $acessopermissoes='normal';
+                                @endphp
+
+                                <button class="btn btn-warning pull-right btn-md btn-outline {{$acessopermissoes}}" type="button" 
                                     onClick="permissoesUsuario( {{$id}})">Permissões
                                 </button>
                                 <button class="btn btn-primary pull-right btn-md btn-outline " type="button" 

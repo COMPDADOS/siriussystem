@@ -52,8 +52,11 @@
         }
 
         if( $("#i-tipo-alteracao-data").val() == 'recibolocador' )
-        {
             var url="{{route('recibolocador.alterardatapag')}}";
+
+        if( $("#i-tipo-alteracao-data").val() == 'recibolocatario' )
+            var url="{{route('recibolocatario.alterardatapag')}}";
+
             var dados = 
                 {   
                     novadata : $("#i-alteracao-data").val(),
@@ -84,7 +87,6 @@
                     }
                 }
             )
-        }
     }
 
 </script>

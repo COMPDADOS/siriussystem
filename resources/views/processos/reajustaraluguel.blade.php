@@ -168,6 +168,8 @@ $("#i-ano").val( moment().format('YYYY'));
 
     var table = $('#tblcontratos').DataTable(
     {
+        "pageLength": 1000,
+
         dom: 'Bfrtip',
         buttons: [
             'print',

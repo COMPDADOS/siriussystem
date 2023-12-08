@@ -140,6 +140,40 @@
     </div>
 </div>
 
+<div class="modal fade " id="modalerronota" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content ">
+            <div class="modal-body">
+                <div class="portlet box blue">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-gift"></i>Erro nota fiscal
+                        </div>
+                    </div>
+                    <div class="portlet-body form">
+                        <div class="row">
+                            <div class="col-md-12">
+                                    <textarea  class="form-control" id="i-erros" cols="30" rows="10"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">sair</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @endsection
 
@@ -276,6 +310,7 @@ $(document).ready(function()
             }
 
 
+            $("#preloader").show();
             gerarNFS( data.IMB_RLD_NUMERO );
             table.draw();
         });
@@ -371,6 +406,7 @@ $(document).ready(function()
 
         var dados = { recibo : recibo };
 
+        $("#preloader").show();
         $.ajaxSetup({
         headers:    
             {
@@ -387,14 +423,23 @@ $(document).ready(function()
             async:false,
             success: function( data )
             {
+                $("#preloader").hide();
                 alert("Nota Gerada!");
+                
                 redrawTable();
             },
             error:function(data)
             {
-                console.log( data.responseText );
-                
-                alert('Verifique se apareceu o numero da nota!');
+                $("#i-erros").html(data.responseText );
+                $("#preloader").hide();
+                if( confirm('Houve erro na geração. Deseja ver o erro?' ) == true )
+                    $("#modalerronota").modal('show');
+
+            },
+            complete:function()
+            {
+                $("#preloader").hide();
+
             }
         });
 

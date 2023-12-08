@@ -8,7 +8,50 @@
 }
 */
 
+/* Rounded pill classes for horizontal sides */
+.rounded-pill-left {
+  border-top-left-radius: 5rem !important;
+  border-bottom-left-radius: 5rem !important;
+  border-color:darkgray;
+}
+.rounded-pill-right {
+  border-top-right-radius: 10rem !important;
+  border-bottom-right-radius: 10rem !important;
+  border-color:darkgray;
+}
 
+/* Another classes to use */
+.rounded-t-l-0 {
+  border-top-left-radius: 0 !important;
+}
+.rounded-t-r-0 {
+  border-top-right-radius: 0 !important;
+}
+.rounded-b-l-0 {
+  border-bottom-left-radius: 0 !important;
+}
+.rounded-b-r-0 {
+  border-bottom-right-radius: 0 !important;
+}
+.rounded-x-l-0 {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+.rounded-x-r-0 {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+label {
+  margin-bottom: 0px;
+}
+
+.form-control {
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+
+  border-radius: 50px;
+}
 .for{
 	position: absolute;
 	right: 0px;
@@ -274,10 +317,6 @@ hr {
     height: 2px;
 }
 
-div .half-size-line
-{
-    line-height: 92%;
-}
 
 .atrasado
 {
@@ -360,6 +399,7 @@ h4-center-17 {
         @php  
             $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'Contratos', 'Contratos', 'ADM', 'Contratos','S', 'I', 'Botão');
             $param2 = app( 'App\Http\Controllers\ctrRotinas')->parametros2( Auth::user()->IMB_IMB_ID);
+            $acessorelcontrato = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'RelatórioGeralContratos', 'Relatório Geral Contratos Aluguéres', 'ADM', 'Contratos','S', 'X', 'Botão');
         @endphp
         <div class="{{$acesso}}">
             <form action="{{route( 'imovel.index' )}}" method="get">
@@ -384,41 +424,41 @@ h4-center-17 {
                     <div class="col-md-3 row-top-margin">
                         <div class="form-group">
                             <label for="js-select-unidade" >Unidade</label>
-                            <select class="form-control" id="js-select-unidade">
+                            <select class="form-control border rounded-pill-left rounded-pill-right " id="js-select-unidade">
                             </select>
                         </div>
                     </div>
                     <div class="col-md-1 row-top-margin">
                         <div class="form-group">
                             <label for="referencia" >Pasta</label>
-                            <input type="text" class="form-control" name="referencia"
+                            <input type="text" class="form-control  border rounded-pill-left rounded-pill-right " name="referencia"
                             id="i-referencia">
                         </div>
                     </div>
                     <div class="col-md-1 row-top-margin">
                         <div class="form-group">
                             <label for="id_completus">Código Imóvel</label>
-                            <input type="text" class="form-control" name="id_completus" id="i-idcompletus">
+                            <input type="text" class="form-control border rounded-pill-left rounded-pill-right " name="id_completus" id="i-idcompletus">
                         </div>
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-1 row-top-margin">
                         <div class="form-group">
                             <label for="id_completus">Dia Vencto.</label>
-                            <input type="number" class="form-control"  id="i-diavencimento" max="31" min="1" value="">
+                            <input type="number" class="form-control border rounded-pill-left rounded-pill-right "  id="i-diavencimento" max="31" min="1" value="">
                         </div>
                     </div>
 
                     <div class="col-md-5 row-top-margin">
                         <div class="form-group">
                             <label  for="endereco">Endereco</label>
-                            <input type="text" class="form-control" name="endereco"
+                            <input type="text" class="form-control border rounded-pill-left rounded-pill-right " name="endereco"
                             placeholder="Sugestão: coloque parte do endereço" id="i-endereco">
                         </div>
                     </div>
                     <div class="col-md-1 div-center row-top-margin">
                         <div class="form-group div-center" >
                             <label >S/ Seguro Incêndio
-                            <input title="Sem seguro lançado para o próximo vencimento" class="form-control" type="checkbox" id="i-semseguro">
+                            <input title="Sem seguro lançado para o próximo vencimento" class="form-control border rounded-pill-left rounded-pill-right " type="checkbox" id="i-semseguro">
                                 </label>
                         </div>
                     </div>
@@ -430,7 +470,7 @@ h4-center-17 {
                     <div class="col-md-3 row-top-margin">
                         <div class="form-group">
                             <label  for="condominio">Condomínio</label>
-                            <input type="text" class="form-control" name="condominio" id="i-condominio"
+                            <input type="text" class="form-control border rounded-pill-left rounded-pill-right " name="condominio" id="i-condominio"
                             placeholder="Sugestão:  parte do nome">
                         </div>
                     </div>
@@ -438,7 +478,7 @@ h4-center-17 {
                     <div class="col-md-3 row-top-margin">
                         <div class="form-group">
                             <label for="cidade">Cidade</label>
-                            <input type="text" class="form-control"
+                            <input type="text" class="form-control border rounded-pill-left rounded-pill-right "
                             name="cidade" id="i-cidade" placeholder="Sugestão: parte do nome">
                         </div>
                     </div>
@@ -446,7 +486,7 @@ h4-center-17 {
                     <div class="col-md-3 row-top-margin">
                         <div class="form-group">
                             <label for="bairro">Bairro</label>
-                            <input type="text" class="form-control" name="bairro"
+                            <input type="text" class="form-control border rounded-pill-left rounded-pill-right " name="bairro"
                             id="i-bairro" placeholder="Sugestão: parte do nome">
                         </div>
                     </div>
@@ -455,7 +495,7 @@ h4-center-17 {
                         <div class="form-group">
                             <label for="i-select-situacao">Situação</label>
                                 <input type="hidden" name="situacao" id="i-situacao">
-                                <select class="form-control" id="i-select-situacao">
+                                <select class="form-control border rounded-pill-left rounded-pill-right " id="i-select-situacao">
                                     <option value="T" >Todos</option>
                                     <option value="A" selected >Ativos</option>
                                     <option value="E" >Encerrados</option>
@@ -469,7 +509,7 @@ h4-center-17 {
                     <div class="col-md-3 row-top-margin">
                         <div class="form-group">
                             <label for="proprietario">Proprietário</label>
-                            <input type="text" class="form-control"
+                            <input type="text" class="form-control border rounded-pill-left rounded-pill-right "
                             name="proprietario" id="i-proprietario"
                             placeholder="Sugestão: parte do nome proprietário">
                         </div>
@@ -477,7 +517,7 @@ h4-center-17 {
                     <div class="col-md-3 row-top-margin">
                         <div class="form-group">
                             <label for="locatario">Locatário</label>
-                            <input type="text" class="form-control"
+                            <input type="text" class="form-control border rounded-pill-left rounded-pill-right "
                             name="locatario" id="i-locatario"
                             placeholder="Sugestão: parte do nome locatário">
                         </div>
@@ -485,7 +525,7 @@ h4-center-17 {
                     <div class="col-md-2 row-top-margin">
                         <div class="form-group">
                             <label for="fiador">Fiador</label>
-                            <input type="text" class="form-control"
+                            <input type="text" class="form-control border rounded-pill-left rounded-pill-right "
                             name="fiador" id="i-fiador"
 
                             placeholder="Sugestão: parte do nome fiador">
@@ -494,15 +534,15 @@ h4-center-17 {
                     <div class="col-md-1 div-center row-top-margin">
                         <div class="form-group div-center" >
                             <label >Somente Jurídico
-                            <input class="form-control" type="checkbox" id="IMB_CTR_ADVOGADO"
-                                name="IMB_CTR_ADVOGADO" >
+                            <input class="form-control border rounded-pill-left rounded-pill-right " type="checkbox" id="IMB_CTR_ADVOGADO"
+                                name="IMB_CTR_ADVOGADO " >
                                 </label>
                         </div>
                     </div>
                     <div class="col-md-1 div-center row-top-margin">
                         <div class="form-group div-center" >
                             <label >Exceto Jurídico
-                            <input class="form-control" type="checkbox" id="IMB_CTR_ADVOGADOEXCETO"
+                            <input class="form-control border rounded-pill-left rounded-pill-right " type="checkbox" id="IMB_CTR_ADVOGADOEXCETO"
                                 name="IMB_CTR_ADVOGADOEXCETO" >
                                 </label>
                         </div>
@@ -514,7 +554,7 @@ h4-center-17 {
                         </div>
                     </div>
                     <div class="col-md-1 div-center row-top-margin">
-                        <div class="form-actions noborder">
+                        <div class="form-actions noborder {{$acessorelcontrato}}">
                             <a class="btn btn-seconday" href="javascript:imprimirVisao();"><i class="fa fa-print fa-2x" aria-hidden="true"></i></a>
                         </div>
                     </div>
@@ -869,6 +909,11 @@ $(document).ready(function()
             else
                 pasta = "# Imóvel: "+full.IMB_IMV_ID + ' Pasta: '+pasta;
 
+            var nomepredio = full.IMB_IMV_PREDIO;
+            if( nomepredio === null || nomepredio=='')  
+                nomepredio =''
+            else
+                nomepredio ='('+nomepredio+')';
 
             var bonificacaovalor = full.IMB_CTR_VALORBONIFICACAO4;
             var bonificacaotipo = full.IMB_CTR_BONIFICACAOTIPO;
@@ -941,7 +986,7 @@ $(document).ready(function()
                 '   </div> '+
                 '   <div class="col-md-5 cardtitulo row-top-margin">'+
                 '       <div class="form-group">'+
-                '           <a href="javascript:alterarClienteIndexCtr('+full.IMB_CLT_IDLOCATARIO+')"<label>Locatário: '+full.IMB_CLT_NOMELOCATARIO+juridico+'</label></a>'+
+                '           <a href="javascript:alterarClienteIndexCtr('+full.IMB_CLT_IDLOCATARIO+')"<label>Locatário: '+full.IMB_CLT_NOMELOCATARIO+juridico+'</label></a> ('+nomepredio+')'+
                 '        </div> '+
                 '   </div> '+
                 '   <div class="col-md-2  row-top-margin">'+
@@ -986,7 +1031,7 @@ $(document).ready(function()
                 '<div class="row  p-5 bg-info text-white">'+
                 '   <div class="col-md-6 cardtitulo-font-med row-top-margin bg-info text-white">'+
                 '       <div class="form-group">'+
-                '           <label class="blue-12-bold bg-info text-white">'+condominio+bairro+'</label>'+
+                '           <label class="blue-12-bold bg-info text-white"><i>'+bairro+condominio+'</i></label>'+
                 '        </div> '+
                 '   </div> '+
                 '   <div class="col-md-6 cardtitulo-font-med row-top-margin bg-info text-white">'+
@@ -1061,15 +1106,14 @@ $(document).ready(function()
                 if( formafianca == 'D' ) formafianca =  'Dispensado';
                 if( formafianca == 'V' ) formafianca =  'Cartão Crédido';
                 if( formafianca == 'P' ) formafianca =  'Título Capitalização';
-                
-                                texto = texto +
-                '<div class="row  p-5 bg-info text-white">'+
-                '   <div class="p-5  col-md-6 cardtitulo row-top-margin bg-info text-white">'+
+                texto = texto +
+                '<div class="row bg-info text-white">'+
+                '   <div class=" col-md-6 cardtitulo row-top-margin bg-info text-white">'+
              
                 '           <label>Forma de Recebimento: <b>'+full.FORMAPAGLT+' ('+formarec+')</b></label>'+
       
                 '   </div> '+
-                '   <div class=" p-5  col-md-6 cardtitulo row-top-margin bg-info text-white">'+
+                '   <div class="  col-md-6 cardtitulo row-top-margin bg-info text-white">'+
              
                 '           <label >Forma de Fiança: '+formafianca+valorcaucao+seguroincendio+'   </label>'+
       
@@ -1077,7 +1121,7 @@ $(document).ready(function()
 
                 '</div>';
 
-                texto = texto + '<div class="row "><div class="p-5  cardtitulo-font-med row-top-margin bg-info text-white col-md-12"><hr></div></div>';
+                texto = texto + '<div class="row bg-info ">&nbsp;</div>';
 
                 texto = texto +
                 '<div class="row  p-5 bg-info text-white">'+

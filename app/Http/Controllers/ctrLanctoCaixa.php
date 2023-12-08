@@ -269,6 +269,10 @@ class ctrLanctoCaixa extends Controller
     {
 
         $lcx = mdlLanctoCaixa::find( $id );
+        if( $lcx->FIN_LC_CONCILIADO='S')
+        {
+            return  response()->json( 'Lancamento já conciliado!',404 );
+        }
         
         if( $lcx <> '')
         {

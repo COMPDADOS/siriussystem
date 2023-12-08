@@ -35,6 +35,7 @@ Route::get('/whatsapp/trocadas/index', function()
 Route::get('/testeofx', 'ctrTeste@ofx');
 Route::get('/jonfilecli', 'ctrTeste@lerJson');
 Route::get('/jonfileimv', 'ctrTeste@lerJsonImv');
+Route::get('/jonfilecontratos', 'ctrTeste@lerJsonContratos');
 
 Route::get('/testeb2', 'ctrTeste@banco2');
 Route::get('/testecss', 'ctrTeste@testeCss');
@@ -63,6 +64,7 @@ Route::get('/testevariavel', 'ctrTeste@variavel');
 
 
 Route::get('/portalcliente', 'ctrClienteAcesso@portal')->name('portalcliente');
+
 
 
 //parametrização
@@ -108,6 +110,8 @@ Route::post('/portais/imovel', 'ctrImovelPortal@store')->name('portalimovel.grav
 Route::get('/portais/imovel/carga/{id?}', 'ctrImovelPortal@carga')->name('portalimovel.carga');
 Route::post('/portais/imovel/apagar/{id?}', 'ctrImovelPortal@destroy')->name('portalimovel.apagar');
 Route::get('/portais/replicar/{id?}', 'ctrImovelPortal@replicarTodosImoveis')->name('portalimovel.replicarimoveis');
+Route::get('/portais/doimovel/{idimovel?}', 'ctrImovel@portaisdoImovel')->name('portais.portaisdoimovel');
+
 
 
 //ROTINAS AUXILIARES
@@ -678,6 +682,7 @@ Route::post('/capctr/apagar/{id?}', 'ctrCapCtr@destroy')->name('capctr.apagar');
 
 Route::post('/corctr/salvar', 'ctrCorCtr@store')->name('corctr.salvar');
 Route::get('/corCtr/carga/{id?}', 'ctrCorCtr@carga')->name('corctr.carga');
+Route::delete('/corCtr/apagar/{id?}', 'ctrCorCtr@destroy')->name('corctr.apagar');
 
 
 Route::get('/propimo/carga/{id?}', 'ctrPropImo@carga')->name('propimo.carga');
@@ -851,6 +856,8 @@ Route::get('/planilhadepositosindex', function()
 
 
 Route::get('/fluxocliente/{id?}', 'ctrRotinas@fluxoNegocioCliente')->name('fluxonegociocliente');
+Route::post('/recibolocatario/alterardatapag', 'ctrReciboLocatario@alterarDataPagto')->name('recibolocatario.alterardatapag');
+
 Route::post('/recibolocador/alterardatapag', 'ctrReciboLocador@alterarDataPagto')->name('recibolocador.alterardatapag');
 
 Route::get('/recibolocadorcontrole', 'ctrReciboLocadorControle@gerar')->name('recibolocadorcontrole.gerar');
@@ -941,6 +948,7 @@ Route::get('/representantes/apagar/{id?}', 'ctrClienteRepresentante@destroy')->n
 
 
 Route::get('/boletoperiodojson','ctrCobrancaGerada@cargaBoletosPeriodoJson')->name('boleto.periodo.email.json');
+Route::get('/boletoperiodojsonwhatsapp','ctrCobrancaGerada@cargaBoletosPeriodoJsonWhats')->name('boleto.periodo.whats.json');
 Route::get('/painelboletosenviadoscarga','ctrCobrancaGerada@painelBoletosEnviadosCarga')->name('boleto.painelenviadoscarga');
 Route::get('/painelboletosenviadosindex', function()
 {
@@ -1074,6 +1082,8 @@ Route::get('/chaves/show/{id?}', 'ctrSaidaChaves@show')->name('saidachaves.show'
 Route::post('/chaves/confirmarretorno', 'ctrSaidaChaves@confirmarRetorno')->name('saidachaves.confirmaretorno');
 
 
+Route::get('/propostas/nova/{idimovel?}', 'ctrPropostas@incluir')->name('proposta.nova');
+Route::get('/propostas/index', 'ctrPropostas@index')->name('propostas.index');
 
 
 

@@ -7,6 +7,7 @@
 <link href="{{asset('/global/plugins/select2/css/select2-bootstrap.min.css')}}" rel="stylesheet" type="text/css" />
 <script language="JavaScript" src="js/myscript.js?n=1"></script>
 <style>
+
     .border-05
     {
         border-width: 0px;
@@ -301,18 +302,9 @@
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>Tipo</label>
-                                                <select class="form-control" id="IMB_IMV_ENDERECOTIPO"
-                                                value="{{$dadosimovel->IMB_IMV_ENDERECOTIPO}}">
-                                                    <option value="Acesso">Acesso</option>
-                                                    <option value="Alameda">Alameda</option>
-                                                    <option value="Avenida">Avenida</option>
-                                                    <option value="Estrada">Estrada</option>
-                                                    <option value="Praça">Praça</option>
-                                                    <option value="Rodovia">Rodovia</option>
-                                                    <option value="Rua">Rua</option>
-                                                    <option value="Travessa">Travessa</option>
-                                                    <option value="Viela">Viela</option>
-                                                </select>
+                                                <input class="form-control" id="IMB_IMV_ENDERECOTIPO" type="text"
+                                                        value="{{$dadosimovel->IMB_IMV_ENDERECOTIPO}}">
+                                                
                                             </div>
                                         </div>
                                         <div class="col-md-4">

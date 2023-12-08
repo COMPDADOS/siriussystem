@@ -378,7 +378,28 @@ td.BoletoCodigoBanco {font-size: 6mm; font-family: arial, verdana; font-weight :
             <TD colspan=5  class="itens-left" >{{$item->IMB_LCF_OBSERVACAO}}</TD>
           </TR>
         @endforeach
+        @php
+          $param = app('App\Http\Controllers\ctrRotinas')->parametros( 1 );
+        @endphp
+         <TR>
+          <TD colspan=10  style='demonstrativo-center'>
+            <hr>
+          </TD>
+         </TR><TR>
+          <TD colspan=10  style='demonstrativo-center'>
+            <b><strong>ATENÇÃO</strong></b>
+          </TD>
+         </TR>
+         <TR>
+          <TD colspan=10  style='demonstrativo-center'>
+            <b>{{$param->IMB_PRM_MENSAGEMBOLETO}}</b>
+          </TD>
+        </TR>
       </TABLE>
+      
+  
+      
+    
   </div>
 
 
@@ -467,6 +488,7 @@ td.BoletoCodigoBanco {font-size: 6mm; font-family: arial, verdana; font-weight :
             {{$dadosboleto[ "instrucoes2" ]}}<br>
             {{$dadosboleto[ "instrucoes3" ]}}<br>
             {{$dadosboleto[ "instrucoes4" ]}}<br>
+            
         </TD>
         <TD class=BoletoValorDireito>&nbsp;</TD>
       </TR>

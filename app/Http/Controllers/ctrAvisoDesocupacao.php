@@ -45,7 +45,8 @@ class ctrAvisoDesocupacao extends Controller
 
             ]
         )
-        ->where('IMB_CONTRATOAVISODESOC.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID);
+        ->where('IMB_CONTRATOAVISODESOC.IMB_IMB_ID','=',Auth::user()->IMB_IMB_ID)
+        ->where('IMB_CTR_SITUACAO','=','ATIVO' );
 
         if( $datainicio <> '' )
             $avd->whereBetween('IMB_CONTRATOAVISODESOC.IMB_AVD_DATAPREVISAO', [$datainicio, $datafim]);

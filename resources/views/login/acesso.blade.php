@@ -58,7 +58,7 @@ License: You must have a valid license purchased only from themeforest(the above
                 <div class="col-md-6 bs-reset mt-login-5-bsfix">
                     <div class="login-bg" style="background-image:url({{ asset('/pages/img/login/bg1.jpg')}})">
                         <div class="text-right"> 
-                            <img class="login-logo" src="{{ asset('/pages/img/login/logo.png')}}" /> 
+                            <img class="login-logo" src="https://www.siriussystem.com.br/sys/assets/pages/img/logo.png" /> 
                         </div>
                     </div>
                 </div>

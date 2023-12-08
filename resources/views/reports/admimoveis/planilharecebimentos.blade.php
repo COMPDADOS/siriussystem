@@ -419,7 +419,7 @@
                 d.datainicio = $('input[name=inicio]').val();
                 d.datafim = $('input[name=termino]').val();
                 d.conta = $("#FIN_CCX_ID").val();
-                d.dimob = $("#i-dimob").prop('checked') ? 'S':'N';
+                d.dimob = $("#i-dimob").prop('checked') ? 'D':'N';
                 
             }
         },

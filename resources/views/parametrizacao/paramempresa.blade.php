@@ -399,40 +399,10 @@
     
     function apagar( id )
   {
-    if (confirm("Tem certeza que deseja inativar este condominio?")) 
+    if (confirm("Tem certeza que deseja inativar esta Empresa?")) 
     {
-      if ( id != '')
-      {
-        var url = "{{ route( 'condominio.apagar' )}}/"+id;
-
-        $.ajaxSetup({
-            headers:    
-            {
-            'X-CSRF-TOKEN': "{{csrf_token()}}"
-            }
-            });        
-
-        $.ajax(
-        {
-            url : url,
-            type: 'post',
-            datatype: 'json',
-            async:false,
-            success: function()
-            {
-                alert('Inativado!');
-                carga();
-                
-            },
-            error: function()
-            {
-                alert( 'erro ao inativar registro');
-            }
-
-        });
-      }
-      
-
+        alert('Não permitido!')
+  
     }
 
   }
@@ -692,7 +662,11 @@
             IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA : $("#IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA").prop( "checked" )   ? 'S' : 'N',
             IMB_PRM_REAJUSTARMESSEGUINTE : $("#IMB_PRM_REAJUSTARMESSEGUINTE").prop( "checked" )   ? 'S' : 'N',
                         
+            IMB_PRM_RECIBOLTRETORNO : $("#IMB_PRM_RECIBOLTRETORNO").prop( "checked" )   ? 'S' : 'N',
+            IMB_PRM_RELREPASSEAGRUFORMA : $("#IMB_PRM_RELREPASSEAGRUFORMA").prop( "checked" )   ? 'S' : 'N',
 
+            
+            
             IMB_FORPAG_IDLOCADOR : $("#IMB_FORPAG_IDLOCADOR").val(),
             FIN_CCX_ID_PADRAO_REP : $("#FIN_CCX_ID_PADRAO_REP").val(),
 
@@ -891,8 +865,10 @@
                     $("#IMB_PRM_DEMONSTRATIVOPDF").prop( 'checked',(data.IMB_PRM_DEMONSTRATIVOPDF == 'S') );
                     $("#IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA").prop( 'checked',(data.IMB_PRM_ENVIARBOLETOENTRADACONFIRMADA == 'S') );
                     $("#IMB_PRM_REAJUSTARMESSEGUINTE").prop( 'checked',(data.IMB_PRM_REAJUSTARMESSEGUINTE == 'S') );
-                                        
-                    
+                    $("#IMB_PRM_RECIBOLTRETORNO").prop( 'checked',(data.IMB_PRM_RECIBOLTRETORNO == 'S') );
+                    $("#IMB_PRM_RELREPASSEAGRUFORMA").prop( 'checked',(data.IMB_PRM_RELREPASSEAGRUFORMA == 'S') );
+                                                            
+                        
                             
                 },
                 error:function()

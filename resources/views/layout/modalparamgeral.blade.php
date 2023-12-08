@@ -56,6 +56,14 @@
                                 
                                 
                             </div>
+                            <div class="row">
+                                <div class="col-md-6 div-center dark-soft-plus">
+                                    <label class="control-label">Relatório Previsão de Repasse Agrupar Forma de Pagto</label>
+                                    <input type="checkbox" class="form-control" id="IMB_PRM_RELREPASSEAGRUFORMA">
+                                </div>
+                            
+                                
+                            </div>
 
                         </div>
                     </div>

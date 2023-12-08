@@ -53,10 +53,12 @@
                                     $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'Imovel', 'Imóveis(Acessar/Incluir/alterar/excluir)', 'CRM', 'Imóveis','S', 'A', 'Botão')
                                 @endphp
 
-                                <div class="col-md-2 {{$acesso}}">
-                                    <button type="button" class="btn btn-success" onClick="imovelAlterar()">Alterar
-                                        <i class="glyphicon glyphicon-edit" ></i>
-                                    </button>
+                                <div class="col-md-2 {{$acesso}} div-center">
+                                    <h4>Alterar dados</h4>
+                                    <a href="javascript:imovelAlterar()">
+                                        <i class="glyphicon glyphicon-edit fa-2x" ></i>
+                                    </a>
+                                    
                                 </div>
                                 
                                 @php  
@@ -73,6 +75,14 @@
                                 <div class="col-md-2 {{$acesso}}">
                                     <button type="button" class="btn btn-light" onClick="fichaImovel()">Ficha do Imóvel
                                         <i class="glyphicon glyphicon glyphicon-print" ></i>
+                                        </button>
+                                </div>
+                                @php  
+                                    $acesso = app( 'App\Http\Controllers\ctrRotinas')->verificarRecurso( 'ImovelProposta', 'Cadastrar Proposta para o Imóvel', 'CRM', 'Imóveis','S', 'X', 'Botão')
+                                @endphp
+                                <div class="col-md-2 {{$acesso}}">
+                                    <button type="button" class="btn btn-green" onClick="proposta()" style="background-color:green;color:white">Nova Proposta
+                                        <i class="fa fa-money " aria-hidden="true" style="color:black"></i>
                                         </button>
                                 </div>
                             </div>
@@ -1196,6 +1206,14 @@ function mostrarImovelModal( id )
                 }
             });
         }
+
+    function proposta()
+    {
+        var id = $("#i-codigo-imovel").val();
+        var url = "{{route('proposta.nova')}}/"+id;
+        window.open( url, '_blank');
+        
+    }
 
 
     

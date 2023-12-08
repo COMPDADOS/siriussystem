@@ -143,6 +143,7 @@ border-top:3px dotted black;
         @php
             $param = app( 'App\Http\Controllers\ctrParametrizacao')->pegarParametrosTodos( Auth::user()->IMB_IMB_ID );
             $repassar = $param->IMB_PRM_REPASSENORECTO;
+            $imprimirreclt = $param->IMB_PRM_RECIBOLTRETORNO;
         @endphp
         <div class="caption font-blue">
             <span class="caption-subject bold uppercase"> * Prévia para Baixa de Títulos Bancários *</span>
@@ -563,11 +564,17 @@ border-top:3px dotted black;
             complete:function(data)
             {
 
-                if (confirm("Baixado! Deseja imprimir o recibo?") == true) 
+                var imprimirreclt = "{{$imprimirreclt}}";
+
+                if( imprimirreclt == 'S')
                 {
-                    window.open("{{route('recibolocatario.imprimir')}}/"+data+'/S ', '_blank');
+                    if (confirm("Baixado! Deseja imprimir o recibo?") == true) 
+                    {
+                        window.open("{{route('recibolocatario.imprimir')}}/"+data+'/S ', '_blank');
+                    }
                 }
 
+                debugger;
                 var repassar = "{{$repassar}}";
                 if( repassar == 'S' )
                 {

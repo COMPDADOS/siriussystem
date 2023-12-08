@@ -75,6 +75,7 @@
     }
 
 </style>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.css"/>  
 @endsection
 
 @section('content')
@@ -127,6 +128,13 @@
                             <input type="date" class="form-control" name="termino" placeholder="Data Final" id="i-termino">
                         </div>
                     </div>
+                    <div class="col-md-12 div-center">
+                        <select id="i-dimob" class="form-control">
+                            <option value="D" selected>Somente Dimob</option>
+                            <option value="T">Todos</option>
+                        </select>
+                    </div>
+    
                     <div class="div-center" >
                         <label id="i-total"></label>
                     </div>
@@ -161,6 +169,7 @@
                         <th style="width: 6px">Pasta</th>
                         <th style="width: 100px">Endereço</th>
                         <th style="width: 100px">Locador</th>
+                        <th style="width: 100px">CPF Locador</th>
                         <th style="width: 100px">Locatário</th>
                         <th style="width: 50px">Recibo</th>
                         <th style="width: 50px">Dt. Vencto.</th>
@@ -177,6 +186,31 @@
                         <th style="width: 50px">$ Outros</th>
                         <th style="width: 50px">$ Repassado</th>
                     </thead>
+                    <tfoot>
+                        <tr>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                            <th class="td-direita"></th>
+                        </tr>
+                    </tfoot>
+
                 </table>
             </div>
         </div>
@@ -200,6 +234,7 @@
 <script type="text/javascript" src="{{asset('/js/i18n/jquery-ui-timepicker-addon-i18n.min.js')}}"></script>
 <script src="{{asset('/global/plugins/select2/js/select2.full.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('/pages/scripts/components-select2.min.js')}}" type="text/javascript"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.20/api/sum().js"></script>
 
 <script>
 
@@ -296,11 +331,14 @@
 
     var table = $('#resultTable').DataTable(
     {
-        "pageLength": 50,
-        buttons: [
-        'excel',
-        'print'
+        "pageLength": -1,
+        dom: 'Blfrtip',
+        buttons: 
+        [
+            'excel',
+            'print'
         ],
+
         "language":
         {
             "sEmptyTable": "Nenhum registro encontrado",
@@ -336,14 +374,34 @@
                 d.datafim = $('input[name=termino]').val();
                 d.IMB_CLT_ID = $('#i-locadores').val();
                 d.tipo = $("#i-tipo").val();
+                d.dimob = $("#i-dimob").val();
             }
         },
+        "drawCallback":function()
+        {
+            //alert("La tabla se está recargando"); 
+            var api = this.api();
+            taxaadm = api.column(11, {page:'current'}).data().sum();
+            taxaadm = taxaadm.toFixed(2);
+            taxaadm = formatarValor( taxaadm );
+
+            var api = this.api();
+            taxacon = api.column(12, {page:'current'}).data().sum();
+            taxacon = taxacon.toFixed(2);
+            taxacon = formatarValor( taxacon );
+
+            $(api.column(11).footer()).html('<div class="td-direita">'+taxaadm+'</div>')
+            $(api.column(12).footer()).html('<div class="td-direita">'+taxacon+'</div>')
+
+        },
+
         columns:
         [
             {data: 'IMB_IMV_ID'},
             {data: 'IMB_CTR_REFERENCIA'},
             {data: 'ENDERECOIMOVEL'},
             {data: 'NOMELOCADOR'},
+            {data: 'CPFLOCADOR'},
             {data: 'NOMELOCATARIO'},
             {data: 'IMB_RLD_NUMERO', render:recibo},
             {data: 'IMB_RLD_DATAVENCIMENTO', render:formatarData },

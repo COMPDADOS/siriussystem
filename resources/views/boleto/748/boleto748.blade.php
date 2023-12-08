@@ -460,11 +460,17 @@ td.BoletoCodigoBanco {font-size: 6mm; font-family: arial, verdana; font-weight :
         <TD class=BoletoTituloDireito>(-) Desconto</TD>
       </TR>
       <TR>
+        @php
+          $param = app('App\Http\Controllers\ctrRotinas')->parametros( 1);
+        @endphp
         <TD colspan=10 rowspan=9 class=BoletoValorEsquerdo style='text-align: left; vertical-align:top; padding-left : 0.1cm'>
             {{$dadosboleto[ "instrucoes1" ]}}<br>
             {{$dadosboleto[ "instrucoes2" ]}}<br>
             {{$dadosboleto[ "instrucoes3" ]}}<br>
             {{$dadosboleto[ "instrucoes4" ]}}<br>
+            <br>
+            {{$param->IMB_PRM_MENSAGEMBOLETO}}
+            
         </TD>
         <TD class=BoletoValorDireito>&nbsp;</TD>
       </TR>

@@ -56,6 +56,8 @@
 @section('content')
 
 @include( 'layout.cabecalhocontrato')
+@include(' layout.modaldata')
+
 
 
 <div class="portlet box blue " id="div-geral">
@@ -98,6 +100,7 @@
                         
               <tr class="{{$classe}}">
                 <td style="text-align:center" valign="center">
+                  <a title="Alterar data de Recebimento" href="javascript:alterarDataRecebimento({{$registro->IMB_RLT_NUMERO}})" class="btn btn-sm btn-warning"><span class="fa fa-pencil"></span></a> 
                 <a href="javascript:cargaHistDet({{$registro->IMB_RLT_NUMERO}})" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-zoom-in"></span></a> 
                 <a href="javascript:verRecibo({{$registro->IMB_RLT_NUMERO}})" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-print"></span></a> 
                   <a title="Estornar o recibo" href="javascript:estornarRecibo({{$registro->IMB_RLT_NUMERO}})" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span></a> 
@@ -263,6 +266,13 @@
 
     }
   
+    function alterarDataRecebimento( id )
+    {
+      $("#i-tipo-alteracao-data").val('recibolocatario');
+      $("#i-numero-recibo").val(id);
+      $("#modaldata").modal('show');
+
+    }
 
 
 </script>

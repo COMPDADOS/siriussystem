@@ -241,11 +241,11 @@ class ctrDocsAutomaticos extends Controller
 
         if( $nidavd <> 0 )
         {
-            $texto = str_replace( "**DATAPREVISAODESOCUPACAO**", $this->formatarData( $avd->IMB_AVD_DATAPREVISAO), $texto);
-            $texto = str_replace( "**MOTIVODESOCUPACAO**", $avd->IMB_AVD_RELATO, $texto);
-            $texto = str_replace( "**DESOCUPACAONOME**", $avd->IMB_AVD_NOME, $texto);
-            $texto = str_replace( "**DESOCUPACAOCPF**", $avd->IMB_AVD_CPF, $texto);
-            $texto = str_replace( "**DESOCUPACAORG**", $avd->IMB_AVD_RG, $texto);
+            $texto = str_replace( '${**DATAPREVISAODESOCUPACAO**}', $this->formatarData( $avd->IMB_AVD_DATAPREVISAO), $texto);
+            $texto = str_replace( '${**MOTIVODESOCUPACAO**}', $avd->IMB_AVD_RELATO, $texto);
+            $texto = str_replace( '${**DESOCUPACAONOME**}', $avd->IMB_AVD_NOME, $texto);
+            $texto = str_replace( '${**DESOCUPACAOCPF**}', $avd->IMB_AVD_CPF, $texto);
+            $texto = str_replace( '${**DESOCUPACAORG**}', $avd->IMB_AVD_RG, $texto);
         }
         $imovelgarantia='';
 
@@ -258,80 +258,80 @@ class ctrDocsAutomaticos extends Controller
             {
                 //Log:info( "LOCADOR PP-IMB_CLT_ID $pp->IMB_CLT_ID IMOVEL $idimovel");
                 $cont = $cont + 1;
-                $trocar = "**NOMELOCADOR_$cont**";
+                $trocar = '${**NOMELOCADOR_'.$cont.'**}';
                 $texto = str_replace( $trocar,
                  $this->pegarNomeCliente($pp->IMB_CLT_ID ), $texto);
 
                 $maisum='';
                 if( $cont > 1 ) $maisum = ', e ';
-                    $trocar = "**LOCADORDESCRITIVO_$cont**";
+                    $trocar = '${**LOCADORDESCRITIVO_'.$cont.'**}';
                 $texto = str_replace( $trocar,
                 $maisum.$this->descritivoCliente($pp->IMB_CLT_ID ), $texto);
             };
 
-            $texto = $this->limparNaoUsados( '**LOCADORDESCRITIVO_', $texto);
-            $texto = $this->limparNaoUsados( '**NOMELOCADOR_', $texto);
+            $texto = $this->limparNaoUsados( '${**LOCADORDESCRITIVO_', $texto);
+            $texto = $this->limparNaoUsados( '${**NOMELOCADOR_', $texto);
 
             if( $histrea <> '')
             {
                 $indice = mdlIndiceReajuste::find( $histrea->IMB_IRJ_ID);
 
                 $mesanoreajuste = app('App\Http\Controllers\ctrRotinas')->mesExtenso( $histrea->IMB_CHR_DATAREAJUSTE);
-                $texto = str_replace( "**MESANOREAJUSTE**", $mesanoreajuste, $texto);
+                $texto = str_replace( '${**MESANOREAJUSTE**}', $mesanoreajuste, $texto);
 
                 $indicereajuste = $indice->IMB_IRJ_NOME;
-                $texto = str_replace( "**INDICEREAJUSTE**", $indicereajuste, $texto);
+                $texto = str_replace( '${**INDICEREAJUSTE**}', $indicereajuste, $texto);
 
             }
             $enderecimovel = app('App\Http\Controllers\ctrRotinas')
             ->imovelEndereco( $idimovel );
-            $texto = str_replace( "**ENDERECOIMOVEL_1**",  $enderecimovel, $texto );
+            $texto = str_replace( '${**ENDERECOIMOVEL_1**}',  $enderecimovel, $texto );
           
 
-            $texto = str_replace( "**PROXVENCIMENTOLOCATARIO_1**",
+            $texto = str_replace( '${**PROXVENCIMENTOLOCATARIO_1**}',
                     $this->formatarData( $ctr->IMB_CTR_VENCIMENTOLOCATARIO ), $texto);
 
-                    $texto = str_replace( "**TIPOCONTRATO**",  $ctr->IMB_CTR_FINALIDADE, $texto );
+                    $texto = str_replace( '{**TIPOCONTRATO**}',  $ctr->IMB_CTR_FINALIDADE, $texto );
                                         
-            $texto = str_replace( "**BAIRROIMOVEL_1**", $imv->CEP_BAI_NOME, $texto);
-            $texto = str_replace( "**CIDADEIMOVEL_1**", $imv->IMB_IMV_CIDADE, $texto);
-            $texto = str_replace( "**UFDOIMOVEL_1**", '('.$imv->IMB_IMV_ESTADO.')', $texto);
-            $texto = str_replace( "**CEPIMOVEL_1**",$imv->IMB_IMV_ENDERECOCEP, $texto);
-            $texto = str_replace( "**DURACAOCONTRATO_1**",$ctr->IMB_CTR_DURACAO, $texto);
-            $texto = str_replace( "**DURACAOCONTRATOEXTENSO_1**",
+            $texto = str_replace( '${**BAIRROIMOVEL_1**}', $imv->CEP_BAI_NOME, $texto);
+            $texto = str_replace( '${**CIDADEIMOVEL_1**}', $imv->IMB_IMV_CIDADE, $texto);
+            $texto = str_replace( '${**UFDOIMOVEL_1**}', '('.$imv->IMB_IMV_ESTADO.')', $texto);
+            $texto = str_replace( '${**CEPIMOVEL_1**}',$imv->IMB_IMV_ENDERECOCEP, $texto);
+            $texto = str_replace( '${**DURACAOCONTRATO_1**}',$ctr->IMB_CTR_DURACAO, $texto);
+            $texto = str_replace( '${**DURACAOCONTRATOEXTENSO_1**}',
             app('App\Http\Controllers\ctrRotinas')
                         ->numeroextenso( intval($ctr->IMB_CTR_DURACAO) ), $texto);
-            $texto = str_replace( "**INICIOCONTRATO_1**",
+            $texto = str_replace( '${**INICIOCONTRATO_1**}',
                     $this->formatarData( $ctr->IMB_CTR_INICIO ), $texto);
-            $texto = str_replace( "**TERMINOCONTRATO_1**",
+            $texto = str_replace( '${**TERMINOCONTRATO_1**}',
                     $this->formatarData( $ctr->IMB_CTR_TERMINO ), $texto);
 
-            $texto = str_replace( "**TERMINOCONTRATOEXTENSO_1**",
+            $texto = str_replace( '${**TERMINOCONTRATOEXTENSO_1**}',
             app('App\Http\Controllers\ctrRotinas')
             ->dataExtenso( $ctr->IMB_CTR_TERMINO ), $texto);
 
 
-            $texto = str_replace( "**INICIOCONTRATOEXTENSO_1**",
+            $texto = str_replace( '${**INICIOCONTRATOEXTENSO_1**}',
                     app('App\Http\Controllers\ctrRotinas')
                     ->dataExtenso( $ctr->IMB_CTR_INICIO), $texto);
 
-            $texto = str_replace( "**VALORALUGUEL_1**",
+            $texto = str_replace( '${**VALORALUGUEL_1**}',
                     app('App\Http\Controllers\ctrRotinas')
                     ->formatarReal(  $ctr->IMB_CTR_VALORALUGUEL ), $texto);
 
-            $texto = str_replace( "**VALORALUGUELEXTENSO_1**",
+            $texto = str_replace( '${**VALORALUGUELEXTENSO_1**}',
                     app('App\Http\Controllers\ctrRotinas')
                     ->valorExtenso(  $ctr->IMB_CTR_VALORALUGUEL ), $texto);
 
 
-            $texto = str_replace( "**DIAVENCIMENTO_1**",
+            $texto = str_replace( '${**DIAVENCIMENTO_1**}',
                     str_pad( $ctr->IMB_CTR_DIAVENCIMENTO,2,'0' ), $texto);
 
-            $texto = str_replace( "**DIAVENCIMENTOEXTENSO_1**",
+            $texto = str_replace( '${**DIAVENCIMENTOEXTENSO_1**}',
                     app('App\Http\Controllers\ctrRotinas')
                     ->numeroextenso(  $ctr->IMB_CTR_DIAVENCIMENTO ), $texto);
 
-                    $texto = str_replace( "**INDICEREAJUSTE_1**",
+                    $texto = str_replace( '${**INDICEREAJUSTE_1**}',
                     app('App\Http\Controllers\ctrRotinas')
                     ->buscarIndiceReajuste(  $ctr->IMB_IRJ_ID ), $texto);
 
@@ -360,15 +360,15 @@ class ctrDocsAutomaticos extends Controller
 
                    $locatarioprincipal = $this->pegarNomeCliente($lt->IMB_CLT_ID );
                    
-                   $trocar = "**NOMELOCATARIOPRINCIPAL**";                   
+                   $trocar = '${**NOMELOCATARIOPRINCIPAL**}';                   
                    $texto = $texto = str_replace( $trocar,
                             $cliente->IMB_CLT_NOME, $texto );
                     
-                    $trocar = "**ENDERECOLOCATARIOPRINCIPAL**";                   
+                    $trocar = '${**ENDERECOLOCATARIOPRINCIPAL**}';                   
                     $texto = $texto = str_replace( $trocar,
                             $cliente->IMB_CLT_RESEND.', '.$lt->IMB_CLT_RESENDNUM, $texto);
                     
-                    $trocar = "**CPFLOCATARIOPRINCIPAL**";                   
+                    $trocar = '${**CPFLOCATARIOPRINCIPAL**}';                   
                     $texto = $texto = str_replace( $trocar,
                             $cliente->IMB_CLT_CPF, $texto);
          
@@ -380,17 +380,17 @@ class ctrDocsAutomaticos extends Controller
                 $maisum='';
                 if( $cont > 1 ) $maisum = ', e ';
 
-                $trocar = "**NOMELOCATARIO_$cont**";
+                $trocar = '${**NOMELOCATARIO_'.$cont.'**}';
                 $texto = str_replace( $trocar,
                  $this->pegarNomeCliente($lt->IMB_CLT_ID ), $texto);
-                $trocar = "**LOCATARIODESCRITIVO_$cont**";
+                $trocar = '${**LOCATARIODESCRITIVO_'.$cont.'**}';
                 $texto = str_replace( $trocar,
                 $maisum.$this->descritivoCliente($lt->IMB_CLT_ID ), $texto);
                 
 
             }
-            $texto = $this->limparNaoUsados( '**LOCATARIODESCRITIVO_', $texto);
-            $texto = $this->limparNaoUsados( '**NOMELOCATARIO_', $texto);
+            $texto = $this->limparNaoUsados( '${**LOCATARIODESCRITIVO_', $texto);
+            $texto = $this->limparNaoUsados( '${**NOMELOCATARIO_', $texto);
 
             $lctctr = mdlFiadorContrato::where( 'IMB_CTR_ID','=', $idcontrato )->get();
 
@@ -407,17 +407,17 @@ class ctrDocsAutomaticos extends Controller
                 $maisum='';
                 if( $cont > 1 ) $maisum = ', e ';
 
-                $trocar = "**ENDERECOFIADOR_$cont**";
+                $trocar = '${**ENDERECOFIADOR_'.$cont.'**}';
                 $texto = str_replace( $trocar, $cliente->IMB_CLT_RESEND.', '.$cliente->IMB_CLT_RESENDNUM.' '.$cliente->IMB_CLT_RESENDCOM.' - CEP: '.$cliente->IMB_CLT_RESENDCEP.' - '.$cliente->CEP_CID_NOME.'('.$cliente->CEP_UF_SIGLA.')', $texto);
 
-                $trocar = "**CPFFIADOR_$cont**";
+                $trocar = '${**CPFFIADOR_'.$cont.'**}';
                 $texto = str_replace( $trocar, $cliente->IMB_CLT_CPF, $texto);
 
-                $trocar = "**NOMEFIADOR_$cont**";
+                $trocar = '${**NOMEFIADOR_'.$cont.'**}';
                 $texto = str_replace( $trocar,$cliente->IMB_CLT_NOME , $texto);
 
 
-                $trocar = "**FIADORDESCRITIVO_$cont**";
+                $trocar = '${**FIADORDESCRITIVO_'.$cont.'**}';
                 $texto = str_replace( $trocar,
                 $maisum.$this->descritivoCliente($lt->IMB_CLT_ID ), $texto);
 
@@ -429,15 +429,15 @@ class ctrDocsAutomaticos extends Controller
             }
 
 
-            $texto = str_replace( "**IMOVEL_GARANTIA**", $imovelgarantia, $texto);
-            $texto = $this->limparNaoUsados( '**FIADORDESCRITIVO_', $texto);
-            $texto = $this->limparNaoUsados( '**NOMEFIADOR_', $texto);
+            $texto = str_replace( '${**IMOVEL_GARANTIA**}', $imovelgarantia, $texto);
+            $texto = $this->limparNaoUsados( '${**FIADORDESCRITIVO_', $texto);
+            $texto = $this->limparNaoUsados( '${**NOMEFIADOR_', $texto);
 
             //pgando informacoes do ultimo reajuste
             if( $histrea )
             {
-                $texto = str_replace( "**INDICE_REAJUSTE_PERCENTUAL**", number_format($histrea->IMB_CHR_FATOR,2,',','.').'%', $texto);
-                $texto = str_replace( "**DATA_ULTIMO_REAJUSTE**", $this->formatarData( $histrea->IMB_CHR_DATAREAJUSTE), $texto);
+                $texto = str_replace( '${**INDICE_REAJUSTE_PERCENTUAL**}', number_format($histrea->IMB_CHR_FATOR,2,',','.').'%', $texto);
+                $texto = str_replace( '${**DATA_ULTIMO_REAJUSTE**}', $this->formatarData( $histrea->IMB_CHR_DATAREAJUSTE), $texto);
 
             }
 
@@ -445,21 +445,21 @@ class ctrDocsAutomaticos extends Controller
             $ec = mdlEnderecoCobranca::find( $idcontrato);
             if( $ec <>  '' )
             {
-                $texto = str_replace( "**IMB_CTG_DESTINATARIO**", 
+                $texto = str_replace( '${**IMB_CTG_DESTINATARIO**}', 
                         $ec->IMB_CCB_DESTINATARIO, $texto);
 
-                $texto = str_replace( "**IMB_CTG_COBRANCAENDERECO**", 
+                $texto = str_replace( '${**IMB_CTG_COBRANCAENDERECO**}', 
                         $ec->IMB_CCB_ENDERECO.' '. 
                         $ec->IMB_CCB_ENDERECONUMERO.' '.
                         $ec->IMB_CCB_ENDERECOCOMPLEMENTO, $texto);
-                $texto = str_replace( "**IMB_CTG_COBRANCABAIRRO**", 
+                $texto = str_replace( '${**IMB_CTG_COBRANCABAIRRO**}', 
                         $ec->IMB_CCB_BAIRRO, $texto);
-                $texto = str_replace( "**IMB_CTG_COBRANCACEP**", 
+                $texto = str_replace( '{**IMB_CTG_COBRANCACEP**}', 
                         $ec->IMB_CCB_CEP, $texto);
 
-                $texto = str_replace( "**IMB_CTG_COBRANCACIDADE**", 
+                $texto = str_replace( '${**IMB_CTG_COBRANCACIDADE**}', 
                         $ec->CEP_CID_NOME, $texto);
-                $texto = str_replace( "**IMB_CTG_COBRANCAUF**", 
+                $texto = str_replace( '${**IMB_CTG_COBRANCAUF**}', 
                         $ec->CEP_UF_SIGLA, $texto);
 
 
@@ -469,26 +469,26 @@ class ctrDocsAutomaticos extends Controller
             {
                 if( $idimovel <> 0 )
                 {
-                    $texto = str_replace( "**IMB_CTG_COBRANCAENDERECO**",
+                    $texto = str_replace( '${**IMB_CTG_COBRANCAENDERECO**}',
                     app('App\Http\Controllers\ctrRotinas')
                         ->imovelEndereco( $idimovel ), $texto);
-                    $texto = str_replace( "**IMB_CTG_DESTINATARIO**", 
+                    $texto = str_replace( '${**IMB_CTG_DESTINATARIO**}', 
                         $locatarioprincipal, $texto);
             
-                    $texto = str_replace( "**IMB_CTG_COBRANCABAIRRO**", 
+                    $texto = str_replace( '${**IMB_CTG_COBRANCABAIRRO**}', 
                         $imv->CEP_BAI_NOME, $texto);
                     
-                    $texto = str_replace( "**IMB_CTG_COBRANCACEP**", 
+                    $texto = str_replace( '${**IMB_CTG_COBRANCACEP**}', 
                         $imv->IMB_IMV_ENDERECOCEP, $texto);
 
-                    $texto = str_replace( "**IMB_CTG_COBRANCACIDADE**", 
+                    $texto = str_replace( '${**IMB_CTG_COBRANCACIDADE**}', 
                         $imv->IMB_IMV_CIDADE, $texto);
-                    $texto = str_replace( "**IMB_CTG_COBRANCAUF**", 
+                    $texto = str_replace( '${**IMB_CTG_COBRANCAUF**}', 
                         $imv->IMB_IMV_ESTADO, $texto);
                 }
             }
 
-            $texto = str_replace( "**DATAATUAL**", 
+            $texto = str_replace( '${**DATAATUAL**}', 
             date('d/m/Y'), $texto);
 
             
