@@ -46,7 +46,11 @@ class ctrContratoSeguroIncendio extends Controller
                 'IMB_CLT_NOME AS SEGURADORA',
                 'IMB_SCT_VALORSEGURO',
                 'IMB_SCT_VALORCOBERTURA',
+                                
+                DB::Raw('( select PEGALOCADORPRINCIPALIMV( IMB_IMOVEIS.IMB_IMV_ID ) ) AS LOCADOR'),
+                DB::Raw('( select PEGACPFLOCADORPRINCIPALIMV( IMB_IMOVEIS.IMB_IMV_ID ) ) AS LOCADORCPF'),
                 DB::Raw('( select PEGALOCATARIOCONTRATO( IMB_CONTRATOSEGUROINCENDIO.IMB_CTR_ID ) ) AS LOCATARIO'),
+                DB::Raw('( select PEGACPFLOCATARIOCONTRATO( IMB_CONTRATOSEGUROINCENDIO.IMB_CTR_ID ) ) AS LOCATARIOCPF'),
                 'IMB_CTR_REFERENCIA',
                 DB::Raw('( select imovel( IMB_CONTRATO.IMB_IMV_ID ) ) AS ENDERECO'),
 

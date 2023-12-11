@@ -1165,7 +1165,6 @@ class ctrReciboLocador extends Controller
             number_format($totaltaxadm,2,",","."),
             number_format($totaltaxcon,2,",","."),
             number_format($totaliptu,2,",","."),
-            number_format($totalirrf,2,",","."),
             number_format($totalmulta,2,",","."),
             number_format($totaljuros,2,",","."),
             number_format($totalcorrecao,2,",","."),
@@ -1573,7 +1572,7 @@ class ctrReciboLocador extends Controller
  
 
                 if( $fp == '' ) 
-                    $nomeformapagamento = '**NÃO ENCONTRADO**' ;
+                    $nomeformapagamento = '-' ;
                 else 
                     $nomeformapagamento=$fp->IMB_FORPAG_NOME;
 

@@ -166,8 +166,12 @@
                     <button class="form-control btn btn-success" id='search-form' onClick="cargaResult()"> Processar</button>
                 </div>
                 <div class="col-md-1 div-center">
-                    <button class="form-control btn btn-dark" id='search-form' onClick="totalizarInad()"> Totalizar</button>
+                    <button class="form-control btn btn-dark" onClick="totalizarInad()"> Totalizar</button>
                 </div>
+                <div class="col-md-1 div-center">
+                  <button class="form-control btn btn-dark" onClick="imprimirAtrasados()"> Imprimir</button>
+                </div>
+
               </div>
               <div class="col-md-12">
                 <div class="col-md-2 div-center">
@@ -285,12 +289,6 @@
     var rows_selected = [];
     var table = $('#resultTable').DataTable(
     {
-      dom: 'Bfrtip',
-        buttons: [
-            'pageLength',
-            'print',
-            'excel'
-        ],
       "pageLength": -1,
       "language": 
       {
@@ -569,7 +567,27 @@ function alterarClienteIndexCtr( id )
             $("#form-alt-cliente-indexctr").submit();
         }
 
+function imprimirAtrasados()
+{
+  var garantidos = $("#i-garantidos").prop('checked') ? 'S' : 'N';
+  var ativos =  $("#i-ativos").prop('checked') ? 'S' : 'N';
+  var acordos =  $("#i-acordos").prop('checked') ? 'S' : 'N';
+  
+  var url = "{{ route('inadimplentes.calcular') }}?opcaovencimento="+$("#opcaovencimento").val()+
+  "&situacao="+$("#i-situacao").val()+
+  "&datainicio="+moment( $("#i-data-inicio").val()).format( 'DD/MM/YYYY')+
+  "&datafim="+moment( $("#i-data-fim").val()).format( 'DD/MM/YYYY')+
+  "&garantidos="+garantidos+
+  "&ativos="+ativos+
+  "&acordos"+acordos+
+  '&destino=relatorio';
+
+   window.open( url, '_blank');
+
+}
+
 </script>
+
 
 
 

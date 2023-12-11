@@ -162,6 +162,10 @@ border-top:3px dotted black;
                     </div>
 
                 </div>
+                <div class="col-md-1">
+                    <label class="control-label"> Formatar Real</label>
+                    <input type="checkbox" id="i-real">
+                </div>
                 <div class="form-actions noborder">
                     <button class="btn blue pull-right" id='search-form' >Pesquisar</button>
                 </div>
@@ -442,10 +446,14 @@ border-top:3px dotted black;
 
     function formatarValor( data )
     {
-        var valor = parseFloat( data );
-        console.log( valor );
-        
-        return '<div class="div-right font-15"><b>'+formatarBRSemSimbolo(valor)+'</b></div>';
+        if( $("#i-real").prop('checked') == true)
+        {
+            var valor = parseFloat( data );
+            console.log( valor );
+            return '<div class="div-right font-15"><b>'+formatarBRSemSimbolo(valor)+'</b></div>';
+        }
+        return '<div class="div-right font-15"><b>'+data+'</b></div>';
+
     }
 
 

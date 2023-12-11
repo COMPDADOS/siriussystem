@@ -93,7 +93,7 @@ class ctrCobrancaGerada extends Controller
         foreach( $contratos as $contrato)
         {
 
-            Log::info( 'entou');
+            //Log::info( 'entou');
 
 
             $idcontrato     = $contrato->IMB_CTR_ID;
@@ -197,7 +197,7 @@ class ctrCobrancaGerada extends Controller
         $intfim = intval($anofinal.$mesfinal.$diafinal );
         $intvencimento = intval(date( 'Ymd',$datavencimento));
 
-//        Log::info( "$intvencimento >= $intinicio" );
+//        //Log::info( "$intvencimento >= $intinicio" );
         //Log::info( "$intvencimento <= $intfim" );
 
         if(  $intvencimento >= $intinicio
@@ -255,6 +255,8 @@ class ctrCobrancaGerada extends Controller
        
         $ctr = mdlContrato::find( $idcontrato );
 
+        $cobrartarifa=$ctr->IMB_CTR_COBRARBOLETO;
+
         $locatario = app('App\Http\Controllers\ctrRotinas')
                     ->nomeLocatarioPrincipal( $idcontrato );
 
@@ -290,7 +292,7 @@ class ctrCobrancaGerada extends Controller
         //Log::info('IMOVEL: '.$endereco->IMB_CCB_ENDERECO);
         //Log::info('Locatario: '.$endereco->IMB_CCB_DESTINATARIO);
         
-//        Log::info( 'Locatario: '.$locatario );
+//        //Log::info( 'Locatario: '.$locatario );
 
        if( $locatario)
         {
@@ -366,6 +368,7 @@ class ctrCobrancaGerada extends Controller
 
                 foreach ( $lcfs as $lf )
                 {
+                    //Log::info("lf $lf->IMB_TBE_ID ");
                     if( $lf->IMB_TBE_ID == 1 )
                     $itemaluguel = $lf->IMB_LCF_VALOR;
                     $valorlcf = $lf->IMB_LCF_VALOR;
@@ -409,8 +412,8 @@ class ctrCobrancaGerada extends Controller
                     $item->save();
                 }
 
-                
-                if ( $tarifaBoleto <> 0 and $tarifaboletolancado  == 'N' )
+
+                if ( $tarifaBoleto <> 0 and $tarifaboletolancado  == 'N' and $cobrartarifa=='S')
                 {
                     $item                               = new mdlCobrancaGeradaItem;
                     $item->IMB_CGR_ID                   = $hd->IMB_CGR_ID;
@@ -1242,7 +1245,7 @@ class ctrCobrancaGerada extends Controller
             
             if( $dadosconta->FIN_CCI_BANCONUMERO == 77 )
             {
-                Log::info( 'vou acessar o 77');
+                //Log::info( 'vou acessar o 77');
                 $dados = app('App\Http\Controllers\ctrBoleto077')
                 ->lerRetorno400( $request->conta, $request->arquivo, $request->ocor, $request->nomeoriginal );
 
@@ -1426,7 +1429,7 @@ class ctrCobrancaGerada extends Controller
             //Log::info( 'TBE_ID: '.$c->IMB_TBE_ID.' - VALOR: '.$c->IMB_LCF_VALOR );
                 
             }
-        Log::info('total calculado  '.$totalCalculado );
+        //Log::info('total calculado  '.$totalCalculado );
 
 
 
@@ -1442,9 +1445,9 @@ class ctrCobrancaGerada extends Controller
 
 
         }
-        Log::info('total itens boleto  '.$totalitensboleto );
-        Log::info( 'strtotime($cgr->IMB_CGR_DATALIMITE): '.strtotime($cgr->IMB_CGR_DATALIMITE));
-        Log::info( 'strtotime(datapagamento): '.strtotime($datapagamento));
+        //Log::info('total itens boleto  '.$totalitensboleto );
+        //Log::info( 'strtotime($cgr->IMB_CGR_DATALIMITE): '.strtotime($cgr->IMB_CGR_DATALIMITE));
+        //Log::info( 'strtotime(datapagamento): '.strtotime($datapagamento));
         
         if( strtotime($cgr->IMB_CGR_DATALIMITE) >= strtotime($datapagamento) )
         {
@@ -1469,8 +1472,8 @@ class ctrCobrancaGerada extends Controller
                 $idtbe = $item->IMB_TBE_ID;
 
                 $idlocador = $item->IMB_CLT_IDLOCADOR;
-                Log::info('LT: '.$item->IMB_LCF_LOCATARIOCREDEB);
-                Log::info('LD: '.$item->IMB_LCF_LOCADOR );
+                //Log::info('LT: '.$item->IMB_LCF_LOCATARIOCREDEB);
+                //Log::info('LD: '.$item->IMB_LCF_LOCADOR );
 
                 $idlocatario = collect( DB::select("select PEGACODIGOLOCATARIOCONTRATO('$idcontrato') as id "))->first()->id;
                 $idimv      = $ctr->IMB_IMV_ID;
@@ -2504,6 +2507,9 @@ class ctrCobrancaGerada extends Controller
        
         $ctr = mdlContrato::find( $idcontrato );
 
+        $cobrartarifa=$ctr->IMB_CTR_COBRARBOLETO;
+
+
         $locatario = app('App\Http\Controllers\ctrRotinas')
                     ->nomeLocatarioPrincipal( $idcontrato );
 
@@ -2526,6 +2532,7 @@ class ctrCobrancaGerada extends Controller
 
         $tarifaBoleto = app('App\Http\Controllers\ctrRotinas')
         ->tarifaBoleto( $idcontrato, $vencimento );
+        //Log::info( " tarifaBoleto $tarifaBoleto");
 
         $datalimite = app('App\Http\Controllers\ctrRotinas')
         ->dataLimite( $idcontrato, $vencimento );
@@ -2615,6 +2622,8 @@ class ctrCobrancaGerada extends Controller
                     ->incideIRRF( $lf->IMB_TBE_ID, $lf->IMB_LCF_ID ) =='S' )
                     $objbases->baseirrf = $objbases->baseirrf + $valorlcf;
 
+                //Log::info('evento: '.$lf->IMB_TBE_ID);
+
                 $item                               = new mdlTmpPrevisaoRecebimentoDetail;
                 $item->IMB_CGR_ID                   = $hd->IMB_CGR_ID;
                 $item->IMB_LCF_ID                   = $lf->IMB_LCF_ID;
@@ -2631,7 +2640,9 @@ class ctrCobrancaGerada extends Controller
             }
 
                 
-            if ( $tarifaBoleto <> 0 and $tarifaboletolancado  == 'N' )
+            //Log::info( " tarifaboletolancado $tarifaboletolancado");
+
+            if ( $tarifaBoleto <> 0 and $tarifaboletolancado  == 'N' and  $cobrartarifa =='S')
             {
                 $item                               = new mdlTmpPrevisaoRecebimentoDetail;
                 $item->IMB_CGR_ID                   = $hd->IMB_CGR_ID;

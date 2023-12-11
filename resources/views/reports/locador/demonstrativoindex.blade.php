@@ -417,6 +417,14 @@ function cargaDemonstrativo( email)
                 }
             });
         }
+        else
+        {
+            var url = "{{route('recibolocador.demonstrativosnew')}}?IMB_CLT_ID="+
+                        "&datainicial="+$("#i-data-inicio").val()+
+                        "&datafinal="+$("#i-data-fim").val()+"&email=N"+
+                        "&IMB_IMV_ID="+$("#IMB_IMV_ID_DEMONST").val()+"&IMB_CTR_REFERENCIA="+$("#IMB_CTR_REFERENCIA_DEMONST").val();
+            window.open( url, '_blank');
+        }        
     
     }
     
@@ -425,12 +433,6 @@ function cargaDemonstrativo( email)
 }
 
 
-function gerarPDF()
-{
-    alert('Essa operação pode levar algum tempo para ser processada!');
-    window.open( "{{route('cobranca.pdfcobrancagerada')}}", "_blank");
-
-}
 function cargaLocadores()
 {
 

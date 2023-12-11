@@ -103,7 +103,7 @@
                 $idimovel='';
 
                 $vencimentolocatario ='';
-                if( $idcontrato<>'' )
+                if( $idcontrato<>'0' and  $idcontrato <> '' )
                 {
                     $contrato = app('App\Http\Controllers\ctrContrato')->findJson( $idcontrato );
                     $vencimentolocatario = $contrato->IMB_CTR_VENCIMENTOLOCATARIO;
@@ -164,14 +164,17 @@
                     <thead>
                         <th style="width: 25%">Seguradora</th>
                         <th style="width: 5%">Pasta</th>
-                        <th style="width: 25%">Imóvel</th>
+                        <th style="width: 20%">Imóvel</th>
                         <th style="width: 20%">Locatário</th>
+                        <th style="width: 5%">CPF Locatário</th>
+                        <th style="width: 20%">Locador</th>
+                        <th style="width: 5%">CPF Locador</th>
                         <th style="width: 10%">$ Seguro</th>
                         <th style="width: 10%">$ Cobertura</th>
                         <th style="width: 10%">Inicio Contrato</th>
                         <th style="width: 10%">Inicio Seguro</th>
                         <th style="width: 5%">Vencto. Seguro</th>
-                        <th width="15%">Ações</th>
+                        <th width="7%">Ações</th>
                     </thead>
                 </table>
             </div>
@@ -363,6 +366,12 @@
     console.log( url );
     var table = $('#resultTable').DataTable(
     {        
+        dom: 'Bfrtip',
+          buttons: [{
+            extend: 'excelHtml5',
+            title: 'Excel'
+        }],
+        
         "pageLength": -1,
         "language": 
         {
@@ -406,23 +415,24 @@
             {data: 'IMB_CTR_REFERENCIA'},
             {data: 'ENDERECO'},
             {data: 'LOCATARIO'},
+            {data: 'LOCATARIOCPF',render:mostrarcpf},
+            {data: 'LOCADOR'},
+            {data: 'LOCADORCPF',render:mostrarcpf},
             {data: 'IMB_SCT_VALORSEGURO', render:formatarValor},
             {data: 'IMB_SCT_VALORCOBERTURA', render:formatarValor},
-                        
             {data: 'IMB_CTR_INICIO', render: formatarDataInicioContrato },
             {data: 'IMB_CTR_VIGENCIAINICIO', render: formatarDataVigInicio},
             {data: 'IMB_CTR_VIGENCIATERMINO', render: formatarDataVigTermino},
         ],
 
-
         "columnDefs": 
         [ 
             {
-                "targets": 9,
+                "targets": 12,
                 "data": null,
                 "defaultContent": "<div style='text-align:center'>"+
-                "<button class='btn btn-primary glyphicon glyphicon-pencil pull-right alt-lcx'></button>"+
-                "<button class='btn btn-danger glyphicon glyphicon-trash pull-right del-lcx'></button>",                
+                "<button class='btn btn-primary btn-sm glyphicon glyphicon-pencil pull-right alt-lcx'></button>"+
+                "<button class='btn btn-danger btn-sm  glyphicon glyphicon-trash pull-right del-lcx'></button>",                
             },
         ],
         searching: false
@@ -886,6 +896,12 @@
           }
         });
         
+  }
+
+  function mostrarcpf( data )
+  {
+    var dado = "'"+data.toString()+"'";
+    return '<div>'+dado+'</div>';
   }
 
     

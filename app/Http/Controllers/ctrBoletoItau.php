@@ -268,7 +268,6 @@ class ctrBoletoItau extends Controller
                     {
                         if( $a <>'' and filter_var($a, FILTER_VALIDATE_EMAIL))
                         {
-                            Log::info( 'Enviando para: '.$a );
                             //$pdf=PDF::loadHtml( $html,'UTF-8');
                               //  $message->attachData($pdf->output(), $nossonumero_email.'.pdf');
 //                        $message->to( "suporte@compdados.com.br" );
@@ -279,7 +278,6 @@ class ctrBoletoItau extends Controller
                         ->gravarObs( $imovel_log, $contrato_log,0,0,0,'Boleto enviado para '.$a);
     
                     });
-                    Log::info( 'Enviado para: '.$a );
 
                     }
                     
@@ -549,6 +547,7 @@ class ctrBoletoItau extends Controller
         {
             // pega cada numero isoladamente
             $numeros[$i] = substr($num,$i-1,1);
+
             // Efetua multiplicacao do numero pelo falor
             $parcial[$i] = $numeros[$i] * $fator;
             // Soma dos digitos
@@ -864,6 +863,18 @@ class ctrBoletoItau extends Controller
             $nTotalFatVal   = 0;
             $nTitulos       = 0;
             $nSeqLote       =0;
+
+            //verificar se há negativos
+            foreach( $cgs as $cg )
+            {
+                if( $cg->IMB_CGR_VALOR < 0 )
+                {
+                    Log::info('Valor negativo: '.$cg->IMB_CGR_VALOR);
+                    return 'Valor negativo de cobrança encontrato';
+                }
+
+            }
+
 
             foreach( $cgs as $cg )
             {

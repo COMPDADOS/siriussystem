@@ -1950,6 +1950,7 @@ class ctrRotinas extends Controller
 
       $datainicio = $this->formatarData( $request->datainicio );
       $datafim = $this->formatarData( $request->datafim );
+      $destino = $request->destino;
     
       
 
@@ -2243,6 +2244,12 @@ class ctrRotinas extends Controller
       $headers = mdlTMPAtrasadoHeader::where( 'TMP_ATRASADOSHEADER.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID )
       ->where('TMP_ATRASADOSHEADER.IMB_ATD_ID','=', Auth::user()->IMB_ATD_ID )
       ->orderBy('TMP_ATRASADOSHEADER.IMB_CTR_VENCIMENTOLOCATARIO');
+
+      if( $destino == 'relatorio')
+      {
+         $headers = $headers->get();
+         return view( 'reports.admimoveis.relinadimplentes',compact('headers'));
+      }
 
       return DataTables::of($headers)->make(true);
 

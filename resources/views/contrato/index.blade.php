@@ -418,7 +418,6 @@ h4-center-17 {
             <input type="hidden" id="i-idtbesemseg" value="{{$param2->IMB_TBE_IDSEGINC}}">
             <input type="hidden" id="i-textsemseguro">
             <div class="form-body cor-fundo-pesquisa">
-                <input type="hidden" id="i-unidade" name="agencia">
 
                 <div class="row">
                     <div class="col-md-3 row-top-margin">
@@ -637,10 +636,6 @@ $(document).ready(function()
         //$('#js-select-unidade').select2();
     //});
 //    document.getElementById("myText").disabled = true;
-    $( "#js-select-unidade" ).change(function() {
-        var nUnidade = $('#js-select-unidade').val();
-        $("#i-unidade").val( nUnidade);
-    });
 
     $("#i-semseguro").change( function()
     {
@@ -715,7 +710,7 @@ $(document).ready(function()
                 d.condominio = $('input[name=condominio]').val();
                 d.cidade = $('input[name=cidade]').val();
                 d.proprietario = $('input[name=proprietario]').val();
-                d.agencia = $('input[name=agencia]').val();
+                d.agencia = $("#js-select-unidade").val();
                 d.situacao = $('input[name=situacao]').val();
                 d.locatario = $('input[name=locatario]').val();
                 d.advogado = $('input[name=IMB_CTR_ADVOGADO]').val();
@@ -995,7 +990,6 @@ $(document).ready(function()
                 '   </div> '+
                 '</div>';
 
-            //DIV DOS DADOS DO CONTRATO
             texto = texto +
             '<div class="divdados escondido " id = "i-div-'+full.IMB_CTR_ID+'">';
             

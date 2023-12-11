@@ -141,6 +141,13 @@ class ctrContrato extends Controller
             
             $contrato->where( 'IMB_IMOVEIS.IMB_IMB_ID','=', Auth::user()->IMB_IMB_ID );
 
+            if( $request->agencia <> '0' )
+            {
+                $cFiltrou = 'S';
+                $contrato->where('IMB_CONTRATO.IMB_IMB_ID2','=', $request->agencia );
+
+            }
+
             if(  $situacao == 'A' )
             {
                 $cFiltrou = 'S';
